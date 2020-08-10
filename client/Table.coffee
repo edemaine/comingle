@@ -23,11 +23,10 @@ export useLayoutModel = (tableId) ->
   setModel = (model) -> setState model.layout
   [model, setModel]
 
-export default Table = ->
-  {tableId} = useParams()
+export default Table = ({tableId}) ->
   table = useTracker -> Tables.findOne tableId
   [model, setModel] = useLayoutModel tableId
   <div className="table">
     <h1>{table?.title}</h1>
-    <FlexLayout.Layout model={model}/>
   </div>
+   #<FlexLayout.Layout model={model}/>
