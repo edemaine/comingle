@@ -6,7 +6,21 @@
     "visualize": "meteor --production --extra-packages bundle-visualizer"
   },
   "dependencies": {
-    "@babel/runtime": "^7.8.3",
-    "meteor-node-stubs": "^1.0.0"
+    "@babel/runtime": "^7.8.4",
+    "@popperjs/core": "^2.4.4",
+    "bootstrap": "^4.5.2",
+    "flexlayout-react": "^0.4.5",
+    "jquery": "^3.5.1",
+    "meteor-node-stubs": "^1.0.0",
+    "popper.js": "^1.16.1",
+    "pug": "^3.0.0",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  },
+  "meteor": {
+    "mainModule": {
+      "client": "client/main.coffee",
+      "server": "server/main.coffee"
+    }
   }
 }
