@@ -1,9 +1,10 @@
 import React from 'react'
-import {useParams} from 'react-router-dom'
+import {Switch, Route, useParams} from 'react-router-dom'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import TableList from './TableList'
 import TableNew from './TableNew'
+import Table from './Table'
 
 export default Room = ->
   {roomId} = useParams()
@@ -19,6 +20,15 @@ export default Room = ->
       <TableNew/>
     </div>
     <div className="col-sm">
-      Room
+      <Switch>
+        <Route path="/r/:roomId/t/:tableId">
+          <Table loading={loading}/>
+        </Route>
+        <Route>
+          <div className="jumbotron">
+            <h2>Choose a table on the left</h2>
+          </div>
+        </Route>
+      </Switch>
     </div>
   </div>

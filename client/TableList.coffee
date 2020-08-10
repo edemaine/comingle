@@ -1,5 +1,5 @@
 import React from 'react'
-import {useParams} from 'react-router-dom'
+import {Link, useParams} from 'react-router-dom'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {Tables} from '/lib/tables'
@@ -24,6 +24,7 @@ export default TableList = ({loading}) ->
     </div>
 
 export TableInfo = ({table}) ->
-  <a className="list-group-item list-group-item-action" href="#">
+  {roomId} = useParams()
+  <Link to="/r/#{roomId}/t/#{table._id}" className="list-group-item list-group-item-action">
     <span className="title">{table.title}</span>
-  </a>
+  </Link>
