@@ -79,8 +79,4 @@ export default Room = ->
   factory = (tab) ->
     switch tab.getComponent()
       when 'Table' then <Table loading={loading} tableId={tab.getId()}/>
-      when 'TableList' then <TableList loading={loading} onSelect={onSelect}/>
-  onSelect = (e) ->
-    e.preventDefault()
-    console.log e.target.href
   <FlexLayout.Layout model={model} factory={factory} onAction={onAction}/>
