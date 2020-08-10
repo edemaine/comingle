@@ -1,1 +1,18 @@
 @import "{}/node_modules/flexlayout-react/style/light.scss";
+
+// Override button placement
+.flexlayout__tab_button_trailing { margin-top: 0; }
+
+.flexlayout__tab_toolbar_button-min,
+.flexlayout__tab_toolbar_button-max {
+  display: none;
+}
+
+.flexlayout__tab_toolbar_button-fa {
+  background: transparent;
+  // @include toolbar_button;
+  width: 20px;
+  height: 20px;
+  border: none;
+  outline-width: 0;
+}
