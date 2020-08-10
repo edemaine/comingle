@@ -15,7 +15,8 @@
     "popper.js": "^1.16.1",
     "pug": "^3.0.0",
     "react": "^16.13.0",
-    "react-dom": "^16.13.0"
+    "react-dom": "^16.13.0",
+    "react-router-dom": "^5.2.0"
   },
   "meteor": {
     "mainModule": {

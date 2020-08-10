@@ -1,11 +1,14 @@
 import React, {useState} from 'react'
+import {useParams} from 'react-router-dom'
 
 export default TableNew = ->
+  {roomId} = useParams()
   [title, setTitle] = useState ''
   submit = (e) ->
     e.preventDefault()
     return unless title.trim().length
     Meteor.call 'tableNew',
+      room: roomId
       title: title.trim()
     setTitle ''
   <form onSubmit={submit}>

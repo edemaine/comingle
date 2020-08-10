@@ -1,2 +1,2 @@
-import '/lib/tables'
-import './tables'
+import '/lib/main.coffee'
+import './rooms'

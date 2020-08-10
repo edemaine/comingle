@@ -1,12 +1,14 @@
 import React from 'react'
+import {useParams} from 'react-router-dom'
 import {useTracker} from 'meteor/react-meteor-data'
+
 import {Tables} from '/lib/tables'
 
-export default TableList = ->
-  {tables, loading} = useTracker ->
-    sub = Meteor.subscribe 'tables'
-    loading: not sub.ready()
-    tables: Tables.find({}).fetch()
+export default TableList = ({loading}) ->
+  {roomId} = useParams()
+  tables = useTracker ->
+    Tables.find room: roomId
+    .fetch()
   if tables.length or loading
     <div className="list-group">
       {for table in tables
