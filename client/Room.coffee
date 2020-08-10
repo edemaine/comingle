@@ -11,36 +11,30 @@ import {validId} from '/lib/id'
 
 initModel = ->
   model = FlexLayout.Model.fromJson
-    global: {}
-    borders: []
+    global:
+      borderEnableDrop: false
+    borders: [
+      type: 'border'
+      location: 'left'
+      selected: 0
+      children: [
+        id: 'tablesTab'
+        type: 'tab'
+        name: 'Comingle Tables'
+        component: 'TableList'
+        enableClose: false
+        enableDrag: false
+      ]
+    ]
     layout:
       id: 'root'
       type: 'row'
       weight: 100
-      children: [
-        id: 'tablesTabSet'
-        type: 'tabset'
-        weight: 25
-        selected: 0
-        enableTabStrip: false
-        children: [
-          id: 'tablesTab'
-          type: 'tab'
-          name: 'Tables'
-          component: 'TableList'
-          enableClose: false
-        ]
-      ,
-        id: 'tableTabSet'
-        type: 'tabset'
-        weight: 75
-        selected: 0
-        children:
-          []
-      ]
+      children: []
   model.setOnAllowDrop (dragNode, dropInfo) ->
     return false if dropInfo.node.getId() == 'tablesTabSet' and dropInfo.location != FlexLayout.DockLocation.RIGHT
-    return false if dropInfo.node.getType() == 'border'
+    #return false if dropInfo.node.getType() == 'border'
+    #return false if dragNode.getParent()?.getType() == 'border'
     true
   model
 
@@ -72,7 +66,7 @@ export default Room = ->
             currentTabSet, FlexLayout.DockLocation.CENTER, -1
         else
           model.doAction FlexLayout.Actions.addNode tab,
-            'tablesTabSet', FlexLayout.DockLocation.RIGHT
+            'root', FlexLayout.DockLocation.RIGHT
           setCurrentTabSet model.getNodeById(id).getParent().getId()
       model.doAction FlexLayout.Actions.selectTab id
     undefined
