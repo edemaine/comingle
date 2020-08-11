@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useReducer} from 'react'
 import {useParams} from 'react-router-dom'
-import FlexLayout from 'flexlayout-react'
+import FlexLayout from './FlexLayout'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faTimes} from '@fortawesome/free-solid-svg-icons'
@@ -108,6 +108,5 @@ export default Table = ({loading, tableId}) ->
   <div className="table">
     <h1>{table?.title}</h1>
     <FlexLayout.Layout model={model} factory={factory}
-     closeIcon={<FontAwesomeIcon icon={faTimes}/>}
      onRenderTabSet={onRenderTabSet}/>
   </div>

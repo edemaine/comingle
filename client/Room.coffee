@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import {Switch, Route, useParams, useLocation} from 'react-router-dom'
-import FlexLayout from 'flexlayout-react'
+import FlexLayout from './FlexLayout'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTimes, faExpandArrowsAlt, faCompressArrowsAlt, faChair} from '@fortawesome/free-solid-svg-icons'
+import {faChair} from '@fortawesome/free-solid-svg-icons'
 
 import TableList from './TableList'
 import TableNew from './TableNew'
@@ -85,16 +85,5 @@ export default Room = ->
       when 'TableList' then <TableList loading={loading}/>
   iconFactory = (tab) ->
     <FontAwesomeIcon icon={faChair}/>
-  onRenderTabSet = (node, {buttons}) ->
-    return unless node.isEnableMaximize?()
-    maxed = node.isMaximized()
-    buttons.push \
-      <button key="minmax" className="flexlayout__tab_toolbar_button-fa"
-       title={if maxed then 'Unmaximize' else 'Maximize'}
-       onClick={-> model.doAction FlexLayout.Actions.maximizeToggle node.getId()}>
-        <FontAwesomeIcon icon={if maxed then faCompressArrowsAlt else faExpandArrowsAlt}/>
-      </button>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-   closeIcon={<FontAwesomeIcon icon={faTimes}/>}
-   onAction={onAction}
-   onRenderTabSet={onRenderTabSet}/>
+   onAction={onAction}/>
