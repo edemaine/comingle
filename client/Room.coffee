@@ -45,16 +45,17 @@ export default Room = ->
   [model, setModel] = useState initModel
   [currentTabSet, setCurrentTabSet] = useState null
   location = useLocation()
-  loading = useTracker ->
+  {loading, tables} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
-    tables = Tables.find()
-    model.visitNodes (node) ->
-      if node.getType() == 'tab' and node.getId() != 'tablesTab'
-        table = Tables.findOne node.getId()
-        if table?
-          model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
-            name: table.title
-    not sub.ready()
+    loading: not sub.ready()
+    tables: Tables.find().fetch()
+  useEffect ->
+    for table in tables
+      if model.getNodeById table._id
+        model.doAction FlexLayout.Actions.updateNodeAttributes table._id,
+          name: table.title
+    undefined
+  , [tables]
   useEffect ->
     if location.hash and validId id = location.hash[1..]
       unless model.getNodeById id

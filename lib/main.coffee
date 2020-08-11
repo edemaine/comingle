@@ -2,3 +2,4 @@
 
 import './rooms'
 import './tables'
+import './tabs'

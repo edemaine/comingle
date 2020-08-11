@@ -3,7 +3,7 @@ import {Meteor} from 'meteor/meteor'
 import {render} from 'react-dom'
 
 import App from './App'
-import '/lib/main.coffee'
+import '/lib/main'
 import './FlexLayout.scss'
 
 Meteor.startup ->

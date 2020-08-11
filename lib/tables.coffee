@@ -1,10 +1,10 @@
-import {validId} from './id.coffee'
-import {checkRoom} from './rooms.coffee'
+import {validId} from './id'
+import {checkRoom} from './rooms'
 
 export Tables = new Mongo.Collection 'tables'
 
 export checkTable = (table) ->
-  if validId(table) and data = Rooms.findOne table
+  if validId(table) and data = Tables.findOne table
     data
   else
     throw new Error "Invalid table ID #{table}"
