@@ -41,8 +41,7 @@ initModel = ->
       children: []
 
 tabTitle = (tab) ->
-  url = new URL tab.url
-  url.hostname
+  tab.title or 'Untitled'
 
 export default Table = ({loading, tableId}) ->
   {roomId} = useParams()

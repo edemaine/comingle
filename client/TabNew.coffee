@@ -1,13 +1,19 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {validURL} from '/lib/tabs'
 
 export default TabNew = ({tab, roomId, tableId, replaceTabNew}) ->
   [url, setUrl] = useState ''
+  [title, setTitle] = useState ''
+  [manualTitle, setManualTitle] = useState false
+  useEffect ->
+    if url and validURL(url) and not manualTitle
+      setTitle (new URL url).hostname
   onSubmit = (e) ->
     e.preventDefault()
     id = Meteor.apply 'tabNew', [
       room: roomId
       table: tableId
+      title: title
       type: 'iframe'
       url: url
     ], returnStubValue: true
@@ -18,6 +24,11 @@ export default TabNew = ({tab, roomId, tableId, replaceTabNew}) ->
       <label>URL for <code>&lt;iframe&gt;</code></label>
       <input type="url" placeholder="https://..." className="form-control"
        value={url} onChange={(e) -> setUrl e.target.value} required/>
+    </div>
+    <div className="form-group">
+      <label>Tab title</label>
+      <input type="text" placeholder="Cool Site" className="form-control"
+       value={title} onChange={(e) -> setTitle e.target.value; setManualTitle true} required/>
     </div>
     <div className="form-group">
       <button type="submit" className="btn btn-primary btn-block">

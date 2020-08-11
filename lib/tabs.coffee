@@ -22,6 +22,7 @@ Meteor.methods
       type: String
       room: String
       table: String
+      title: String
     switch tab?.type
       when 'iframe'
         Object.assign pattern,
