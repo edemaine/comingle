@@ -11,9 +11,9 @@ export Layout = (props) ->
   ref = useRef null
   onRenderTabSet = (node, renderState) ->
     {buttons} = renderState
-    buttons.push <span ref={ref}/>
+    buttons.push <span ref={ref} key="ref"/>
     setTimeout ->
-      if overflow = ref.current.parentNode.parentNode.querySelector '.flexlayout__tab_button_overflow'
+      if overflow = ref.current?.parentNode?.parentNode?.querySelector '.flexlayout__tab_button_overflow'
         svg = FontAwesomeSVG.icon(faWindowRestore).html[0]
         .replace /<svg/, '$& width="12px"'
         overflow.style.background = "no-repeat left url('data:image/svg+xml,#{svg}')"
