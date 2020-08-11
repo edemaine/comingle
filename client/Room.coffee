@@ -75,9 +75,18 @@ export default Room = ->
     undefined
   , [location]
   onAction = (action) ->
-    if action.type == FlexLayout.Actions.SET_ACTIVE_TABSET and
-       action.data.tabsetNode != 'tablesTabSet'
-      setCurrentTabSet action.data.tabsetNode
+    switch action.type
+      when FlexLayout.Actions.SET_ACTIVE_TABSET
+        ## TableList is now in border, no longer tabset
+        #unless action.data.tabsetNode == 'tablesTabSet'
+        setCurrentTabSet action.data.tabsetNode
+      when FlexLayout.Actions.RENAME_TAB
+        ## Sanitize table title and push to other users
+        action.data.text = action.data.text.trim()
+        return unless action.data.text  # prevent empty title
+        Meteor.call 'tableEdit',
+          id: action.data.node
+          title: action.data.text
     action
   factory = (tab) ->
     switch tab.getComponent()

@@ -73,6 +73,7 @@ export default Table = ({loading, tableId}) ->
         type: 'tab'
         name: tabTitle tab
         component: 'TabIFrame'
+        enableRename: true  # override TabNew
       if id of tabNews  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
           tabNews[id].getId(), tab
@@ -87,6 +88,7 @@ export default Table = ({loading, tableId}) ->
       type: 'tab'
       name: 'New Tab'
       component: 'TabNew'
+      enableRename: false
     , parent, FlexLayout.DockLocation.CENTER, -1
   ## Start new tab in empty table
   useEffect ->
@@ -105,8 +107,18 @@ export default Table = ({loading, tableId}) ->
        title="Add Tab" onClick={(e) -> tabNew node.getId()}>
         <FontAwesomeIcon icon={faPlus}/>
       </button>
+  onAction = (action) ->
+    switch action.type
+      when FlexLayout.Actions.RENAME_TAB
+        ## Sanitize tab title and push to other users
+        action.data.text = action.data.text.trim()
+        return unless action.data.text  # prevent empty title
+        Meteor.call 'tabEdit',
+          id: action.data.node
+          title: action.data.text
+    action
   <div className="table">
     <h1>{table?.title}</h1>
     <FlexLayout.Layout model={model} factory={factory}
-     onRenderTabSet={onRenderTabSet}/>
+     onRenderTabSet={onRenderTabSet} onAction={onAction}/>
   </div>

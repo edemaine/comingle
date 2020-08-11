@@ -13,7 +13,7 @@ export default TabNew = ({tab, roomId, tableId, replaceTabNew}) ->
     id = Meteor.apply 'tabNew', [
       room: roomId
       table: tableId
-      title: title
+      title: title.trim()
       type: 'iframe'
       url: url
     ], returnStubValue: true
@@ -28,7 +28,8 @@ export default TabNew = ({tab, roomId, tableId, replaceTabNew}) ->
     <div className="form-group">
       <label>Tab title</label>
       <input type="text" placeholder="Cool Site" className="form-control"
-       value={title} onChange={(e) -> setTitle e.target.value; setManualTitle true} required/>
+       value={title} required pattern=".*\S.*"
+       onChange={(e) -> setTitle e.target.value; setManualTitle true}/>
     </div>
     <div className="form-group">
       <button type="submit" className="btn btn-primary btn-block">

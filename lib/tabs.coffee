@@ -4,6 +4,12 @@ import {checkTable} from './tables'
 
 export Tabs = new Mongo.Collection 'tabs'
 
+export checkTab = (tab) ->
+  if validId(tab) and data = Tabs.findOne tab
+    data
+  else
+    throw new Error "Invalid tab ID #{tab}"
+
 export validURL = (url) ->
   return false unless typeof url == 'string'
   try
@@ -35,3 +41,14 @@ Meteor.methods
     if tab.room != table.room
       throw new Error "Room #{tab.room} doesn't match table #{tab.table}'s room #{table.room}"
     Tabs.insert tab
+  tabEdit: (diff) ->
+    check diff,
+      id: String
+      title: Match.Optional String
+    tab = checkTab diff.id
+    set = {}
+    for key, value of diff when key != 'id'
+      set[key] = value unless tab[key] == value
+    return unless (key for key of set).length  # nothing to update
+    Tabs.update diff.id,
+      $set: set
