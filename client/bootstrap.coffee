@@ -1,3 +1,3 @@
-import '@popperjs/core'
+import 'popper.js'
 import 'bootstrap'
 import './bootstrap.scss'
