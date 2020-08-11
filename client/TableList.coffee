@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Link, useParams} from 'react-router-dom'
+import {Link, useParams, useHistory} from 'react-router-dom'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {Tables} from '/lib/tables'
@@ -39,12 +39,16 @@ export TableInfo = ({table}) ->
 export TableNew = ->
   {roomId} = useParams()
   [title, setTitle] = useState ''
+  history = useHistory()
   submit = (e) ->
     e.preventDefault()
     return unless title.trim().length
     Meteor.call 'tableNew',
       room: roomId
       title: title.trim()
+    , (error, tableId) ->
+      return console.error error if error?
+      history.push "/r/#{roomId}##{tableId}"
     setTitle ''
   <form onSubmit={submit}>
     <div className="form-group"/>
