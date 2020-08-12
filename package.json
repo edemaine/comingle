@@ -12,7 +12,7 @@
     "@fortawesome/react-fontawesome": "^0.1.11",
     "@use-it/event-listener": "^0.1.5",
     "bootstrap": "^4.5.2",
-    "flexlayout-react": "^0.4.5",
+    "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#publish-src",
     "jquery": "^3.5.1",
     "meteor-node-stubs": "^1.0.0",
     "popper.js": "^1.16.1",
@@ -25,6 +25,11 @@
     "mainModule": {
       "client": "client/main.coffee",
       "server": "server/main.coffee"
+    },
+    "nodeModules": {
+      "recompile": {
+        "flexlayout-react": true
+      }
     }
   }
 }

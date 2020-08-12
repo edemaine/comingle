@@ -4,8 +4,8 @@ import FontAwesomeSVG from '@fortawesome/fontawesome-svg-core'
 import {faTimes, faExpandArrowsAlt, faCompressArrowsAlt, faWindowRestore} \
   from '@fortawesome/free-solid-svg-icons'
 
-export * from 'flexlayout-react'
-import {Layout as FlexLayout} from 'flexlayout-react'
+export * from './lib/FlexLayout'
+import {Layout as FlexLayout} from './lib/FlexLayout'
 
 export Layout = (props) ->
   ref = useRef null
