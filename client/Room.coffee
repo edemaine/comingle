@@ -1,15 +1,18 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {Switch, Route, useParams, useLocation} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faChair} from '@fortawesome/free-solid-svg-icons'
 
+import {AppSettings} from './App'
 import TableList from './TableList'
 import TableNew from './TableNew'
 import Table from './Table'
 import {Tables} from '/lib/tables'
+import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
+import usePresenceId from './lib/usePresenceId'
 
 initModel = ->
   model = FlexLayout.Model.fromJson
@@ -72,9 +75,38 @@ export default Room = ->
             'root', FlexLayout.DockLocation.RIGHT
           setCurrentTabSet model.getNodeById(id).getParent().getId()
       model.doAction FlexLayout.Actions.selectTab id
+      updatePresence()
     undefined
   , [location]
+  presenceId = usePresenceId()
+  {name} = useContext AppSettings
+  updatePresence = ->
+    presence =
+      id: presenceId
+      room: roomId
+      name: name
+      tables:
+        visible: []
+        invisible: []
+    model.visitNodes (node) ->
+      if node.getType() == FlexLayout.TabNode.TYPE and
+         node.getId() != 'tablesTab'
+        if node.getParent()?.getSelectedNode?() == node
+          presence.tables.visible.push node.getId()
+        else
+          presence.tables.invisible.push node.getId()
+    current = Presence.findOne
+      id: presenceId
+      room: roomId
+    unless current? and current.name == presence.name and
+           current?.tables?.visible?.toString?() ==
+           presence.tables.visible.toString() and
+           current?.tables?.invisible?.toString?() ==
+           presence.tables.invisible.toString()
+      Meteor.call 'presenceUpdate', presence
+  useEffect updatePresence, [name]
   onAction = (action) ->
+    setTimeout updatePresence, 0
     switch action.type
       when FlexLayout.Actions.SET_ACTIVE_TABSET
         ## TableList is now in border, no longer tabset

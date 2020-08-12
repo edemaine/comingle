@@ -1,8 +1,17 @@
-## Based on https://usehooks.com/useLocalStorage/
+## Based on https://usehooks.com/useLocalStorage/ and
+## https://github.com/donavon/use-persisted-state/blob/develop/src/usePersistedState.js
 
 import {useState} from 'react'
+import useEventListener from '@use-it/event-listener'
 
-export default useLocalStorage = (key, initialValue) ->
+export default useLocalStorage = (key, initialValue, sync) ->
+  # Support raw initial value or function generating that value
+  initial = ->
+    if typeof initialValue == 'function'
+      initialValue()
+    else
+      initialValue
+
   # Pass initial state function to useState so logic is only executed once
   [storedValue, setStoredValue] = useState ->
     try
@@ -12,11 +21,11 @@ export default useLocalStorage = (key, initialValue) ->
       if item?
         JSON.parse item
       else
-        initialValue
+        initial()
     catch error
       # If error also return initialValue
       console.error error
-      initialValue
+      initial()
 
   # Return a wrapped version of useState's setter function that
   # persists the new value to localStorage.
@@ -30,5 +39,11 @@ export default useLocalStorage = (key, initialValue) ->
       window.localStorage.setItem key, JSON.stringify value
     catch error
       console.error error
+
+  # If requested to sync across tabs/windows, monitor for storage event.
+  if sync
+    useEventListener 'storage', (e) ->
+      if e.key == key
+        setStoredValue JSON.parse e.newValue
 
   [storedValue, setValue]

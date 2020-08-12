@@ -3,3 +3,4 @@
 import './rooms'
 import './tables'
 import './tabs'
+import './presence'
