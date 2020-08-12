@@ -1,0 +1,2 @@
+Icon based on FontAwesome's Solid Style "user" icon, CC-BY-4.0:
+https://fontawesome.com/icons/user?style=solid

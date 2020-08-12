@@ -3,6 +3,7 @@ import {Link, useParams, useHistory} from 'react-router-dom'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {Tables} from '/lib/tables'
+import Header from './Header'
 
 export default TableList = ({loading}) ->
   {roomId} = useParams()
@@ -10,9 +11,7 @@ export default TableList = ({loading}) ->
     Tables.find room: roomId
     .fetch()
   <div className="TableList">
-    <nav className="navbar navbar-light">
-      <span className="navbar-brand mb-0 h1">Comingle</span>
-    </nav>
+    <Header/>
     {if tables.length or loading
       <div className="list-group">
         {for table in tables
