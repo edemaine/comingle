@@ -20,8 +20,24 @@ export default TabIFrame = ({tabId}) ->
   tab = useTracker -> Tabs.findOne tabId
   return null unless tab
   {type, url} = tab
+
+  ## Force type if standard servers recognized
   type = 'cocreate' if /:\/\/cocreate.csail.mit.edu\b/.test url
   type = 'jitsi' if /:\/\/meet.jit.si\b/.test url
+
+  ## YouTube URL mangling into embed link, based on examples from
+  ## https://gist.github.com/rodrigoborgesdeoliveira/987683cfbfcc8d800192da1e73adc486
+  url = url.replace ///
+    ^ (?: http s? : )? \/\/
+    (?: youtu\.be \/ |
+      (?: www\. | m\. )? youtube (-nocookie)? .com
+      \/ (?: v\/ | vi\/ | e\/ | (?: watch )? \? (?: feature=[^&]* & )? v i? = )
+    )
+    ( [\w\-]+ ) [^]*
+  ///, (match, nocookie, video) ->
+    type = 'youtube'
+    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
+
   switch type
     when 'jitsi'
       ###
