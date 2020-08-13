@@ -11,4 +11,4 @@ export checkMeeting = (meeting) ->
 Meteor.methods
   meetingNew: (meeting) ->
     check meeting, {}
-    Meeting.insert meeting
+    Meetings.insert meeting
