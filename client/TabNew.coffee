@@ -51,10 +51,10 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
       url: url
     ], returnStubValue: true
     replaceTabNew {id, tab}
-  <div class="card">
-    <div class="card-body">
-      <h3 class="card-title">Add New Shared Tab to Room</h3>
-      <p class="card-text">Create widget using one of the buttons, or just enter a URL
+  <div className="card">
+    <div className="card-body">
+      <h3 className="card-title">Add New Shared Tab to Room</h3>
+      <p className="card-text">Create widget using one of the buttons, or just enter a URL
          for any embeddable website below. Then click Create New Tab.</p>
       <div className="card form-group">
         <div className="card-header">
