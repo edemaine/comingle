@@ -15,17 +15,20 @@ tabMakerSets =
         response = await fetch url
         json = await response.json()
         @setUrl json.url
+        @setType 'cocreate'
   "Video Conference":
     "Jitsi Meet":
       Server: "https://meet.jit.si"
       onClick: ->
         @setUrl "#{trimUrl @states.Server[0]}/comingle/#{Random.id()}"
+        @setType 'jitsi'
 
 initialTabMakerSet = (key for key of tabMakerSets)[0]
 
 export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
   [url, setUrl] = useState ''
   [title, setTitle] = useState ''
+  [type, setType] = useState 'iframe'
   [manualTitle, setManualTitle] = useState false
   [tabMakerSet, setTabMakerSetRaw] = useState initialTabMakerSet
   setTabMakerSet = (value) ->
@@ -47,7 +50,7 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
       meeting: meetingId
       room: roomId
       title: title.trim()
-      type: 'iframe'
+      type: type
       url: url
     ], returnStubValue: true
     replaceTabNew {id, tab}
@@ -81,7 +84,9 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
               <button type="submit" className="btn btn-info"
                onClick={(e) -> properties.onClick.call
                   states: tabMakerStates[tabMakerSet][tabMaker]
-                  setUrl: setUrl}>
+                  setUrl: setUrl
+                  setType: setType
+                  name: name}>
                 {tabMaker}
               </button>
               {for property, value of properties when not property.startsWith 'on'
@@ -102,7 +107,8 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
         <div className="form-group">
           <label>URL for webpage to embed (via <code>&lt;iframe&gt;</code>)</label>
           <input type="url" placeholder="https://..." className="form-control"
-           value={url} onChange={(e) -> setUrl e.target.value} required/>
+           value={url} required
+           onChange={(e) -> setUrl e.target.value; setType 'iframe'}/>
         </div>
         <div className="form-group">
           <label>Tab title (can be renamed later)</label>

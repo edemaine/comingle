@@ -30,7 +30,7 @@ Meteor.methods
       room: String
       title: String
     switch tab?.type
-      when 'iframe'
+      when 'iframe', 'cocreate', 'jitsi'
         Object.assign pattern,
           url: Match.Where checkURL
       else
