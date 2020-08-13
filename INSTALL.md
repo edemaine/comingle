@@ -15,7 +15,9 @@ Here is how to get a **local test server** running:
 3. **Run meteor:**
    * `cd comingle`
    * `meteor npm install`
-   * `meteor`
+   * `meteor --settings settings.json`
+   * (`meteor` is an alternative to the last command, but you'll get more
+     plain settings instead of the default.)
 
 Even a test server will be accessible from the rest of the Internet,
 on port 3000.
