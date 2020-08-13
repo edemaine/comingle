@@ -119,7 +119,6 @@ export default Room = ({loading, roomId}) ->
           title: action.data.text
     action
   <div className="room">
-    <h1>{room?.title}</h1>
     <FlexLayout.Layout model={model} factory={factory}
      onRenderTabSet={onRenderTabSet} onAction={onAction}/>
   </div>
