@@ -1,130 +1,124 @@
-import React, {useState, useEffect, useContext} from 'react'
-import {Switch, Route, useParams, useLocation} from 'react-router-dom'
+import React, {useState, useEffect, useReducer} from 'react'
+import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faChair} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faTimes} from '@fortawesome/free-solid-svg-icons'
 
-import {AppSettings} from './App'
-import TableList from './TableList'
-import TableNew from './TableNew'
-import Table from './Table'
-import {Tables} from '/lib/tables'
-import {Presence} from '/lib/presence'
-import {validId} from '/lib/id'
-import usePresenceId from './lib/usePresenceId'
+import {Rooms} from '/lib/rooms'
+import {Tabs} from '/lib/tabs'
+import useLocalStorage from './lib/useLocalStorage.coffee'
+import TabNew from './TabNew'
+import TabIFrame from './TabIFrame'
+
+###
+export useLayoutModel = (roomId) ->
+  [state, setState] = useLocalStorage "layout.#{roomId}", {}
+  model = FlexLayout.Model.fromJson
+    global:
+      enableEdgeDock: false
+      tabEnableRename: false
+      #tabEnableFloat: true
+      tabEnableClose: false
+    layout: state
+    borders: [
+      type: 'border'
+      location: 'bottom'
+      children: []
+    ]
+  setModel = (model) -> setState model.layout
+  [model, setModel]
+###
 
 initModel = ->
   model = FlexLayout.Model.fromJson
-    global:
-      borderEnableDrop: false
-    borders: [
-      type: 'border'
-      location: 'left'
-      selected: 0
-      children: [
-        id: 'tablesTab'
-        type: 'tab'
-        name: "Tables in Room"
-        component: 'TableList'
-        enableClose: false
-        enableDrag: false
-      ]
-    ]
+    global: {}
+    borders: []
     layout:
       id: 'root'
       type: 'row'
       weight: 100
       children: []
-  model.setOnAllowDrop (dragNode, dropInfo) ->
-    return false if dropInfo.node.getId() == 'tablesTabSet' and dropInfo.location != FlexLayout.DockLocation.RIGHT
-    #return false if dropInfo.node.getType() == 'border'
-    #return false if dragNode.getParent()?.getType() == 'border'
-    true
-  model
 
-export default Room = ->
-  {roomId} = useParams()
+tabTitle = (tab) ->
+  tab.title or 'Untitled'
+
+export default Room = ({loading, roomId}) ->
+  {meetingId} = useParams()
   [model, setModel] = useState initModel
-  [currentTabSet, setCurrentTabSet] = useState null
-  location = useLocation()
-  {loading, tables} = useTracker ->
+  [tabNews, replaceTabNew] = useReducer(
+    (state, {id, tab}) -> state[id] = tab; state
+  , {})
+  {loading, room, tabs} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
-    loading: not sub.ready()
-    tables: Tables.find().fetch()
+    tabs = Tabs.find(room: roomId).fetch()
+    loading: loading or not sub.ready()
+    room: Rooms.findOne roomId
+    tabs: tabs
   useEffect ->
-    for table in tables
-      if model.getNodeById table._id
-        model.doAction FlexLayout.Actions.updateNodeAttributes table._id,
-          name: table.title
-    undefined
-  , [tables]
-  useEffect ->
-    if location.hash and validId id = location.hash[1..]
-      unless model.getNodeById id
-        tab =
-          id: id
-          type: 'tab'
-          name: Tables.findOne(id)?.title ? id
-          component: 'Table'
-        if currentTabSet? and model.getNodeById currentTabSet
-          model.doAction FlexLayout.Actions.addNode tab,
-            currentTabSet, FlexLayout.DockLocation.CENTER, -1
-        else
-          model.doAction FlexLayout.Actions.addNode tab,
-            'root', FlexLayout.DockLocation.RIGHT
-          setCurrentTabSet model.getNodeById(id).getParent().getId()
-      model.doAction FlexLayout.Actions.selectTab id
-      updatePresence()
-    undefined
-  , [location]
-  presenceId = usePresenceId()
-  {name} = useContext AppSettings
-  updatePresence = ->
-    presence =
-      id: presenceId
-      room: roomId
-      name: name
-      tables:
-        visible: []
-        invisible: []
+    return if loading
+    id2tab = {}
+    id2tab[tab._id] = tab for tab in tabs
+    lastTabSet = null
     model.visitNodes (node) ->
-      if node.getType() == FlexLayout.TabNode.TYPE and
-         node.getId() != 'tablesTab'
-        if node.getParent()?.getSelectedNode?() == node
-          presence.tables.visible.push node.getId()
-        else
-          presence.tables.invisible.push node.getId()
-    current = Presence.findOne
-      id: presenceId
-      room: roomId
-    unless current? and current.name == presence.name and
-           current?.tables?.visible?.toString?() ==
-           presence.tables.visible.toString() and
-           current?.tables?.invisible?.toString?() ==
-           presence.tables.invisible.toString()
-      Meteor.call 'presenceUpdate', presence
-  useEffect updatePresence, [name]
+      if node.getType() == 'tab'
+        if tab = id2tab[node.getId()]
+          model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
+            name: tabTitle tab
+          delete id2tab[tab._id]
+      lastTabSet = node if node.getType() == 'tabset'
+    for id, tab of id2tab
+      tab =
+        id: tab._id
+        type: 'tab'
+        name: tabTitle tab
+        component: 'TabIFrame'
+        enableRename: true  # override TabNew
+      if id of tabNews  # replace TabNew
+        model.doAction FlexLayout.Actions.updateNodeAttributes \
+          tabNews[id].getId(), tab
+        delete tabNews[id]
+      else
+        model.doAction FlexLayout.Actions.addNode tab,
+          lastTabSet.getId(), FlexLayout.DockLocation.CENTER, -1
+    undefined
+  , [loading, tabs]
+  tabNew = (parent) ->
+    model.doAction FlexLayout.Actions.addNode
+      type: 'tab'
+      name: 'New Tab'
+      component: 'TabNew'
+      enableRename: false
+    , parent, FlexLayout.DockLocation.CENTER, -1
+  ## Start new tab in empty room
+  useEffect ->
+    unless loading or tabs.length
+      model.visitNodes (node) ->
+        if node.getType() == 'tabset' and node.getChildren().length == 0
+          tabNew node.getId()
+  , [loading, tabs.length]
+  factory = (tab) ->
+    switch tab.getComponent()
+      when 'TabNew' then <TabNew {...{tab, meetingId, roomId, replaceTabNew}}/>
+      when 'TabIFrame' then <TabIFrame tabId={tab.getId()}/>
+  onRenderTabSet = (node, {buttons}) ->
+    buttons.push \
+      <button key="add" className="flexlayout__tab_toolbar_button-fa"
+       title="Add Tab" onClick={(e) -> tabNew node.getId()}>
+        <FontAwesomeIcon icon={faPlus}/>
+      </button>
   onAction = (action) ->
-    setTimeout updatePresence, 0
     switch action.type
-      when FlexLayout.Actions.SET_ACTIVE_TABSET
-        ## TableList is now in border, no longer tabset
-        #unless action.data.tabsetNode == 'tablesTabSet'
-        setCurrentTabSet action.data.tabsetNode
       when FlexLayout.Actions.RENAME_TAB
-        ## Sanitize table title and push to other users
+        ## Sanitize tab title and push to other users
         action.data.text = action.data.text.trim()
         return unless action.data.text  # prevent empty title
-        Meteor.call 'tableEdit',
+        Meteor.call 'tabEdit',
           id: action.data.node
           title: action.data.text
     action
-  factory = (tab) ->
-    switch tab.getComponent()
-      when 'Table' then <Table loading={loading} tableId={tab.getId()}/>
-      when 'TableList' then <TableList loading={loading}/>
-  iconFactory = (tab) ->
-    <FontAwesomeIcon icon={faChair}/>
-  <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-   onAction={onAction}/>
+  <div className="room">
+    <h1>{room?.title}</h1>
+    <FlexLayout.Layout model={model} factory={factory}
+     onRenderTabSet={onRenderTabSet} onAction={onAction}/>
+  </div>

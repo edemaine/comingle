@@ -4,32 +4,32 @@ import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 
-import {Tables} from '/lib/tables'
+import {Rooms} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import Header from './Header'
 import Name from './Name'
 
-export default TableList = ({loading}) ->
-  {roomId} = useParams()
-  tables = useTracker -> Tables.find(room: roomId).fetch()
-  presences = useTracker -> Presence.find(room: roomId).fetch()
-  presenceByTable = {}
+export default RoomList = ({loading}) ->
+  {meetingId} = useParams()
+  rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
+  presences = useTracker -> Presence.find(meeting: meetingId).fetch()
+  presenceByRoom = {}
   for presence in presences
     for type in ['visible', 'invisible']
-      for table in presence.tables[type]
-        presenceByTable[table] ?= []
-        presenceByTable[table].push
+      for room in presence.rooms[type]
+        presenceByRoom[room] ?= []
+        presenceByRoom[room].push
           type: type
           name: presence.name
           id: presence.id
-  <div className="TableList">
+  <div className="RoomList">
     <Header/>
     <Name/>
-    {if tables.length or loading
+    {if rooms.length or loading
       <div className="list-group">
-        {for table in tables
-          <TableInfo key={table._id} table={table}
-           presence={presenceByTable[table._id]}/>
+        {for room in rooms
+          <RoomInfo key={room._id} room={room}
+           presence={presenceByRoom[room._id]}/>
         }
         {if loading
           <span>...loading...</span>
@@ -37,20 +37,20 @@ export default TableList = ({loading}) ->
       </div>
     else
       <div className="alert alert-warning" role="alert">
-        No tables in this room.
+        No rooms in this meeting.
       </div>
     }
-    <TableNew/>
+    <RoomNew/>
   </div>
 
-export TableInfo = ({table, presence}) ->
-  {roomId} = useParams()
-  <Link to="/r/#{roomId}##{table._id}" className="list-group-item list-group-item-action">
-    <span className="title">{table.title}</span>
+export RoomInfo = ({room, presence}) ->
+  {meetingId} = useParams()
+  <Link to="/m/#{meetingId}##{room._id}" className="list-group-item list-group-item-action">
+    <span className="title">{room.title}</span>
     {if presence?.length
-      <div className="presense">
+      <div className="presence">
         {for person in presence
-          <span key={person.id} className="presense-#{person.type}">
+          <span key={person.id} className="presence-#{person.type}">
             <FontAwesomeIcon icon={faUser} className="mr-1"/>
             {person.name}
           </span>
@@ -59,19 +59,19 @@ export TableInfo = ({table, presence}) ->
     }
   </Link>
 
-export TableNew = ->
-  {roomId} = useParams()
+export RoomNew = ->
+  {meetingId} = useParams()
   [title, setTitle] = useState ''
   history = useHistory()
   submit = (e) ->
     e.preventDefault()
     return unless title.trim().length
-    Meteor.call 'tableNew',
-      room: roomId
+    Meteor.call 'roomNew',
+      meeting: meetingId
       title: title.trim()
-    , (error, tableId) ->
+    , (error, roomId) ->
       return console.error error if error?
-      history.push "/r/#{roomId}##{tableId}"
+      history.push "/m/#{meetingId}##{roomId}"
     setTitle ''
   <form onSubmit={submit}>
     <div className="form-group"/>
@@ -79,7 +79,7 @@ export TableNew = ->
       <input type="text" placeholder="Title" className="form-control"
        value={title} onChange={(e) -> setTitle e.target.value}/>
       <button type="submit" className="btn btn-primary btn-block">
-        Create New Table
+        Create New Room
       </button>
     </div>
   </form>

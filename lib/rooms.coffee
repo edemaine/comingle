@@ -1,4 +1,5 @@
-import {validId} from './id.coffee'
+import {validId} from './id'
+import {checkMeeting} from './meetings'
 
 export Rooms = new Mongo.Collection 'rooms'
 
@@ -10,5 +11,19 @@ export checkRoom = (room) ->
 
 Meteor.methods
   roomNew: (room) ->
-    check room, {}
+    check room,
+      meeting: String
+      title: String
+    meeting = checkMeeting room.meeting
     Rooms.insert room
+  roomEdit: (diff) ->
+    check diff,
+      id: String
+      title: Match.Optional String
+    room = checkRoom diff.id
+    set = {}
+    for key, value of diff when key != 'id'
+      set[key] = value unless room[key] == value
+    return unless (key for key of set).length  # nothing to update
+    Rooms.update diff.id,
+      $set: set

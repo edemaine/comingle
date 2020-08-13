@@ -3,14 +3,14 @@ import {useHistory} from 'react-router-dom'
 
 export default FrontPage = ->
   history = useHistory()
-  newRoom = ->
-    Meteor.call 'roomNew', {}, (error, roomId) ->
+  newMeeting = ->
+    Meteor.call 'meetingNew', {}, (error, meetingId) ->
       if error?
-        return console.error "Room creation failed: #{error}"
-      history.push "/r/#{roomId}"
+        return console.error "Meeting creation failed: #{error}"
+      history.push "/m/#{meetingId}"
   <div className="jumbotron">
     <h1>Welcome to Comingle!</h1>
-    <button className="btn btn-primary btn-lg" onClick={newRoom}>
-      Create New Room
+    <button className="btn btn-primary btn-lg" onClick={newMeeting}>
+      Create New Meeting
     </button>
   </div>

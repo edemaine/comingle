@@ -3,7 +3,8 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import FrontPage from './FrontPage'
-import Room from './Room'
+import Meeting from './Meeting'
+import Redirect from './lib/Redirect'
 import useLocalStorage from './lib/useLocalStorage'
 
 export default App = ->
@@ -11,8 +12,12 @@ export default App = ->
   <AppSettings.Provider value={{name, setName}}>
     <Router>
       <Switch>
-        <Route path="/r/:roomId">
-          <Room/>
+        <Route path="/m/:meetingId">
+          <Meeting/>
+        </Route>
+        <Route path="/r/:meetingId">
+          {### Old-style URL (when meetings were called rooms) ###}
+          <Redirect replace={/^\/r\//} replacement={'/m/'}/>
         </Route>
         <Route path="/">
           <FrontPage/>

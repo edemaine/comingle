@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {validURL} from '/lib/tabs'
 
-export default TabNew = ({tab, roomId, tableId, replaceTabNew}) ->
+export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
   [url, setUrl] = useState ''
   [title, setTitle] = useState ''
   [manualTitle, setManualTitle] = useState false
@@ -11,8 +11,8 @@ export default TabNew = ({tab, roomId, tableId, replaceTabNew}) ->
   onSubmit = (e) ->
     e.preventDefault()
     id = Meteor.apply 'tabNew', [
+      meeting: meetingId
       room: roomId
-      table: tableId
       title: title.trim()
       type: 'iframe'
       url: url

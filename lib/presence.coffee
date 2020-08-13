@@ -1,5 +1,5 @@
 import {validId} from './id.coffee'
-import {checkRoom} from './rooms.coffee'
+import {checkMeeting} from './meetings.coffee'
 
 export Presence = new Mongo.Collection 'presence'
 
@@ -7,22 +7,22 @@ Meteor.methods
   presenceUpdate: (presence) ->
     check presence,
       id: Match.Where validId
-      room: Match.Where validId
+      meeting: Match.Where validId
       name: String
-      tables:
+      rooms:
         visible: [Match.Where validId]
         invisible: [Match.Where validId]
     unless @isSimulation
-      room = checkRoom presence.room
+      meeting = checkMeeting presence.meeting
     Presence.update
       id: presence.id
-      room: presence.room
+      meeting: presence.meeting
     ,
       $set:
         name: presence.name
-        tables: presence.tables
+        rooms: presence.rooms
       $setOnInsert:
         id: presence.id
-        room: presence.room
+        meeting: presence.meeting
     ,
       upsert: true

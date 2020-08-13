@@ -1,6 +1,6 @@
 import {validId} from './id'
+import {checkMeeting} from './meetings'
 import {checkRoom} from './rooms'
-import {checkTable} from './tables'
 
 export Tabs = new Mongo.Collection 'tabs'
 
@@ -26,8 +26,8 @@ Meteor.methods
   tabNew: (tab) ->
     pattern =
       type: String
+      meeting: String
       room: String
-      table: String
       title: String
     switch tab?.type
       when 'iframe'
@@ -36,10 +36,10 @@ Meteor.methods
       else
         throw new Error "Invalid tab type: #{tab?.type}"
     check tab, pattern
+    meeting = checkMeeting tab.meeting
     room = checkRoom tab.room
-    table = checkTable tab.table
-    if tab.room != table.room
-      throw new Error "Room #{tab.room} doesn't match table #{tab.table}'s room #{table.room}"
+    if tab.meeting != room.meeting
+      throw new Error "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
     Tabs.insert tab
   tabEdit: (diff) ->
     check diff,

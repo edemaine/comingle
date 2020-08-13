@@ -1,12 +1,6 @@
 import {checkId} from '/lib/id'
-import {Rooms} from '/lib/rooms'
-import {Tables} from '/lib/tables'
-import {Presence} from '/lib/presence'
+import {Tabs} from '/lib/tabs'
 
 Meteor.publish 'room', (roomId) ->
   checkId roomId
-  [
-    Rooms.find _id: roomId
-    Tables.find room: roomId
-    Presence.find room: roomId
-  ]
+  Tabs.find room: roomId
