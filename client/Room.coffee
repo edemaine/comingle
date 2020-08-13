@@ -74,6 +74,7 @@ export default Room = ({loading, roomId}) ->
         name: tabTitle tab
         component: 'TabIFrame'
         enableRename: true  # override TabNew
+        enableClose: false
       if id of tabNews  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
           tabNews[id].getId(), tab
