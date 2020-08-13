@@ -5,7 +5,7 @@ import {faTimes, faExpandArrowsAlt, faCompressArrowsAlt, faWindowRestore} \
   from '@fortawesome/free-solid-svg-icons'
 
 export * from './lib/FlexLayout'
-import {Layout as FlexLayout} from './lib/FlexLayout'
+import {Actions, Layout as FlexLayout} from './lib/FlexLayout'
 
 export Layout = (props) ->
   ref = useRef null
@@ -24,7 +24,7 @@ export Layout = (props) ->
     buttons.push \
       <button key="minmax" className="flexlayout__tab_toolbar_button-fa"
        title={if maxed then 'Unmaximize' else 'Maximize'}
-       onClick={-> model.doAction FlexLayout.Actions.maximizeToggle node.getId()}>
+       onClick={-> props.model.doAction Actions.maximizeToggle node.getId()}>
         <FontAwesomeIcon icon={if maxed then faCompressArrowsAlt else faExpandArrowsAlt}/>
       </button>
   <FlexLayout {...props}
