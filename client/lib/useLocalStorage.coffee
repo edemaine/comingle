@@ -4,7 +4,7 @@
 import {useState} from 'react'
 import useEventListener from '@use-it/event-listener'
 
-export default useLocalStorage = (key, initialValue, sync) ->
+export default useLocalStorage = (key, initialValue, sync, noUpdate) ->
   # Support raw initial value or function generating that value
   initial = ->
     if typeof initialValue == 'function'
@@ -24,7 +24,7 @@ export default useLocalStorage = (key, initialValue, sync) ->
         initial()
     catch error
       # If error also return initialValue
-      console.error error
+      console.warn error
       initial()
 
   # Return a wrapped version of useState's setter function that
@@ -34,7 +34,7 @@ export default useLocalStorage = (key, initialValue, sync) ->
       # Allow value to be a function so we have same API as useState
       value = value storedValue if value instanceof Function
       # Save state
-      setStoredValue value
+      setStoredValue value unless noUpdate
       # Save to local storage
       window.localStorage.setItem key, JSON.stringify value
     catch error

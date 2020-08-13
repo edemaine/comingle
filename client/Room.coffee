@@ -12,41 +12,12 @@ import Loading from './Loading.coffee'
 import TabNew from './TabNew'
 import TabIFrame from './TabIFrame'
 
-###
-export useLayoutModel = (roomId) ->
-  [state, setState] = useLocalStorage "layout.#{roomId}", {}
-  model = FlexLayout.Model.fromJson
-    global:
-      enableEdgeDock: false
-      tabEnableRename: false
-      #tabEnableFloat: true
-      tabEnableClose: false
-    layout: state
-    borders: [
-      type: 'border'
-      location: 'bottom'
-      children: []
-    ]
-  setModel = (model) -> setState model.layout
-  [model, setModel]
-###
-
-initModel = ->
-  model = FlexLayout.Model.fromJson
-    global: {}
-    borders: []
-    layout:
-      id: 'root'
-      type: 'row'
-      weight: 100
-      children: []
-
 tabTitle = (tab) ->
   tab.title or 'Untitled'
 
 export default Room = ({loading, roomId}) ->
   {meetingId} = useParams()
-  [model, setModel] = useState initModel
+  [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(
     (state, {id, tab}) -> state[id] = tab; state
   , {})
@@ -56,18 +27,35 @@ export default Room = ({loading, roomId}) ->
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
     tabs: tabs
+  [model, setModel] = useState()
+  ## Initialize model according to saved layout
   useEffect ->
-    return if loading
+    return if loading or model?
+    setModel FlexLayout.Model.fromJson
+      global: {}
+      borders: []
+      layout: layout
+  , [loading]
+  ## Synchronize model with room
+  useEffect ->
+    return unless model?
     id2tab = {}
     id2tab[tab._id] = tab for tab in tabs
     lastTabSet = null
+    actions = []  # don't modify model while traversing
     model.visitNodes (node) ->
       if node.getType() == 'tab'
         if tab = id2tab[node.getId()]
-          model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
+          ## Update tabs in both layout and room
+          actions.push FlexLayout.Actions.updateNodeAttributes node.getId(),
             name: tabTitle tab
           delete id2tab[tab._id]
+        else if node.getComponent() != 'TabNew'
+          ## Delete tabs in stored layout that are no longer in room
+          actions.push FlexLayout.Actions.deleteTab node.getId()
       lastTabSet = node if node.getType() == 'tabset'
+    model.doAction action for action in actions
+    ## Add tabs in room but not yet layout
     for id, tab of id2tab
       tab =
         id: tab._id
@@ -83,25 +71,24 @@ export default Room = ({loading, roomId}) ->
       else
         model.doAction FlexLayout.Actions.addNode tab,
           lastTabSet.getId(), FlexLayout.DockLocation.CENTER, -1
+    ## Start new tab in every empty tabset
+    model.visitNodes (node) ->
+      if node.getType() == 'tabset'
+        if node.getChildren().length == 0
+          tabNew node.getId()
     undefined
-  , [loading, tabs]
+  , [model, tabs]
+  ## End of hooks
+  if loading or not model?  # Post-loading, useEffect needs a tick to set model
+    return <Loading/>
   tabNew = (parent) ->
+    return unless model?
     model.doAction FlexLayout.Actions.addNode
       type: 'tab'
       name: 'New Tab'
       component: 'TabNew'
       enableRename: false
     , parent, FlexLayout.DockLocation.CENTER, -1
-  ## Start new tab in empty room
-  useEffect ->
-    unless loading or tabs.length
-      model.visitNodes (node) ->
-        if node.getType() == 'tabset' and node.getChildren().length == 0
-          tabNew node.getId()
-  , [loading, tabs.length]
-  ## End of hooks
-  if loading
-    return <Loading/>
   factory = (tab) ->
     switch tab.getComponent()
       when 'TabNew' then <TabNew {...{tab, meetingId, roomId, replaceTabNew}}/>
@@ -123,4 +110,5 @@ export default Room = ({loading, roomId}) ->
           title: action.data.text
     action
   <FlexLayout.Layout model={model} factory={factory}
-   onRenderTabSet={onRenderTabSet} onAction={onAction}/>
+   onRenderTabSet={onRenderTabSet} onAction={onAction}
+   onModelChange={-> setLayout model.toJson().layout}/>
