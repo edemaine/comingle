@@ -16,10 +16,17 @@ nav
   background-color: #e6e5e5
   padding: 3px 0
 
-.presence
-  font-size: small
-  > span
-    display: inline-block
-    margin-right: 1rem
-  > .presence-invisible
-    color: #aaa
+.room-info
+  &.room-info-visible
+    background-color: #007bff
+    color: #fff
+  &.room-info-invisible
+    background-color: #e9ecef
+
+  .presence
+    font-size: small
+    > span
+      display: inline-block
+      margin-right: 1rem
+    > .presence-invisible
+      color: #aaa

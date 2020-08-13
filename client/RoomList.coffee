@@ -9,6 +9,7 @@ import {Presence} from '/lib/presence'
 import Loading from './Loading'
 import Header from './Header'
 import Name from './Name'
+import usePresenceId from './lib/usePresenceId'
 
 export default RoomList = ({loading}) ->
   {meetingId} = useParams()
@@ -46,7 +47,9 @@ export default RoomList = ({loading}) ->
 
 export RoomInfo = ({room, presence}) ->
   {meetingId} = useParams()
-  <Link to="/m/#{meetingId}##{room._id}" className="list-group-item list-group-item-action">
+  myPresence = (presence?.find (p) -> p.id == usePresenceId())
+  myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
+  <Link to="/m/#{meetingId}##{room._id}" className="list-group-item list-group-item-action room-info #{myPresenceClass}">
     <span className="title">{room.title}</span>
     {if presence?.length
       <div className="presence">
