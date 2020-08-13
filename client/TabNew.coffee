@@ -1,21 +1,26 @@
 import React, {useState, useEffect} from 'react'
+import {Random} from 'meteor/random'
 
 import {validURL} from '/lib/tabs'
 import {AppSettings} from './App'
+
+trimUrl = (x) -> x.replace /\/+$/, ''
 
 tabMakerSets =
   Whiteboard:
     Cocreate:
       Server: "https://cocreate.csail.mit.edu"
       onClick: ->
-        url = @states.Server[0]
-        url += '/' unless url.endsWith '/'
-        url += 'api/roomNew?grid=1'
+        url = "#{trimUrl @states.Server[0]}/api/roomNew?grid=1"
         response = await fetch url
         json = await response.json()
         @setUrl json.url
-  #"Video Conference":
-  #  "Jitsi Meet": {}
+  "Video Conference":
+    "Jitsi Meet":
+      Server: "https://meet.jit.si"
+      onClick: ->
+        @setUrl "#{trimUrl @states.Server[0]}/comingle/#{Random.id()}"
+
 initialTabMakerSet = (key for key of tabMakerSets)[0]
 
 export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
@@ -72,7 +77,7 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
         {for tabMaker, properties of tabMakerSets[tabMakerSet]
           <form className="inline-form tabMaker d-flex flex-wrap"
            key={tabMaker} onSubmit={(e) -> e.preventDefault()}>
-            <button type="submit" className="btn btn-secondary"
+            <button type="submit" className="btn btn-info"
              onClick={(e) -> properties.onClick.call
                 states: tabMakerStates[tabMakerSet][tabMaker]
                 setUrl: setUrl}>
