@@ -6,6 +6,7 @@ import {faUser} from '@fortawesome/free-solid-svg-icons'
 
 import {Rooms} from '/lib/rooms'
 import {Presence} from '/lib/presence'
+import Loading from './Loading'
 import Header from './Header'
 import Name from './Name'
 
@@ -32,7 +33,7 @@ export default RoomList = ({loading}) ->
            presence={presenceByRoom[room._id]}/>
         }
         {if loading
-          <span>...loading...</span>
+          <Loading/>
         }
       </div>
     else

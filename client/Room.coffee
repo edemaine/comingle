@@ -8,6 +8,7 @@ import {faPlus, faTimes} from '@fortawesome/free-solid-svg-icons'
 import {Rooms} from '/lib/rooms'
 import {Tabs} from '/lib/tabs'
 import useLocalStorage from './lib/useLocalStorage.coffee'
+import Loading from './Loading.coffee'
 import TabNew from './TabNew'
 import TabIFrame from './TabIFrame'
 
@@ -98,6 +99,9 @@ export default Room = ({loading, roomId}) ->
         if node.getType() == 'tabset' and node.getChildren().length == 0
           tabNew node.getId()
   , [loading, tabs.length]
+  ## End of hooks
+  if loading
+    return <Loading/>
   factory = (tab) ->
     switch tab.getComponent()
       when 'TabNew' then <TabNew {...{tab, meetingId, roomId, replaceTabNew}}/>
@@ -118,7 +122,5 @@ export default Room = ({loading, roomId}) ->
           id: action.data.node
           title: action.data.text
     action
-  <div className="room">
-    <FlexLayout.Layout model={model} factory={factory}
-     onRenderTabSet={onRenderTabSet} onAction={onAction}/>
-  </div>
+  <FlexLayout.Layout model={model} factory={factory}
+   onRenderTabSet={onRenderTabSet} onAction={onAction}/>
