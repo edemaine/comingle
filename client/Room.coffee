@@ -98,8 +98,7 @@ export default Room = ({loading, roomId}) ->
           component: 'TabIFrame'
         <Loading/>
   onRenderTab = (node, {buttons}) ->
-    if node.getParent()?.getSelectedNode?() == node and
-       node.getComponent() != 'TabNew'
+    if node.isVisible() and node.getComponent() != 'TabNew'
       buttons.push \
         <div key="reload" className="flexlayout__tab_button_trailing"
          title="Reload Tab"

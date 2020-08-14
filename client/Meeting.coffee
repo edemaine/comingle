@@ -90,7 +90,7 @@ export default Meeting = ->
     model.visitNodes (node) ->
       if node.getType() == FlexLayout.TabNode.TYPE and
          node.getId() != 'roomsTab'
-        if node.getParent()?.getSelectedNode?() == node
+        if node.isVisible()
           presence.rooms.visible.push node.getId()
         else
           presence.rooms.invisible.push node.getId()
