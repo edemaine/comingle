@@ -105,7 +105,6 @@ export default Meeting = ->
       Meteor.call 'presenceUpdate', presence
   useEffect updatePresence, [name]
   onAction = (action) ->
-    setTimeout updatePresence, 0
     switch action.type
       when FlexLayout.Actions.SET_ACTIVE_TABSET
         ## RoomList is now in border, no longer tabset
@@ -126,4 +125,4 @@ export default Meeting = ->
   iconFactory = (tab) ->
     <FontAwesomeIcon icon={faDoorOpen}/>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-   onAction={onAction}/>
+   onAction={onAction} onModelChange={updatePresence}/>
