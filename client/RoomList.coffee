@@ -47,7 +47,8 @@ export default RoomList = ({loading}) ->
 
 export RoomInfo = ({room, presence}) ->
   {meetingId} = useParams()
-  myPresence = (presence?.find (p) -> p.id == usePresenceId())
+  presenceId = usePresenceId()
+  myPresence = (presence?.find (p) -> p.id == presenceId)
   myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
   <Link to="/m/#{meetingId}##{room._id}" className="list-group-item list-group-item-action room-info #{myPresenceClass}">
     <span className="title">{room.title}</span>
