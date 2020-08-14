@@ -10,6 +10,7 @@ import Loading from './Loading'
 import Header from './Header'
 import Name from './Name'
 import usePresenceId from './lib/usePresenceId'
+import {sortNames, uniqCountNames} from './lib/sortNames'
 
 export default RoomList = ({loading}) ->
   {meetingId} = useParams()
@@ -48,16 +49,22 @@ export default RoomList = ({loading}) ->
 export RoomInfo = ({room, presence}) ->
   {meetingId} = useParams()
   presenceId = usePresenceId()
-  myPresence = (presence?.find (p) -> p.id == presenceId)
+  if presence?
+    myPresence = (presence?.find (p) -> p.id == presenceId)
+    clusters = sortNames presence, (p) -> p.name
+    clusters = uniqCountNames presence, (p) -> p.name
   myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
   <Link to="/m/#{meetingId}##{room._id}" className="list-group-item list-group-item-action room-info #{myPresenceClass}">
     <span className="title">{room.title}</span>
-    {if presence?.length
+    {if clusters?.length
       <div className="presence">
-        {for person in presence
-          <span key={person.id} className="presence-#{person.type}">
+        {for person in clusters
+          <span key={person.item.id} className="presence-#{person.item.type}">
             <FontAwesomeIcon icon={faUser} className="mr-1"/>
             {person.name}
+            {if person.count > 1
+              <span className="ml-1 badge badge-secondary">{person.count}</span>
+            }
           </span>
         }
       </div>
