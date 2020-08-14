@@ -16,10 +16,18 @@ nav
   background-color: #e6e5e5
   padding: 3px 0
 
-.presence
-  font-size: small
-  > span
-    display: inline-block
-    margin-right: 1rem
-  > .presence-invisible
-    color: #aaa
+.room-info
+  color: black
+
+  &.room-info-visible
+    background-color: #b8daff  // list-group-item-primary
+  &.room-info-invisible
+    background-color: hsl(220,6%,95%)  // list-group-item-secondary, but brighter
+
+  .presence
+    font-size: small
+    > span
+      display: inline-block
+      margin-right: 1rem
+    > .presence-invisible
+      color: rgba(0,0,0,0.333333333) // #aaa
