@@ -2,7 +2,7 @@ import React, {useContext} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {AppSettings} from './App'
-import {Tabs} from '/lib/tabs'
+import {Tabs, mangleTab} from '/lib/tabs'
 
 ## This list of features to re-enable is from
 ## https://dev.chromium.org/Home/chromium-security/deprecating-permissions-in-cross-origin-iframes
@@ -19,24 +19,7 @@ export default TabIFrame = ({tabId}) ->
   {name} = useContext AppSettings
   tab = useTracker -> Tabs.findOne tabId
   return null unless tab
-  {type, url} = tab
-
-  ## Force type if standard servers recognized
-  type = 'cocreate' if /:\/\/cocreate.csail.mit.edu\b/.test url
-  type = 'jitsi' if /:\/\/meet.jit.si\b/.test url
-
-  ## YouTube URL mangling into embed link, based on examples from
-  ## https://gist.github.com/rodrigoborgesdeoliveira/987683cfbfcc8d800192da1e73adc486
-  url = url.replace ///
-    ^ (?: http s? : )? \/\/
-    (?: youtu\.be \/ |
-      (?: www\. | m\. )? youtube (-nocookie)? .com
-      \/ (?: v\/ | vi\/ | e\/ | (?: watch )? \? (?: feature=[^&]* & )? v i? = )
-    )
-    ( [\w\-]+ ) [^]*
-  ///, (match, nocookie, video) ->
-    type = 'youtube'
-    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
+  {type, url} = mangleTab tab
 
   switch type
     when 'jitsi'

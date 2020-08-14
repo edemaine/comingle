@@ -1,5 +1,5 @@
 import {validId} from './id.coffee'
-import Settings from '../settings'
+import Settings from '../settings.coffee'
 
 export Meetings = new Mongo.Collection 'meetings'
 

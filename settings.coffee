@@ -13,5 +13,5 @@ export default Settings =
   ## If you'd rather not use/rely on a publicly deployed server,
   ## consider running your own and changing the default here.
   defaultServers:
-    cocreate: 'cocreate.csail.mit.edu'
-    jitsi: 'meet.jit.si'
+    cocreate: 'https://cocreate.csail.mit.edu'
+    jitsi: 'https://meet.jit.si'

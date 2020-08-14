@@ -3,13 +3,14 @@ import {Random} from 'meteor/random'
 
 import {validURL} from '/lib/tabs'
 import {AppSettings} from './App'
+import Settings from '/settings.coffee'
 
 trimUrl = (x) -> x.replace /\/+$/, ''
 
 tabMakerSets =
   Whiteboard:
     Cocreate:
-      Server: "https://cocreate.csail.mit.edu"
+      Server: Settings.defaultServers.cocreate ? 'https://cocreate.csail.mit.edu'
       onClick: ->
         url = "#{trimUrl @states.Server[0]}/api/roomNew?grid=1"
         response = await fetch url
@@ -18,7 +19,7 @@ tabMakerSets =
         @setType 'cocreate'
   "Video Conference":
     "Jitsi Meet":
-      Server: "https://meet.jit.si"
+      Server: Settings.defaultServers.jitsi ? 'https://meet.jit.si'
       onClick: ->
         @setUrl "#{trimUrl @states.Server[0]}/comingle/#{Random.id()}"
         @setType 'jitsi'
