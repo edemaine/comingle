@@ -3,7 +3,7 @@ import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faTimes} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faTimes, faRedoAlt} from '@fortawesome/free-solid-svg-icons'
 
 import {Rooms} from '/lib/rooms'
 import {Tabs} from '/lib/tabs'
@@ -93,6 +93,22 @@ export default Room = ({loading, roomId}) ->
     switch tab.getComponent()
       when 'TabNew' then <TabNew {...{tab, meetingId, roomId, replaceTabNew}}/>
       when 'TabIFrame' then <TabIFrame tabId={tab.getId()}/>
+      when 'TabReload'
+        model.doAction FlexLayout.Actions.updateNodeAttributes tab.getId(),
+          component: 'TabIFrame'
+        <Loading/>
+  onRenderTab = (node, {buttons}) ->
+    if node.getParent()?.getSelectedNode?() == node and
+       node.getComponent() != 'TabNew'
+      buttons.push \
+        <div key="reload" className="flexlayout__tab_button_trailing"
+         title="Reload Tab"
+         onClick={(e) -> model.doAction \
+           FlexLayout.Actions.updateNodeAttributes node.getId(),
+             component: 'TabReload'}
+         onMouseDown={(e) -> e.stopPropagation()}>
+          <FontAwesomeIcon icon={faRedoAlt}/>
+        </div>
   onRenderTabSet = (node, {buttons}) ->
     buttons.push \
       <button key="add" className="flexlayout__tab_toolbar_button-fa"
@@ -110,5 +126,5 @@ export default Room = ({loading, roomId}) ->
           title: action.data.text
     action
   <FlexLayout.Layout model={model} factory={factory}
-   onRenderTabSet={onRenderTabSet} onAction={onAction}
-   onModelChange={-> setLayout model.toJson().layout}/>
+   onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
+   onAction={onAction} onModelChange={-> setLayout model.toJson().layout}/>
