@@ -1,7 +1,10 @@
-import {validId} from './id.coffee'
+import {validId, checkId} from './id.coffee'
 import {checkMeeting} from './meetings.coffee'
 
 export Presence = new Mongo.Collection 'presence'
+
+## Mapping from Meteor connection id to presenceId [server only]
+export connections = {}
 
 Meteor.methods
   presenceUpdate: (presence) ->
@@ -14,6 +17,7 @@ Meteor.methods
         invisible: [Match.Where validId]
     unless @isSimulation
       meeting = checkMeeting presence.meeting
+      connections[@connection.id] = presence.id
     Presence.update
       id: presence.id
       meeting: presence.meeting
@@ -26,3 +30,6 @@ Meteor.methods
         meeting: presence.meeting
     ,
       upsert: true
+  presenceRemove: (presenceId) ->
+    checkId presenceId
+    Presence.remove id: presenceId
