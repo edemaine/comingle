@@ -6,7 +6,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faTimes, faRedoAlt} from '@fortawesome/free-solid-svg-icons'
 
 import {Rooms} from '/lib/rooms'
-import {Tabs} from '/lib/tabs'
+import {Tabs, tabTypes} from '/lib/tabs'
 import useLocalStorage from './lib/useLocalStorage.coffee'
 import Loading from './Loading.coffee'
 import TabNew from './TabNew'
@@ -51,12 +51,18 @@ export default Room = ({loading, roomId}) ->
     lastTabSet = null
     actions = []  # don't modify model while traversing
     laidOut = {}
+    tabSettings = (tab) ->
+      name: tabTitle tab
+      component: tabComponent tab
+      enableRename: true  # override TabNew
+      enableClose: false
+      enableRenderOnDemand: not tabTypes[tab.type]?.alwaysRender
     model.visitNodes (node) ->
       if node.getType() == 'tab'
         if tab = id2tab[node.getId()]
           ## Update tabs in both layout and room
           actions.push FlexLayout.Actions.updateNodeAttributes node.getId(),
-            name: tabTitle tab
+            tabSettings tab
           laidOut[tab._id] = true
         else if node.getComponent() != 'TabNew'
           ## Delete tabs in stored layout that are no longer in room
@@ -65,13 +71,9 @@ export default Room = ({loading, roomId}) ->
     model.doAction action for action in actions
     ## Add tabs in room but not yet layout
     for id, tab of id2tab when not laidOut[id]
-      tab =
-        id: tab._id
-        type: 'tab'
-        name: tabTitle tab
-        component: tabComponent tab
-        enableRename: true  # override TabNew
-        enableClose: false
+      tab = tabSettings tab
+      tab.id = tab._id
+      tab.type = 'tab'
       if id of tabNews  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
           tabNews[id].getId(), tab

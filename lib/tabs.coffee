@@ -35,6 +35,7 @@ export tabTypes =
     longTitle: 'Jitsi Meet'
     category: 'Video Conference'
     instance: 'room'
+    alwaysRender: true
   youtube:
     title: 'YouTube'
 
