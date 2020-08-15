@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {allow} from './TabIFrame'

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {Switch, Route, useParams, useLocation, useHistory} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {Session} from 'meteor/session'
@@ -42,13 +42,12 @@ initModel = ->
     true
   model
 
-currentTabSet = null
-
 export default Meeting = ->
   {meetingId} = useParams()
   [model, setModel] = useState initModel
   location = useLocation()
   history = useHistory()
+  currentTabSet = useRef()
   {loading, rooms} = useTracker ->
     sub = Meteor.subscribe 'meeting', meetingId
     loading: not sub.ready()
@@ -68,13 +67,13 @@ export default Meeting = ->
           type: 'tab'
           name: Rooms.findOne(id)?.title ? id
           component: 'Room'
-        if currentTabSet? and model.getNodeById currentTabSet
+        if currentTabSet.current? and model.getNodeById currentTabSet.current
           model.doAction FlexLayout.Actions.addNode tab,
-            currentTabSet, FlexLayout.DockLocation.CENTER, -1
+            currentTabSet.current, FlexLayout.DockLocation.CENTER, -1
         else
           model.doAction FlexLayout.Actions.addNode tab,
             'root', FlexLayout.DockLocation.RIGHT
-          currentTabSet = model.getNodeById(id).getParent().getId()
+          currentTabSet.current = model.getNodeById(id).getParent().getId()
       model.doAction FlexLayout.Actions.selectTab id
     undefined
   , [location]
@@ -107,17 +106,25 @@ export default Meeting = ->
       Meteor.call 'presenceUpdate', presence
   useEffect updatePresence, [name]
   onAction = (action) ->
+    ## Keep track of "current" tabset (as destination for new tabs), and
+    ## maintain hash part of URL to point to "current" tab.
     switch action.type
       when FlexLayout.Actions.SET_ACTIVE_TABSET
         ## RoomList is now in border, no longer tabset
         #unless action.data.tabsetNode == 'roomsTabSet'
-        currentTabSet = action.data.tabsetNode
+        currentTabSet.current = action.data.tabsetNode
         child = model.getNodeById(action.data.tabsetNode).getSelectedNode()
         history.replace "/m/#{meetingId}##{child.getId()}"
       when FlexLayout.Actions.SELECT_TAB
         parent = model.getNodeById(action.data.tabNode).getParent()
-        currentTabSet = parent.getId() if parent.getType() == 'tabset'
+        currentTabSet.current = parent.getId() if parent.getType() == 'tabset'
         history.replace "/m/#{meetingId}##{action.data.tabNode}"
+      when FlexLayout.Actions.MOVE_NODE
+        setTimeout ->  # wait until after move
+          parent = model.getNodeById(action.data.fromNode).getParent()
+          currentTabSet.current = parent.getId() if parent.getType() == 'tabset'
+          history.replace "/m/#{meetingId}##{action.data.fromNode}"
+        , 0
       when FlexLayout.Actions.RENAME_TAB
         ## Sanitize room title and push to other users
         action.data.text = action.data.text.trim()
