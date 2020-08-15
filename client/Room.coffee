@@ -11,9 +11,16 @@ import useLocalStorage from './lib/useLocalStorage.coffee'
 import Loading from './Loading.coffee'
 import TabNew from './TabNew'
 import TabIFrame from './TabIFrame'
+import TabJitsi from './TabJitsi'
 
 tabTitle = (tab) ->
   tab.title or 'Untitled'
+tabComponent = (tab) ->
+  switch tab.type
+    when 'jitsi'
+      'TabJitsi'
+    else # iframe, cocreate, youtube -- for now
+      'TabIFrame'
 
 export default Room = ({loading, roomId}) ->
   {meetingId} = useParams()
@@ -37,9 +44,9 @@ export default Room = ({loading, roomId}) ->
       layout: layout
   , [loading]
   ## Synchronize model with room
+  id2tab = {}
   useEffect ->
     return unless model?
-    id2tab = {}
     id2tab[tab._id] = tab for tab in tabs
     lastTabSet = null
     actions = []  # don't modify model while traversing
@@ -61,7 +68,7 @@ export default Room = ({loading, roomId}) ->
         id: tab._id
         type: 'tab'
         name: tabTitle tab
-        component: 'TabIFrame'
+        component: tabComponent tab
         enableRename: true  # override TabNew
         enableClose: false
       if id of tabNews  # replace TabNew
@@ -93,9 +100,10 @@ export default Room = ({loading, roomId}) ->
     switch tab.getComponent()
       when 'TabNew' then <TabNew {...{tab, meetingId, roomId, replaceTabNew}}/>
       when 'TabIFrame' then <TabIFrame tabId={tab.getId()}/>
+      when 'TabJitsi' then <TabJitsi tabId={tab.getId()}/>
       when 'TabReload'
         model.doAction FlexLayout.Actions.updateNodeAttributes tab.getId(),
-          component: 'TabIFrame'
+          component: tabComponent id2tab[tab.getId()]
         <Loading/>
   onRenderTab = (node, {buttons}) ->
     if node.isVisible() and node.getComponent() != 'TabNew'

@@ -45,12 +45,15 @@ Meteor.methods
       meeting: String
       room: String
       title: String
-    switch tab?.type
-      when 'iframe', 'cocreate', 'jitsi'
-        Object.assign pattern,
-          url: Match.Where checkURL
-      else
-        throw new Error "Invalid tab type: #{tab?.type}"
+      url: Match.Where checkURL
+    unless tab.type of tabTypes
+      throw new Error "Invalid tab type: #{tab?.type}"
+    #switch tab?.type
+    #  when 'iframe', 'cocreate', 'jitsi'
+    #    Object.assign pattern,
+    #      url: Match.Where checkURL
+    #  else
+    #    throw new Error "Invalid tab type: #{tab?.type}"
     check tab, pattern
     meeting = checkMeeting tab.meeting
     room = checkRoom tab.room
