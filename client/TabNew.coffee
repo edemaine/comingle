@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import {Random} from 'meteor/random'
 
-import {validURL} from '/lib/tabs'
+import {validURL, tabTypes} from '/lib/tabs'
+import {useDebounce} from './lib/useDebounce'
 import {AppSettings} from './App'
 import Settings from '/settings.coffee'
 
@@ -31,6 +32,16 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
   [title, setTitle] = useState ''
   [type, setType] = useState 'iframe'
   [manualTitle, setManualTitle] = useState false
+
+  ## Automatic mangling after a little idle time
+  urlDebounce = useDebounce url, 100
+  useEffect ->
+    tab = mangleTab {url, title, manualTitle, type}
+    setUrl tab.url if tab.url != url
+    setTitle tab.title if tab.title != title
+    setType tab.type if tab.type != type
+  , [urlDebounce]
+
   [tabMakerSet, setTabMakerSetRaw] = useState initialTabMakerSet
   setTabMakerSet = (value) ->
     setTabMakerSetRaw value
@@ -42,18 +53,18 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
       tabMakerStates[key][tabMaker] = {}
       for property, initial of properties when not property.startsWith 'on'
         tabMakerStates[key][tabMaker][property] = useState initial
-  useEffect ->
-    if url and validURL(url) and not manualTitle
-      setTitle (new URL url).hostname
+
   onSubmit = (e) ->
     e.preventDefault()
-    id = Meteor.apply 'tabNew', [
+    tab = mangleTab
       meeting: meetingId
       room: roomId
       title: title.trim()
       type: type
       url: url
-    ], returnStubValue: true
+      manualTitle: manualTitle
+    delete tab.manualTitle
+    id = Meteor.apply 'tabNew', [tab], returnStubValue: true
     replaceTabNew {id, tab}
   <div className="card">
     <div className="card-body">
@@ -123,3 +134,37 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
       </form>
     </div>
   </div>
+
+export mangleTab = (tab) ->
+  tab.url = tab.url.trim()
+  return tab unless tab.url and validURL tab.url
+
+  ## Force type if we recognize default servers
+  for service in ['cocreate', 'jitsi']
+    server = Settings.defaultServers[service]
+    continue unless server?
+    if tab.url.startsWith server
+      tab.type = service
+
+  ## YouTube URL mangling into embed link, based on examples from
+  ## https://gist.github.com/rodrigoborgesdeoliveira/987683cfbfcc8d800192da1e73adc486
+  tab.url = tab.url.replace ///
+    ^ (?: http s? : )? //
+    (?: youtu\.be/ |
+      (?: www\. | m\. )? youtube (-nocookie)? .com /
+        (?: v/ | vi/ | e/ | embed/ |
+          (?: watch )? \? (?: feature=[^&]* & )? v i? = )
+    )
+    ( [\w\-]+ ) [^]*
+  ///i, (match, nocookie, video) ->
+    tab.type = 'youtube'
+    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
+
+  ## Automatic title
+  if tab.manualTitle == false
+    if tab.type == 'iframe'
+      tab.title = (new URL tab.url).hostname
+    else
+      tab.title = tabTypes[tab.type].title if tab.type of tabTypes
+
+  tab

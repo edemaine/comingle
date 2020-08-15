@@ -23,28 +23,16 @@ export checkURL = (url) ->
     throw new Error "Invalid URL #{url}"
   true
 
-export mangleTab = (tab) ->
-  ## Force type if we recognize default servers
-  for service in ['cocreate', 'jitsi']
-    server = Settings.defaultServers[service]
-    continue unless server?
-    if url.startsWith server
-      tab.type = service
-
-  ## YouTube URL mangling into embed link, based on examples from
-  ## https://gist.github.com/rodrigoborgesdeoliveira/987683cfbfcc8d800192da1e73adc486
-  tab.url = tab.url.replace ///
-    ^ (?: http s? : )? \/\/
-    (?: youtu\.be \/ |
-      (?: www\. | m\. )? youtube (-nocookie)? .com
-      \/ (?: v\/ | vi\/ | e\/ | (?: watch )? \? (?: feature=[^&]* & )? v i? = )
-    )
-    ( [\w\-]+ ) [^]*
-  ///i, (match, nocookie, video) ->
-    tab.type = 'youtube'
-    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
-
-  tab
+export tabTypes =
+  iframe:
+    title: 'Web'
+  cocreate:
+    title: 'Cocreate'
+  jitsi:
+    title: 'Jitsi'
+    longTitle: 'Jitsi Meet'
+  youtube:
+    title: 'YouTube'
 
 Meteor.methods
   tabNew: (tab) ->
