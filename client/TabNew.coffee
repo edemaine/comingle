@@ -79,7 +79,6 @@ export TabNew = ({tab: tabNew, meetingId, roomId,
           <ul className="nav nav-tabs card-header-tabs" role="tablist">
             {for tabType, tabData of tabTypes
               selected = (type == tabType)
-              console.log tabType, existingTabTypes[tabType], tabData.onePerRoom
               if tabData.onePerRoom and existingTabTypes[tabType]
                 continue unless selected
               <li key={tabType} className="nav-item" role="presentation">
