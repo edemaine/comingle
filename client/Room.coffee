@@ -94,12 +94,15 @@ export default Room = ({loading, roomId}) ->
       tabLayout = tabSettings tab
       tabLayout.id = tab._id
       tabLayout.type = 'tab'
+      location = tabDefaultLocation tab
+      if id of tabNews and location != 'lastTabSet'  # delete TabNew
+        model.doAction FlexLayout.Actions.deleteTab tabNews[id].getId()
+        delete tabNews[id]
       if id of tabNews  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
           tabNews[id].getId(), tabLayout
         delete tabNews[id]
       else
-        location = tabDefaultLocation tab
         location = lastTabSet.getId() if location == 'lastTabSet'
         model.doAction FlexLayout.Actions.addNode tabLayout,
           location, FlexLayout.DockLocation.CENTER, -1
