@@ -36,6 +36,7 @@ export tabTypes =
     category: 'Video Conference'
     instance: 'room'
     alwaysRender: true
+    onePerRoom: true
   youtube:
     title: 'YouTube'
 

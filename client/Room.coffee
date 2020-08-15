@@ -52,8 +52,10 @@ export default Room = ({loading, roomId}) ->
     tabs: tabs
   id2tab = {}
   id2tab[tab._id] = tab for tab in tabs
-  [model, setModel] = useState()
+  existingTabTypes = {}
+  existingTabTypes[tab.type] = true for tab in tabs
   ## Initialize model according to saved layout
+  [model, setModel] = useState()
   useEffect ->
     return if loading or model?
     setModel FlexLayout.Model.fromJson
@@ -128,9 +130,11 @@ export default Room = ({loading, roomId}) ->
     , parent, FlexLayout.DockLocation.CENTER, -1
   factory = (tab) ->
     switch tab.getComponent()
-      when 'TabNew' then <TabNew {...{tab, meetingId, roomId, replaceTabNew}}/>
       when 'TabIFrame' then <TabIFrame tabId={tab.getId()}/>
       when 'TabJitsi' then <TabJitsi tabId={tab.getId()}/>
+      when 'TabNew'
+        <TabNew {...{tab, meetingId, roomId,
+                     replaceTabNew, existingTabTypes}}/>
       when 'TabReload'
         model.doAction FlexLayout.Actions.updateNodeAttributes tab.getId(),
           component: tabComponent id2tab[tab.getId()]

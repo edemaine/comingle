@@ -29,7 +29,8 @@ tabTypePage =
   youtube:
     topDescription: <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
 
-export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
+export default TabNew = ({tab: tabNew, meetingId, roomId,
+                          replaceTabNew, existingTabTypes}) ->
   [url, setUrl] = useState ''
   [title, setTitle] = useState ''
   [type, setType] = useState 'iframe'
@@ -78,6 +79,9 @@ export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
           <ul className="nav nav-tabs card-header-tabs" role="tablist">
             {for tabType, tabData of tabTypes
               selected = (type == tabType)
+              console.log tabType, existingTabTypes[tabType], tabData.onePerRoom
+              if tabData.onePerRoom and existingTabTypes[tabType]
+                continue unless selected
               <li key={tabType} className="nav-item" role="presentation">
                 <a className="nav-link #{if selected then 'active'}"
                  href="#" role="tab" aria-selected="#{selected}"
@@ -91,6 +95,11 @@ export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
         <div className="card-body">
           <form className="newTab" onSubmit={onSubmit}>
             {tabTypePage[type].topDescription}
+            {if tabTypes[type].onePerRoom and existingTabTypes[type]
+              <div className="alert alert-warning">
+                WARNING: This room already has a {tabTypes[type].longTitle ? tabTypes[type].title} tab. Do you really want another?
+              </div>
+            }
             {if tabTypePage[type].createNew
               onClick = ->
                 url = tabTypePage[type].createNew()
