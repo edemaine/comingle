@@ -105,6 +105,7 @@ export default Meeting = ->
            presence.rooms.invisible.toString()
       Meteor.call 'presenceUpdate', presence
   useEffect updatePresence, [name]
+  useTracker -> updatePresence() if Meteor.status().connected
   onAction = (action) ->
     ## Keep track of "current" tabset (as destination for new tabs), and
     ## maintain hash part of URL to point to "current" tab.
