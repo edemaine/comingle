@@ -1,4 +1,4 @@
-import {validId} from './id.coffee'
+import {validId, creatorPattern} from './id.coffee'
 import Settings from '../settings.coffee'
 
 export Meetings = new Mongo.Collection 'meetings'
@@ -11,10 +11,14 @@ export checkMeeting = (meeting) ->
 
 Meteor.methods
   meetingNew: (meeting) ->
-    check meeting, {}
+    check meeting,
+      creator: creatorPattern
     unless @isSimulation
       meeting.created = new Date
     meetingId = Meetings.insert meeting
     for room in Settings.newMeetingRooms ? []
-      Meteor.call 'roomNew', Object.assign {meeting: meetingId}, room
+      Meteor.call 'roomNew', Object.assign
+        meeting: meetingId
+        creator: meeting.creator
+      , room
     meetingId

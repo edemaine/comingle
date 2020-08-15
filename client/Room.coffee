@@ -8,6 +8,7 @@ import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 
 import {Rooms} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
+import {getCreator} from './lib/presenceId'
 import useLocalStorage from './lib/useLocalStorage.coffee'
 import Loading from './Loading.coffee'
 import TabNew from './TabNew'
@@ -161,6 +162,7 @@ export default Room = ({loading, roomId}) ->
         Meteor.call 'tabEdit',
           id: action.data.node
           title: action.data.text
+          updator: getCreator()
     action
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}

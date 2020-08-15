@@ -7,3 +7,10 @@ export checkId = (id, type = '') ->
   unless validId id
     type += ' ' if type
     throw new Error "Invalid #{type}ID #{id}"
+
+## Match pattern for `creator` and `updator` fields
+
+export creatorPattern =
+  #username: Match.Optional String
+  name: String  # name at the time of operation
+  presenceId: String

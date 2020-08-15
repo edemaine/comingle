@@ -9,7 +9,7 @@ import {Presence} from '/lib/presence'
 import Loading from './Loading'
 import Header from './Header'
 import Name from './Name'
-import usePresenceId from './lib/usePresenceId'
+import {getPresenceId, getCreator} from './lib/presenceId'
 import {sortNames, uniqCountNames} from './lib/sortNames'
 
 export default RoomList = ({loading}) ->
@@ -48,7 +48,7 @@ export default RoomList = ({loading}) ->
 
 export RoomInfo = ({room, presence}) ->
   {meetingId} = useParams()
-  presenceId = usePresenceId()
+  presenceId = getPresenceId()
   if presence?
     myPresence = (presence?.find (p) -> p.id == presenceId)
     clusters = sortNames presence, (p) -> p.name
@@ -81,6 +81,7 @@ export RoomNew = ->
     Meteor.call 'roomNew',
       meeting: meetingId
       title: title.trim()
+      creator: getCreator()
     , (error, roomId) ->
       return console.error error if error?
       history.push "/m/#{meetingId}##{roomId}"

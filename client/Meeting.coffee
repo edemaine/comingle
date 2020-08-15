@@ -11,7 +11,7 @@ import Room from './Room'
 import {Rooms} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
-import usePresenceId from './lib/usePresenceId'
+import {getPresenceId, getCreator} from './lib/presenceId'
 
 initModel = ->
   model = FlexLayout.Model.fromJson
@@ -77,7 +77,7 @@ export default Meeting = ->
       model.doAction FlexLayout.Actions.selectTab id
     undefined
   , [location]
-  presenceId = usePresenceId()
+  presenceId = getPresenceId()
   name = useTracker -> Session.get 'name'
   updatePresence = ->
     return unless name?  # wait for tracker to load name
@@ -133,6 +133,7 @@ export default Meeting = ->
         Meteor.call 'roomEdit',
           id: action.data.node
           title: action.data.text
+          updator: getCreator()
     action
   factory = (tab) ->
     switch tab.getComponent()

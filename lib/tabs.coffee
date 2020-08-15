@@ -1,4 +1,4 @@
-import {validId} from './id'
+import {validId, creatorPattern} from './id'
 import {checkMeeting} from './meetings'
 import {checkRoom} from './rooms'
 import Settings from '../settings.coffee'
@@ -47,6 +47,7 @@ Meteor.methods
       room: String
       title: String
       url: Match.Where checkURL
+      creator: creatorPattern
     unless tab.type of tabTypes
       throw new Error "Invalid tab type: #{tab?.type}"
     #switch tab?.type
@@ -67,6 +68,7 @@ Meteor.methods
     check diff,
       id: String
       title: Match.Optional String
+      updator: creatorPattern
     tab = checkTab diff.id
     set = {}
     for key, value of diff when key != 'id'

@@ -1,4 +1,4 @@
-import {validId} from './id'
+import {validId, creatorPattern} from './id'
 import {checkMeeting} from './meetings'
 
 export Rooms = new Mongo.Collection 'rooms'
@@ -14,6 +14,7 @@ Meteor.methods
     check room,
       meeting: String
       title: String
+      creator: creatorPattern
     unless @isSimulation
       room.created = new Date
     meeting = checkMeeting room.meeting
@@ -22,6 +23,7 @@ Meteor.methods
     check diff,
       id: String
       title: Match.Optional String
+      updator: creatorPattern
     unless @isSimulation
       diff.updated = new Date
     room = checkRoom diff.id

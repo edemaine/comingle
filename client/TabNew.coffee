@@ -3,6 +3,7 @@ import {Random} from 'meteor/random'
 
 import {validURL, tabTypes} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
+import {getCreator} from './lib/presenceId'
 import Settings from '/settings.coffee'
 
 trimURL = (x) -> x.replace /\/+$/, ''
@@ -45,6 +46,7 @@ export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
   onSubmit = (e) ->
     e.preventDefault()
     return unless validURL url
+    ## One last mangle (in case didn't reach idle threshold)
     tab = mangleTab
       meeting: meetingId
       room: roomId
@@ -52,6 +54,7 @@ export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
       type: type
       url: url
       manualTitle: manualTitle
+      creator: getCreator()
     delete tab.manualTitle
     id = Meteor.apply 'tabNew', [tab], returnStubValue: true
     replaceTabNew {id, tab: tabNew}

@@ -1,10 +1,14 @@
 import React from 'react'
 import {useHistory} from 'react-router-dom'
 
+import {getCreator} from './lib/presenceId'
+
 export default FrontPage = ->
   history = useHistory()
   newMeeting = ->
-    Meteor.call 'meetingNew', {}, (error, meetingId) ->
+    Meteor.call 'meetingNew',
+      creator: getCreator()
+    , (error, meetingId) ->
       if error?
         return console.error "Meeting creation failed: #{error}"
       history.push "/m/#{meetingId}"
