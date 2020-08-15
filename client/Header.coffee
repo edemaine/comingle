@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default Header = ->
+export Header = ->
   <nav>
     <span className="flex-shrink-1" style={maxWidth:"35px"}>
       <img src="/comingle.svg" className="w-100"/>

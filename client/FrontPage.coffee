@@ -3,7 +3,7 @@ import {useHistory} from 'react-router-dom'
 
 import {getCreator} from './lib/presenceId'
 
-export default FrontPage = ->
+export FrontPage = ->
   history = useHistory()
   newMeeting = ->
     Meteor.call 'meetingNew',

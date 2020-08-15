@@ -4,7 +4,7 @@
 import {useState} from 'react'
 import useEventListener from '@use-it/event-listener'
 
-export default useLocalStorage = (key, initialValue, sync, noUpdate) ->
+export useLocalStorage = (key, initialValue, sync, noUpdate) ->
   # Support raw initial value or function generating that value
   initial = ->
     if typeof initialValue == 'function'

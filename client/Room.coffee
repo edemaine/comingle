@@ -9,11 +9,11 @@ import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 import {Rooms} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
 import {getCreator} from './lib/presenceId'
-import useLocalStorage from './lib/useLocalStorage.coffee'
-import Loading from './Loading.coffee'
-import TabNew from './TabNew'
-import TabIFrame from './TabIFrame'
-import TabJitsi from './TabJitsi'
+import {useLocalStorage} from './lib/useLocalStorage.coffee'
+import {Loading} from './Loading.coffee'
+import {TabNew} from './TabNew'
+import {TabIFrame} from './TabIFrame'
+import {TabJitsi} from './TabJitsi'
 
 tabTitle = (tab) ->
   tab.title or 'Untitled'
@@ -38,7 +38,7 @@ tabDefaultLocation = (tab) ->
     else
       'lastTabSet'
 
-export default Room = ({loading, roomId}) ->
+export Room = ({loading, roomId}) ->
   {meetingId} = useParams()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(

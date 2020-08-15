@@ -9,7 +9,7 @@ presenceId = Random.id()
 export getPresenceId = -> presenceId
 
 ### Persistent version, which causes trouble with multiple windows:
-export default getPresenceId = (key = 'presenceId') ->
+export getPresenceId = (key = 'presenceId') ->
   id = window.localStorage.getItem key
   unless id?
     id = Random.id()

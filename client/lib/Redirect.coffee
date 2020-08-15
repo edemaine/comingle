@@ -1,7 +1,7 @@
 import React from 'react'
 import {useHistory} from 'react-router-dom'
 
-export default Redirect = ({replace, replacement}) ->
+export Redirect = ({replace, replacement}) ->
   history = useHistory()
   history.replace newUrl =
     (history.location.pathname.replace replace, replacement) +

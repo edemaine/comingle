@@ -5,7 +5,7 @@ import {allow} from './TabIFrame'
 import {AppSettings} from './App'
 import {Tabs} from '/lib/tabs'
 
-export default TabJitsi = ({tabId, room}) ->
+export TabJitsi = ({tabId, room}) ->
   tab = useTracker -> Tabs.findOne tabId
   return null unless tab
   url = tab.url

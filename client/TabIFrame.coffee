@@ -14,7 +14,7 @@ allowList = [
 ]
 export allow = allowList.join ';'
 
-export default TabIFrame = ({tabId}) ->
+export TabIFrame = ({tabId}) ->
   tab = useTracker -> Tabs.findOne tabId
   return null unless tab
   <iframe src={tab.url} allow={allow}/>

@@ -29,8 +29,8 @@ tabTypePage =
   youtube:
     topDescription: <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
 
-export default TabNew = ({tab: tabNew, meetingId, roomId,
-                          replaceTabNew, existingTabTypes}) ->
+export TabNew = ({tab: tabNew, meetingId, roomId,
+                  replaceTabNew, existingTabTypes}) ->
   [url, setUrl] = useState ''
   [title, setTitle] = useState ''
   [type, setType] = useState 'iframe'

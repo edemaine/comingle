@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react'
 import {Session} from 'meteor/session'
 
-import useLocalStorage from './lib/useLocalStorage'
+import {useLocalStorage} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
-export default Name = ->
+export Name = ->
   [name, setName] = useLocalStorage 'name', '', true
   nameDebounce = useDebounce name, 500
   useEffect ->

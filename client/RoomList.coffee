@@ -6,13 +6,13 @@ import {faUser} from '@fortawesome/free-solid-svg-icons'
 
 import {Rooms} from '/lib/rooms'
 import {Presence} from '/lib/presence'
-import Loading from './Loading'
-import Header from './Header'
-import Name from './Name'
+import {Loading} from './Loading'
+import {Header} from './Header'
+import {Name} from './Name'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {sortNames, uniqCountNames} from './lib/sortNames'
 
-export default RoomList = ({loading}) ->
+export RoomList = ({loading}) ->
   {meetingId} = useParams()
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
   presences = useTracker -> Presence.find(meeting: meetingId).fetch()

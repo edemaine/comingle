@@ -6,8 +6,8 @@ import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faDoorOpen} from '@fortawesome/free-solid-svg-icons'
 
-import RoomList from './RoomList'
-import Room from './Room'
+import {RoomList} from './RoomList'
+import {Room} from './Room'
 import {Rooms} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
@@ -42,7 +42,7 @@ initModel = ->
     true
   model
 
-export default Meeting = ->
+export Meeting = ->
   {meetingId} = useParams()
   [model, setModel] = useState initModel
   location = useLocation()
