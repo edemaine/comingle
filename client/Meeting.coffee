@@ -1,11 +1,11 @@
 import React, {useState, useEffect, useContext} from 'react'
 import {Switch, Route, useParams, useLocation} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
+import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faDoorOpen} from '@fortawesome/free-solid-svg-icons'
 
-import {AppSettings} from './App'
 import RoomList from './RoomList'
 import Room from './Room'
 import {Rooms} from '/lib/rooms'
@@ -78,8 +78,9 @@ export default Meeting = ->
     undefined
   , [location]
   presenceId = usePresenceId()
-  {name} = useContext AppSettings
+  name = useTracker -> Session.get 'name'
   updatePresence = ->
+    return unless name?  # wait for tracker to load name
     presence =
       id: presenceId
       meeting: meetingId

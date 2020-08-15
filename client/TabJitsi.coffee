@@ -6,7 +6,6 @@ import {AppSettings} from './App'
 import {Tabs} from '/lib/tabs'
 
 export default TabJitsi = ({tabId}) ->
-  {name} = useContext AppSettings
   tab = useTracker -> Tabs.findOne tabId
   return null unless tab
   url = tab.url
@@ -22,7 +21,7 @@ export default TabJitsi = ({tabId}) ->
   url += "#" + (
     for key, value of {
       jitsi_meet_external_api_id: 0
-      'userInfo.displayName': name
+      'userInfo.displayName': Session.get 'name'
       ###
       Interface config as defined in
       https://github.com/jitsi/jitsi-meet/blob/master/interface_config.js

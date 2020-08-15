@@ -3,7 +3,6 @@ import {Random} from 'meteor/random'
 
 import {validURL, tabTypes} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
-import {AppSettings} from './App'
 import Settings from '/settings.coffee'
 
 trimURL = (x) -> x.replace /\/+$/, ''

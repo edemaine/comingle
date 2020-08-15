@@ -1,9 +1,16 @@
-import React, {useContext} from 'react'
+import React, {useEffect} from 'react'
+import {Session} from 'meteor/session'
 
-import {AppSettings} from './App'
+import useLocalStorage from './lib/useLocalStorage'
+import {useDebounce} from './lib/useDebounce'
 
 export default Name = ->
-  {name, setName} = useContext AppSettings
+  [name, setName] = useLocalStorage 'name', '', true
+  nameDebounce = useDebounce name, 500
+  useEffect ->
+    Session.set 'name', nameDebounce
+    undefined
+  , [nameDebounce]
   <form onSubmit={(e) -> e.preventDefault()}>
     <div className="form-group">
       <label className="text-center small w-100 mb-n1">Your name:</label>
