@@ -34,6 +34,8 @@ export default Room = ({loading, roomId}) ->
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
     tabs: tabs
+  id2tab = {}
+  id2tab[tab._id] = tab for tab in tabs
   [model, setModel] = useState()
   ## Initialize model according to saved layout
   useEffect ->
@@ -44,26 +46,25 @@ export default Room = ({loading, roomId}) ->
       layout: layout
   , [loading]
   ## Synchronize model with room
-  id2tab = {}
   useEffect ->
     return unless model?
-    id2tab[tab._id] = tab for tab in tabs
     lastTabSet = null
     actions = []  # don't modify model while traversing
+    laidOut = {}
     model.visitNodes (node) ->
       if node.getType() == 'tab'
         if tab = id2tab[node.getId()]
           ## Update tabs in both layout and room
           actions.push FlexLayout.Actions.updateNodeAttributes node.getId(),
             name: tabTitle tab
-          delete id2tab[tab._id]
+          laidOut[tab._id] = true
         else if node.getComponent() != 'TabNew'
           ## Delete tabs in stored layout that are no longer in room
           actions.push FlexLayout.Actions.deleteTab node.getId()
       lastTabSet = node if node.getType() == 'tabset'
     model.doAction action for action in actions
     ## Add tabs in room but not yet layout
-    for id, tab of id2tab
+    for id, tab of id2tab when not laidOut[id]
       tab =
         id: tab._id
         type: 'tab'
