@@ -74,7 +74,7 @@ export default Meeting = ->
           model.doAction FlexLayout.Actions.addNode tab,
             'root', FlexLayout.DockLocation.RIGHT
           currentTabSet.current = model.getNodeById(id).getParent().getId()
-      model.doAction FlexLayout.Actions.selectTab id
+      FlexLayout.forceSelectTab model, id
     undefined
   , [location]
   presenceId = getPresenceId()

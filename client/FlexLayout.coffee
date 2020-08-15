@@ -16,3 +16,8 @@ export Layout = (props) ->
      more: <FontAwesomeIcon icon={faWindowRestore} width="12px"/>
    }
   />
+
+export forceSelectTab = (model, tab) ->
+  tab = model.getNodeById tab if typeof tab == 'string'
+  unless tab.getParent().getSelectedNode() == tab
+    model.doAction Actions.selectTab tab.getId()

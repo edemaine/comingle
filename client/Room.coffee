@@ -107,7 +107,7 @@ export default Room = ({loading, roomId}) ->
         model.doAction FlexLayout.Actions.addNode tabLayout,
           location, FlexLayout.DockLocation.CENTER, -1
         if tabTypes[tab.type]?.alwaysRender
-          model.doAction FlexLayout.Actions.selectTab tabLayout.id
+          FlexLayout.forceSelectTab model, tabLayout.id
     ## Start new tab in every empty tabset
     model.visitNodes (node) ->
       if node.getType() == 'tabset'
