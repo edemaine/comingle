@@ -60,6 +60,8 @@ Meteor.methods
     room = checkRoom tab.room
     if tab.meeting != room.meeting
       throw new Error "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
+    unless @isSimulation
+      tab.created = new Date
     Tabs.insert tab
   tabEdit: (diff) ->
     check diff,
@@ -70,5 +72,7 @@ Meteor.methods
     for key, value of diff when key != 'id'
       set[key] = value unless tab[key] == value
     return unless (key for key of set).length  # nothing to update
+    unless @isSimulation
+      set.updated = new Date
     Tabs.update diff.id,
       $set: set

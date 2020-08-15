@@ -18,6 +18,7 @@ Meteor.methods
     unless @isSimulation
       meeting = checkMeeting presence.meeting
       connections[@connection.id] = presence.id
+      presence.updated = new Date
     Presence.update
       id: presence.id
       meeting: presence.meeting

@@ -14,12 +14,16 @@ Meteor.methods
     check room,
       meeting: String
       title: String
+    unless @isSimulation
+      room.created = new Date
     meeting = checkMeeting room.meeting
     Rooms.insert room
   roomEdit: (diff) ->
     check diff,
       id: String
       title: Match.Optional String
+    unless @isSimulation
+      diff.updated = new Date
     room = checkRoom diff.id
     set = {}
     for key, value of diff when key != 'id'

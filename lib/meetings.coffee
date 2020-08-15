@@ -12,6 +12,8 @@ export checkMeeting = (meeting) ->
 Meteor.methods
   meetingNew: (meeting) ->
     check meeting, {}
+    unless @isSimulation
+      meeting.created = new Date
     meetingId = Meetings.insert meeting
     for room in Settings.newMeetingRooms ? []
       Meteor.call 'roomNew', Object.assign {meeting: meetingId}, room
