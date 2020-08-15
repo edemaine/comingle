@@ -3,7 +3,8 @@ import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faTimes, faRedoAlt} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faTimes, faRedoAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 
 import {Rooms} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
@@ -21,6 +22,14 @@ tabComponent = (tab) ->
       'TabJitsi'
     else # iframe, cocreate, youtube -- for now
       'TabIFrame'
+tabIcon = (tab) ->
+  switch tab?.type  # undefined for TabNew
+    when 'jitsi'
+      <FontAwesomeIcon icon={faVideo}/>
+    when 'youtube'
+      <FontAwesomeIcon icon={faYoutube}/>
+    else
+      null
 
 export default Room = ({loading, roomId}) ->
   {meetingId} = useParams()
@@ -108,6 +117,7 @@ export default Room = ({loading, roomId}) ->
         model.doAction FlexLayout.Actions.updateNodeAttributes tab.getId(),
           component: tabComponent id2tab[tab.getId()]
         <Loading/>
+  iconFactory = (tab) -> tabIcon id2tab[tab.getId()]
   onRenderTab = (node, {buttons}) ->
     if node.isVisible() and node.getComponent() != 'TabNew'
       buttons.push \
@@ -136,6 +146,6 @@ export default Room = ({loading, roomId}) ->
           id: action.data.node
           title: action.data.text
     action
-  <FlexLayout.Layout model={model} factory={factory}
+  <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
    onAction={onAction} onModelChange={-> setLayout model.toJson().layout}/>
