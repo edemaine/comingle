@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useReducer} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
+import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faTimes, faRedoAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
@@ -10,8 +11,9 @@ import {clipboardLink} from './icons/clipboardLink'
 import {Rooms} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
 import {getCreator} from './lib/presenceId'
-import {useLocalStorage} from './lib/useLocalStorage.coffee'
-import {Loading} from './Loading.coffee'
+import {useLocalStorage} from './lib/useLocalStorage'
+import {formatDate} from './lib/dates'
+import {Loading} from './Loading'
 import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
@@ -141,10 +143,25 @@ export Room = ({loading, roomId}) ->
           component: tabComponent id2tab[tab.getId()]
         <Loading/>
   iconFactory = (tab) -> tabIcon id2tab[tab.getId()]
-  onRenderTab = (node, {buttons}) ->
-    if node.isVisible() and node.getComponent() != 'TabNew'
+  onRenderTab = (node, renderState) ->
+    return if node.getComponent() == 'TabNew'
+    tab = id2tab[node.getId()]
+    return unless tab
+    renderState.content =
+      <OverlayTrigger placement="bottom" overlay={
+        <Tooltip>
+          &ldquo;{tab.title}&rdquo;<br/>
+          <code>{tab.url}</code><br/>
+          created by {tab.creator?.name ? 'unknown'}<br/>
+          on {formatDate tab.created}
+        </Tooltip>
+      }>
+        <span className="tab-title">{renderState.content}</span>
+      </OverlayTrigger>
+    if node.isVisible()  # special buttons for visible tabs
+      buttons = renderState.buttons
       type = if node.getParent().getType() == 'border' then 'border' else 'tab'
-      if url = id2tab[node.getId()].url
+      if url = tab.url
         buttons.push \
           <div key="link" className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
            title="Save tab URL to clipboard"
