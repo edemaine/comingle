@@ -42,10 +42,7 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
     setType tab.type if tab.type != type
   , [urlDebounce]
 
-  [tabMakerSet, setTabMakerSetRaw] = useState initialTabMakerSet
-  setTabMakerSet = (value) ->
-    setTabMakerSetRaw value
-    initialTabMakerSet = value
+  [tabMakerSet, setTabMakerSet] = useState initialTabMakerSet
   tabMakerStates = {}
   for key, tabMakers of tabMakerSets
     tabMakerStates[key] = {}
