@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Switch, Route, useParams, useLocation, useHistory} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {Session} from 'meteor/session'
@@ -47,7 +47,6 @@ export Meeting = ->
   [model, setModel] = useState initModel
   location = useLocation()
   history = useHistory()
-  currentTabSet = useRef()
   {loading, rooms} = useTracker ->
     sub = Meteor.subscribe 'meeting', meetingId
     loading: not sub.ready()
@@ -67,16 +66,15 @@ export Meeting = ->
           type: 'tab'
           name: Rooms.findOne(id)?.title ? id
           component: 'Room'
-        if currentTabSet.current? and model.getNodeById currentTabSet.current
+        if tabset = model.getActiveTabset()
           model.doAction FlexLayout.Actions.addNode tab,
-            currentTabSet.current, FlexLayout.DockLocation.CENTER, -1
+            tabset.getId(), FlexLayout.DockLocation.CENTER, -1
         else
           model.doAction FlexLayout.Actions.addNode tab,
             'root', FlexLayout.DockLocation.RIGHT
-          currentTabSet.current = model.getNodeById(id).getParent().getId()
       FlexLayout.forceSelectTab model, id
     undefined
-  , [location]
+  , [location.hash]
   presenceId = getPresenceId()
   name = useTracker -> Session.get 'name'
   updatePresence = ->
@@ -104,28 +102,12 @@ export Meeting = ->
            current?.rooms?.invisible?.toString?() ==
            presence.rooms.invisible.toString()
       Meteor.call 'presenceUpdate', presence
+  ## Send presence when name changes or when we reconnect to server
+  ## (so server may have deleted our presence information).
   useEffect updatePresence, [name]
   useTracker -> updatePresence() if Meteor.status().connected
   onAction = (action) ->
-    ## Keep track of "current" tabset (as destination for new tabs), and
-    ## maintain hash part of URL to point to "current" tab.
     switch action.type
-      when FlexLayout.Actions.SET_ACTIVE_TABSET
-        ## RoomList is now in border, no longer tabset
-        #unless action.data.tabsetNode == 'roomsTabSet'
-        currentTabSet.current = action.data.tabsetNode
-        child = model.getNodeById(action.data.tabsetNode).getSelectedNode()
-        history.replace "/m/#{meetingId}##{child.getId()}"
-      when FlexLayout.Actions.SELECT_TAB
-        parent = model.getNodeById(action.data.tabNode).getParent()
-        currentTabSet.current = parent.getId() if parent.getType() == 'tabset'
-        history.replace "/m/#{meetingId}##{action.data.tabNode}"
-      when FlexLayout.Actions.MOVE_NODE
-        setTimeout ->  # wait until after move
-          parent = model.getNodeById(action.data.fromNode).getParent()
-          currentTabSet.current = parent.getId() if parent.getType() == 'tabset'
-          history.replace "/m/#{meetingId}##{action.data.fromNode}"
-        , 0
       when FlexLayout.Actions.RENAME_TAB
         ## Sanitize room title and push to other users
         action.data.text = action.data.text.trim()
@@ -135,6 +117,20 @@ export Meeting = ->
           title: action.data.text
           updator: getCreator()
     action
+  onModelChange = ->
+    updatePresence()
+    ## Maintain hash part of URL to point to "current" tab.
+    tabset = model.getActiveTabset()
+    unless tabset  # if active tabset closed, take another tabset if exists
+      model.visitNodes (node) ->
+        if node.getType() == 'tabset'
+          tabset = node
+    if tabset and tab = tabset.getSelectedNode()
+      unless location.hash == "##{tab.getId()}"
+        history.replace "/m/#{meetingId}##{tab.getId()}"
+    else
+      if location.hash
+        history.replace "/m/#{meetingId}"
   factory = (tab) ->
     switch tab.getComponent()
       when 'Room' then <Room loading={loading} roomId={tab.getId()}/>
@@ -142,4 +138,4 @@ export Meeting = ->
   iconFactory = (tab) ->
     <FontAwesomeIcon icon={faDoorOpen}/>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-   onAction={onAction} onModelChange={updatePresence}/>
+   onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}/>
