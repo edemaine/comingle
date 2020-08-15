@@ -9,7 +9,7 @@ import Settings from '/settings.coffee'
 
 trimURL = (x) -> x.replace /\/+$/, ''
 
-tabTypePage =
+export tabTypePage =
   iframe:
     topDescription: <p>Paste the URL for any embeddable website, e.g., Wikipedia:</p>
   cocreate:
@@ -65,7 +65,7 @@ export TabNew = ({node, meetingId, roomId,
       url: url
       manualTitle: manualTitle
       creator: getCreator()
-    delete tab.manualTitle
+    , true
     id = Meteor.apply 'tabNew', [tab], returnStubValue: true
     replaceTabNew {id, node}
   <div className="card">
@@ -137,7 +137,7 @@ export TabNew = ({node, meetingId, roomId,
     </div>
   </div>
 
-export mangleTab = (tab) ->
+export mangleTab = (tab, dropManualTitle) ->
   tab.url = tab.url.trim()
   return tab unless tab.url and validURL tab.url
 
@@ -163,12 +163,13 @@ export mangleTab = (tab) ->
     "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
 
   ## Automatic title
-  unless tab.title.trim()
+  unless tab.title?.trim()
     tab.manualTitle = false
   if tab.manualTitle == false
     if tab.type == 'iframe'
       tab.title = (new URL tab.url).hostname
     else
       tab.title = tabTypes[tab.type].title if tab.type of tabTypes
+  delete tab.manualTitle if dropManualTitle
 
   tab

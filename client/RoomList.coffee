@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import {Link, useParams, useHistory} from 'react-router-dom'
+import {SplitButton, Dropdown} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
@@ -9,6 +10,7 @@ import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
 import {Header} from './Header'
 import {Name} from './Name'
+import {tabTypePage, mangleTab} from './TabNew'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {sortNames, uniqCountNames} from './lib/sortNames'
 
@@ -76,7 +78,7 @@ export RoomNew = ->
   [title, setTitle] = useState ''
   history = useHistory()
   submit = (e) ->
-    e.preventDefault()
+    e.preventDefault?()
     return unless title.trim().length
     Meteor.call 'roomNew',
       meeting: meetingId
@@ -84,6 +86,16 @@ export RoomNew = ->
       creator: getCreator()
     , (error, roomId) ->
       return console.error error if error?
+      switch e.template ? 'jitsi'
+        when 'jitsi'
+          Meteor.call 'tabNew', mangleTab(
+            meeting: meetingId
+            room: roomId
+            type: 'jitsi'
+            title: ''
+            url: tabTypePage.jitsi.createNew()
+            creator: getCreator()
+          , true)
       history.push "/m/#{meetingId}##{roomId}"
     setTitle ''
   <form onSubmit={submit}>
@@ -91,8 +103,14 @@ export RoomNew = ->
     <div className="form-group">
       <input type="text" placeholder="Title" className="form-control"
        value={title} onChange={(e) -> setTitle e.target.value}/>
-      <button type="submit" className="btn btn-primary btn-block">
-        Create New Room
-      </button>
+      <SplitButton type="submit" className="btn-block" drop="up"
+                   title="Create Room">
+        <Dropdown.Item onClick={-> submit template: 'empty'}>
+          Empty room
+        </Dropdown.Item>
+        <Dropdown.Item onClick={-> submit template: 'jitsi'}>
+          Jitsi Meeting (default)
+        </Dropdown.Item>
+      </SplitButton>
     </div>
   </form>
