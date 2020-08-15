@@ -131,7 +131,7 @@ export default Room = ({loading, roomId}) ->
   factory = (tab) ->
     switch tab.getComponent()
       when 'TabIFrame' then <TabIFrame tabId={tab.getId()}/>
-      when 'TabJitsi' then <TabJitsi tabId={tab.getId()}/>
+      when 'TabJitsi' then <TabJitsi tabId={tab.getId()} room={room}/>
       when 'TabNew'
         <TabNew {...{tab, meetingId, roomId,
                      replaceTabNew, existingTabTypes}}/>
