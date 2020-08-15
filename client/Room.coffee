@@ -114,7 +114,8 @@ export default Room = ({loading, roomId}) ->
          onClick={(e) -> model.doAction \
            FlexLayout.Actions.updateNodeAttributes node.getId(),
              component: 'TabReload'}
-         onMouseDown={(e) -> e.stopPropagation()}>
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
           <FontAwesomeIcon icon={faRedoAlt}/>
         </div>
   onRenderTabSet = (node, {buttons}) ->
