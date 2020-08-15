@@ -12,6 +12,9 @@
   border: none;
   outline-width: 0;
 }
+.flexlayout__tab_button_link { font-size: larger; margin-top: -3.5px }
+
+.flexlayout__tab_button_trailing:active { color: #555 }
 
 .flexlayout__tab_button_leading, .flexlayout__border_button_leading {
   padding-right: 0.5ex;

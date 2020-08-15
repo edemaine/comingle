@@ -5,6 +5,7 @@ import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faTimes, faRedoAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
+import {clipboardLink} from './icons/clipboardLink'
 
 import {Rooms} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
@@ -143,8 +144,18 @@ export Room = ({loading, roomId}) ->
   onRenderTab = (node, {buttons}) ->
     if node.isVisible() and node.getComponent() != 'TabNew'
       type = if node.getParent().getType() == 'border' then 'border' else 'tab'
+      if url = id2tab[node.getId()].url
+        buttons.push \
+          <div key="link" className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
+           title="Save tab URL to clipboard"
+           onClick={(e) -> navigator.clipboard.writeText url}
+           onMouseDown={(e) -> e.stopPropagation()}
+           onTouchStart={(e) -> e.stopPropagation()}>
+            <FontAwesomeIcon icon={clipboardLink}/>
+          </div>
       buttons.push \
-        <div key="reload" className="flexlayout__#{type}_button_trailing"
+        <div key="reload"
+         className="flexlayout__#{type}_button_trailing"
          title="Reload Tab"
          onClick={(e) -> model.doAction \
            FlexLayout.Actions.updateNodeAttributes node.getId(),
