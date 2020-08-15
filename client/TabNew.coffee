@@ -4,21 +4,30 @@ import {Random} from 'meteor/random'
 import {validURL, tabTypes} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
 import {getCreator} from './lib/presenceId'
+import {capitalize} from './lib/capitalize'
 import Settings from '/settings.coffee'
 
 trimURL = (x) -> x.replace /\/+$/, ''
 
-urlMaker =
-  cocreate: ->
-    server = Settings.defaultServers.cocreate ?
-             'https://cocreate.csail.mit.edu'
-    url = "#{trimURL server}/api/roomNew?grid=1"
-    response = await fetch url
-    json = await response.json()
-    json.url
-  jitsi: ->
-    server = Settings.defaultServers.jitsi ? 'https://meet.jit.si'
-    "#{trimURL server}/comingle/#{Random.id()}"
+tabTypePage =
+  iframe:
+    topDescription: <p>Paste the URL for any embeddable website, e.g., Wikipedia:</p>
+  cocreate:
+    topDescription: <p>This server uses <b><a href="https://github.com/edemaine/cocreate">Cocreate</a></b> for a shared whiteboard.</p>
+    createNew: ->
+      server = Settings.defaultServers.cocreate ?
+               'https://cocreate.csail.mit.edu'
+      url = "#{trimURL server}/api/roomNew?grid=1"
+      response = await fetch url
+      json = await response.json()
+      json.url
+  jitsi:
+    topDescription: <p>This server uses <b><a href="https://meet.jit.si/">Jitsi Meet</a></b> for video conferencing.</p>
+    createNew: ->
+      server = Settings.defaultServers.jitsi ? 'https://meet.jit.si'
+      "#{trimURL server}/comingle/#{Random.id()}"
+  youtube:
+    topDescription: <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
 
 export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
   [url, setUrl] = useState ''
@@ -81,36 +90,22 @@ export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
         </div>
         <div className="card-body">
           <form className="newTab" onSubmit={onSubmit}>
-            {switch type
-              when 'iframe'
-                <p>Paste the URL for any embeddable website, e.g., Wikipedia:</p>
-              when 'cocreate'
-                <>
-                  <p>This server uses <b><a href="https://github.com/edemaine/cocreate">Cocreate</a></b> for a shared whiteboard.</p>
-                  <div className="form-group">
-                    <button className="btn btn-primary btn-lg btn-block"
-                     onClick={-> urlMaker.cocreate().then (url) ->
-                                setUrl url; setSubmit true}>
-                      New Cocreate Board
-                    </button>
-                  </div>
-                  <p>Or paste the URL for an existing board:</p>
-                </>
-              when 'jitsi'
-                <>
-                  <p>This server uses <b><a href="https://meet.jit.si/">Jitsi Meet</a></b> for video conferencing.</p>
-                  <div className="form-group">
-                    <button className="btn btn-primary btn-lg btn-block"
-                     onClick={-> setUrl urlMaker.jitsi(); setSubmit true}>
-                      New Jitsi Meet Room
-                    </button>
-                  </div>
-                  <p>Or paste the URL for an existing room:</p>
-                </>
-              when 'youtube'
-                <>
-                  <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
-                </>
+            {tabTypePage[type].topDescription}
+            {if tabTypePage[type].createNew
+              onClick = ->
+                url = tabTypePage[type].createNew()
+                url = await url if url.then?
+                setUrl url
+                setSubmit true
+              <>
+                <div className="form-group">
+                  <button className="btn btn-primary btn-lg btn-block"
+                   onClick={onClick}>
+                    New {tabTypes[type].longTitle ? tabTypes[type].title} {capitalize tabTypes[type].instance}
+                  </button>
+                </div>
+                <p>Or paste the URL for an existing {tabTypes[type].instance}:</p>
+              </>
             }
             <div className="form-group">
               <label>URL</label>
