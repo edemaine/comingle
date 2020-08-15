@@ -7,8 +7,16 @@ import {faTimes, faExpandArrowsAlt, faCompressArrowsAlt, faWindowRestore} \
 export * from './lib/FlexLayout'
 import {Actions, Layout as FlexLayout} from './lib/FlexLayout'
 
+titleLimit = 20
+
 export Layout = (props) ->
+  titleFactory = (node) ->
+    title = node.getName()
+    if title.length > titleLimit
+      title = title[...titleLimit-1] + '…'
+    title
   <FlexLayout {...props}
+   titleFactory={titleFactory}
    icons={
      close: <FontAwesomeIcon icon={faTimes}/>
      maximize: <FontAwesomeIcon icon={faExpandArrowsAlt}/>
