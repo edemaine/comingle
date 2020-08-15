@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {Switch, Route, useParams, useLocation} from 'react-router-dom'
+import {Switch, Route, useParams, useLocation, useHistory} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
@@ -42,11 +42,13 @@ initModel = ->
     true
   model
 
+currentTabSet = null
+
 export default Meeting = ->
   {meetingId} = useParams()
   [model, setModel] = useState initModel
-  [currentTabSet, setCurrentTabSet] = useState null
   location = useLocation()
+  history = useHistory()
   {loading, rooms} = useTracker ->
     sub = Meteor.subscribe 'meeting', meetingId
     loading: not sub.ready()
@@ -72,9 +74,8 @@ export default Meeting = ->
         else
           model.doAction FlexLayout.Actions.addNode tab,
             'root', FlexLayout.DockLocation.RIGHT
-          setCurrentTabSet model.getNodeById(id).getParent().getId()
+          currentTabSet = model.getNodeById(id).getParent().getId()
       model.doAction FlexLayout.Actions.selectTab id
-      updatePresence()
     undefined
   , [location]
   presenceId = usePresenceId()
@@ -110,7 +111,13 @@ export default Meeting = ->
       when FlexLayout.Actions.SET_ACTIVE_TABSET
         ## RoomList is now in border, no longer tabset
         #unless action.data.tabsetNode == 'roomsTabSet'
-        setCurrentTabSet action.data.tabsetNode
+        currentTabSet = action.data.tabsetNode
+        child = model.getNodeById(action.data.tabsetNode).getSelectedNode()
+        history.replace "/m/#{meetingId}##{child.getId()}"
+      when FlexLayout.Actions.SELECT_TAB
+        parent = model.getNodeById(action.data.tabNode).getParent()
+        currentTabSet = parent.getId() if parent.getType() == 'tabset'
+        history.replace "/m/#{meetingId}##{action.data.tabNode}"
       when FlexLayout.Actions.RENAME_TAB
         ## Sanitize room title and push to other users
         action.data.text = action.data.text.trim()
