@@ -12,6 +12,7 @@ import {Rooms} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
 import {getCreator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
+import {useIdMap} from './lib/useIdMap'
 import {formatDate} from './lib/dates'
 import {Loading} from './Loading'
 import {TabNew} from './TabNew'
@@ -53,8 +54,7 @@ export Room = ({loading, roomId}) ->
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
     tabs: tabs
-  id2tab = {}
-  id2tab[tab._id] = tab for tab in tabs
+  id2tab = useIdMap tabs
   existingTabTypes = {}
   existingTabTypes[tab.type] = true for tab in tabs
   ## Initialize model according to saved layout

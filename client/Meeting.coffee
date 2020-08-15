@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {Switch, Route, useParams, useLocation, useHistory} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
+import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -12,6 +13,8 @@ import {Rooms} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
+import {useIdMap} from './lib/useIdMap'
+import {formatDate} from './lib/dates'
 
 initModel = ->
   model = FlexLayout.Model.fromJson
@@ -51,6 +54,7 @@ export Meeting = ->
     sub = Meteor.subscribe 'meeting', meetingId
     loading: not sub.ready()
     rooms: Rooms.find().fetch()
+  id2room = useIdMap rooms
   useEffect ->
     for room in rooms
       if model.getNodeById room._id
@@ -137,5 +141,20 @@ export Meeting = ->
       when 'RoomList' then <RoomList loading={loading}/>
   iconFactory = (tab) ->
     <FontAwesomeIcon icon={faDoorOpen}/>
+  onRenderTab = (node, renderState) ->
+    return if node.getComponent() == 'roomsTab'
+    room = id2room[node.getId()]
+    return unless room
+    renderState.content =
+      <OverlayTrigger placement="bottom" overlay={
+        <Tooltip>
+          &ldquo;{room.title}&rdquo;<br/>
+          created by {room.creator?.name ? 'unknown'}<br/>
+          on {formatDate room.created}
+        </Tooltip>
+      }>
+        <span className="tab-title">{renderState.content}</span>
+      </OverlayTrigger>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
+   onRenderTab={onRenderTab}
    onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}/>

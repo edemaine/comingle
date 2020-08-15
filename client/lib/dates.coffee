@@ -1,5 +1,5 @@
 export formatDate = (date) ->
-  return date unless date
+  return 'unknown date' unless date
   date.toLocaleDateString undefined,
     dateStyle: 'full'
     timeStyle: 'long'
