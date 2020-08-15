@@ -29,7 +29,7 @@ tabTypePage =
   youtube:
     topDescription: <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
 
-export TabNew = ({tab: tabNew, meetingId, roomId,
+export TabNew = ({node, meetingId, roomId,
                   replaceTabNew, existingTabTypes}) ->
   [url, setUrl] = useState ''
   [title, setTitle] = useState ''
@@ -67,7 +67,7 @@ export TabNew = ({tab: tabNew, meetingId, roomId,
       creator: getCreator()
     delete tab.manualTitle
     id = Meteor.apply 'tabNew', [tab], returnStubValue: true
-    replaceTabNew {id, tab: tabNew}
+    replaceTabNew {id, node}
   <div className="card">
     <div className="card-body">
       <h3 className="card-title">Add Shared Tab to Room</h3>

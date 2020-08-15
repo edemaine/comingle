@@ -135,24 +135,26 @@ export Meeting = ->
     else
       if location.hash
         history.replace "/m/#{meetingId}"
-  factory = (tab) ->
-    switch tab.getComponent()
-      when 'Room' then <Room loading={loading} roomId={tab.getId()}/>
+  factory = (node) ->
+    switch node.getComponent()
+      when 'Room' then <Room loading={loading} roomId={node.getId()}/>
       when 'RoomList' then <RoomList loading={loading}/>
-  iconFactory = (tab) ->
-    <FontAwesomeIcon icon={faDoorOpen}/>
-  onRenderTab = (node, renderState) ->
-    return if node.getComponent() == 'roomsTab'
+  tooltip = (node) -> (props) ->
     room = id2room[node.getId()]
-    return unless room
+    return <span/> unless room
+    <Tooltip {...props}>
+      Room &ldquo;{room.title}&rdquo;<br/>
+      created by {room.creator?.name ? 'unknown'}<br/>
+      on {formatDate room.created}
+    </Tooltip>
+  iconFactory = (node) ->
+    <OverlayTrigger placement="bottom" overlay={tooltip node}>
+      <FontAwesomeIcon icon={faDoorOpen}/>
+    </OverlayTrigger>
+  onRenderTab = (node, renderState) ->
+    #return if node.getComponent() == 'roomsTab'
     renderState.content =
-      <OverlayTrigger placement="bottom" overlay={
-        <Tooltip>
-          &ldquo;{room.title}&rdquo;<br/>
-          created by {room.creator?.name ? 'unknown'}<br/>
-          on {formatDate room.created}
-        </Tooltip>
-      }>
+      <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className="tab-title">{renderState.content}</span>
       </OverlayTrigger>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}

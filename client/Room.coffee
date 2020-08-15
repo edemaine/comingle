@@ -46,7 +46,7 @@ export Room = ({loading, roomId}) ->
   {meetingId} = useParams()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(
-    (state, {id, tab}) -> state[id] = tab; state
+    (state, {id, node}) -> state[id] = node; state
   , {})
   {loading, room, tabs} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
@@ -131,31 +131,38 @@ export Room = ({loading, roomId}) ->
       component: 'TabNew'
       enableRename: false
     , parent, FlexLayout.DockLocation.CENTER, -1
-  factory = (tab) ->
-    switch tab.getComponent()
-      when 'TabIFrame' then <TabIFrame tabId={tab.getId()}/>
-      when 'TabJitsi' then <TabJitsi tabId={tab.getId()} room={room}/>
+  factory = (node) ->
+    switch node.getComponent()
+      when 'TabIFrame' then <TabIFrame tabId={node.getId()}/>
+      when 'TabJitsi' then <TabJitsi tabId={node.getId()} room={room}/>
       when 'TabNew'
-        <TabNew {...{tab, meetingId, roomId,
+        <TabNew {...{node, meetingId, roomId,
                      replaceTabNew, existingTabTypes}}/>
       when 'TabReload'
-        model.doAction FlexLayout.Actions.updateNodeAttributes tab.getId(),
-          component: tabComponent id2tab[tab.getId()]
+        model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
+          component: tabComponent id2tab[node.getId()]
         <Loading/>
-  iconFactory = (tab) -> tabIcon id2tab[tab.getId()]
+  iconFactory = (node) ->
+    icon = tabIcon id2tab[node.getId()]
+    return icon unless icon?
+    <OverlayTrigger placement="bottom" overlay={tooltip node}>
+      {icon}
+    </OverlayTrigger>
+  tooltip = (node) -> (props) ->
+    tab = id2tab[node.getId()]
+    return <span/> unless room
+    <Tooltip {...props}>
+      Tab &ldquo;{tab.title}&rdquo;<br/>
+      <code>{tab.url}</code><br/>
+      created by {tab.creator?.name ? 'unknown'}<br/>
+      on {formatDate tab.created}
+    </Tooltip>
   onRenderTab = (node, renderState) ->
     return if node.getComponent() == 'TabNew'
     tab = id2tab[node.getId()]
     return unless tab
     renderState.content =
-      <OverlayTrigger placement="bottom" overlay={
-        <Tooltip>
-          &ldquo;{tab.title}&rdquo;<br/>
-          <code>{tab.url}</code><br/>
-          created by {tab.creator?.name ? 'unknown'}<br/>
-          on {formatDate tab.created}
-        </Tooltip>
-      }>
+      <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className="tab-title">{renderState.content}</span>
       </OverlayTrigger>
     if node.isVisible()  # special buttons for visible tabs
