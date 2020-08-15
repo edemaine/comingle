@@ -30,6 +30,12 @@ tabIcon = (tab) ->
       <FontAwesomeIcon icon={faYoutube}/>
     else
       null
+tabDefaultLocation = (tab) ->
+  switch tab.type
+    when 'jitsi'
+      'border_right'
+    else
+      'lastTabSet'
 
 export default Room = ({loading, roomId}) ->
   {meetingId} = useParams()
@@ -51,7 +57,11 @@ export default Room = ({loading, roomId}) ->
     return if loading or model?
     setModel FlexLayout.Model.fromJson
       global: {}
-      borders: []
+      borders: [
+        type: 'border'
+        location: 'right'
+        children: []
+      ]
       layout: layout
   , [loading]
   ## Synchronize model with room
@@ -80,16 +90,20 @@ export default Room = ({loading, roomId}) ->
     model.doAction action for action in actions
     ## Add tabs in room but not yet layout
     for id, tab of id2tab when not laidOut[id]
-      tab = tabSettings tab
-      tab.id = tab._id
-      tab.type = 'tab'
+      tabLayout = tabSettings tab
+      tabLayout.id = tab._id
+      tabLayout.type = 'tab'
       if id of tabNews  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
-          tabNews[id].getId(), tab
+          tabNews[id].getId(), tabLayout
         delete tabNews[id]
       else
-        model.doAction FlexLayout.Actions.addNode tab,
-          lastTabSet.getId(), FlexLayout.DockLocation.CENTER, -1
+        location = tabDefaultLocation tab
+        location = lastTabSet.getId() if location == 'lastTabSet'
+        model.doAction FlexLayout.Actions.addNode tabLayout,
+          location, FlexLayout.DockLocation.CENTER, -1
+        if tabTypes[tab.type]?.alwaysRender
+          model.doAction FlexLayout.Actions.selectTab tabLayout.id
     ## Start new tab in every empty tabset
     model.visitNodes (node) ->
       if node.getType() == 'tabset'
@@ -120,8 +134,9 @@ export default Room = ({loading, roomId}) ->
   iconFactory = (tab) -> tabIcon id2tab[tab.getId()]
   onRenderTab = (node, {buttons}) ->
     if node.isVisible() and node.getComponent() != 'TabNew'
+      type = if node.getParent().getType() == 'border' then 'border' else 'tab'
       buttons.push \
-        <div key="reload" className="flexlayout__tab_button_trailing"
+        <div key="reload" className="flexlayout__#{type}_button_trailing"
          title="Reload Tab"
          onClick={(e) -> model.doAction \
            FlexLayout.Actions.updateNodeAttributes node.getId(),
@@ -131,6 +146,7 @@ export default Room = ({loading, roomId}) ->
           <FontAwesomeIcon icon={faRedoAlt}/>
         </div>
   onRenderTabSet = (node, {buttons}) ->
+    return if node.getType() == 'border'
     buttons.push \
       <button key="add" className="flexlayout__tab_toolbar_button-fa"
        title="Add Tab" onClick={(e) -> tabNew node.getId()}>
