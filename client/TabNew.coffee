@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {Random} from 'meteor/random'
 
 import {validURL, tabTypes} from '/lib/tabs'
@@ -6,53 +6,46 @@ import {useDebounce} from './lib/useDebounce'
 import {AppSettings} from './App'
 import Settings from '/settings.coffee'
 
-trimUrl = (x) -> x.replace /\/+$/, ''
+trimURL = (x) -> x.replace /\/+$/, ''
 
-tabMakerSets =
-  Whiteboard:
-    Cocreate:
-      Server: Settings.defaultServers.cocreate ? 'https://cocreate.csail.mit.edu'
-      onClick: ->
-        url = "#{trimUrl @states.Server[0]}/api/roomNew?grid=1"
-        response = await fetch url
-        json = await response.json()
-        @setUrl json.url
-        @setType 'cocreate'
-  "Video Conference":
-    "Jitsi Meet":
-      Server: Settings.defaultServers.jitsi ? 'https://meet.jit.si'
-      onClick: ->
-        @setUrl "#{trimUrl @states.Server[0]}/comingle/#{Random.id()}"
-        @setType 'jitsi'
+urlMaker =
+  cocreate: ->
+    server = Settings.defaultServers.cocreate ?
+             'https://cocreate.csail.mit.edu'
+    url = "#{trimURL server}/api/roomNew?grid=1"
+    response = await fetch url
+    json = await response.json()
+    json.url
+  jitsi: ->
+    server = Settings.defaultServers.jitsi ? 'https://meet.jit.si'
+    "#{trimURL server}/comingle/#{Random.id()}"
 
-initialTabMakerSet = (key for key of tabMakerSets)[0]
-
-export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
+export default TabNew = ({tab: tabNew, meetingId, roomId, replaceTabNew}) ->
   [url, setUrl] = useState ''
   [title, setTitle] = useState ''
   [type, setType] = useState 'iframe'
   [manualTitle, setManualTitle] = useState false
+  [submit, setSubmit] = useState false
+  submitButton = useRef()
 
   ## Automatic mangling after a little idle time
   urlDebounce = useDebounce url, 100
+  titleDebounce = useDebounce title, 100
   useEffect ->
-    tab = mangleTab {url, title, manualTitle, type}
+    tab = mangleTab {url, title, type, manualTitle}
     setUrl tab.url if tab.url != url
     setTitle tab.title if tab.title != title
     setType tab.type if tab.type != type
-  , [urlDebounce]
-
-  [tabMakerSet, setTabMakerSet] = useState initialTabMakerSet
-  tabMakerStates = {}
-  for key, tabMakers of tabMakerSets
-    tabMakerStates[key] = {}
-    for tabMaker, properties of tabMakers
-      tabMakerStates[key][tabMaker] = {}
-      for property, initial of properties when not property.startsWith 'on'
-        tabMakerStates[key][tabMaker][property] = useState initial
+    setManualTitle tab.manualTitle if tab.manualTitle != manualTitle
+    if submit
+      setSubmit false
+      setTimeout (-> submitButton.current?.click()), 0
+    undefined
+  , [urlDebounce, titleDebounce, submit]
 
   onSubmit = (e) ->
     e.preventDefault()
+    return unless validURL url
     tab = mangleTab
       meeting: meetingId
       room: roomId
@@ -62,73 +55,80 @@ export default TabNew = ({tab, meetingId, roomId, replaceTabNew}) ->
       manualTitle: manualTitle
     delete tab.manualTitle
     id = Meteor.apply 'tabNew', [tab], returnStubValue: true
-    replaceTabNew {id, tab}
+    replaceTabNew {id, tab: tabNew}
   <div className="card">
     <div className="card-body">
-      <h3 className="card-title">Add New Shared Tab to Room</h3>
-      <p className="card-text">Create widget using one of the buttons, or just enter a URL
-         for any embeddable website below. Then click Create New Tab.</p>
+      <h3 className="card-title">Add Shared Tab to Room</h3>
+      <p className="card-text">
+        Create/embed a widget for everyone in this room to use.
+      </p>
       <div className="card form-group">
         <div className="card-header">
           <ul className="nav nav-tabs card-header-tabs" role="tablist">
-            <li className="nav-item">
-              <span className="nav-link disabled pl-1">Create:</span>
-            </li>
-            {for key of tabMakerSets
-              selected = (tabMakerSet == key)
-              <li key={key} className="nav-item" role="presentation">
+            {for tabType, tabData of tabTypes
+              selected = (type == tabType)
+              <li key={tabType} className="nav-item" role="presentation">
                 <a className="nav-link #{if selected then 'active'}"
                  href="#" role="tab" aria-selected="#{selected}"
-                 onClick={do (key) -> (e) -> e.preventDefault(); setTabMakerSet key}>
-                  {key}
+                 onClick={do (tabType) -> (e) -> e.preventDefault(); setType tabType}>
+                  {tabData.category ? tabData.title}
                 </a>
               </li>
             }
           </ul>
         </div>
         <div className="card-body">
-          {for tabMaker, properties of tabMakerSets[tabMakerSet]
-            <form className="inline-form tabMaker d-flex flex-wrap"
-             key={tabMaker} onSubmit={(e) -> e.preventDefault()}>
-              <button type="submit" className="btn btn-info"
-               onClick={(e) -> properties.onClick.call
-                  states: tabMakerStates[tabMakerSet][tabMaker]
-                  setUrl: setUrl
-                  setType: setType
-                  name: name}>
-                {tabMaker}
-              </button>
-              {for property, value of properties when not property.startsWith 'on'
-                <div key={property} className="d-flex flex-grow-1 flex-wrap align-items-baseline">
-                  <label className="pl-4 pr-2">{property}:</label>
-                  <input className="form-control w-auto flex-grow-1" type="text"
-                   value={tabMakerStates[tabMakerSet][tabMaker][property][0]}
-                   onChange={do (tabMakerSet, tabMaker, property) -> (e) ->
-                     tabMakerStates[tabMakerSet][tabMaker][property][1] e.target.value
-                   }/>
-                </div>
-              }
-            </form>
-          }
+          <form className="newTab" onSubmit={onSubmit}>
+            {switch type
+              when 'iframe'
+                <p>Paste the URL for any embeddable website, e.g., Wikipedia:</p>
+              when 'cocreate'
+                <>
+                  <p>This server uses <b><a href="https://github.com/edemaine/cocreate">Cocreate</a></b> for a shared whiteboard.</p>
+                  <div className="form-group">
+                    <button className="btn btn-primary btn-lg btn-block"
+                     onClick={-> urlMaker.cocreate().then (url) ->
+                                setUrl url; setSubmit true}>
+                      New Cocreate Board
+                    </button>
+                  </div>
+                  <p>Or paste the URL for an existing board:</p>
+                </>
+              when 'jitsi'
+                <>
+                  <p>This server uses <b><a href="https://meet.jit.si/">Jitsi Meet</a></b> for video conferencing.</p>
+                  <div className="form-group">
+                    <button className="btn btn-primary btn-lg btn-block"
+                     onClick={-> setUrl urlMaker.jitsi(); setSubmit true}>
+                      New Jitsi Meet Room
+                    </button>
+                  </div>
+                  <p>Or paste the URL for an existing room:</p>
+                </>
+              when 'youtube'
+                <>
+                  <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
+                </>
+            }
+            <div className="form-group">
+              <label>URL</label>
+              <input type="url" placeholder="https://..." className="form-control"
+               value={url} required
+               onChange={(e) -> setUrl e.target.value}/>
+            </div>
+            <div className="form-group">
+              <label>Tab title (can be renamed later)</label>
+              <input type="text" placeholder="Cool Site" className="form-control"
+               value={title} required pattern=".*\S.*"
+               onChange={(e) -> setTitle e.target.value; setManualTitle true}/>
+            </div>
+            <button ref={submitButton} type="submit"
+             className="btn btn-primary btn-lg btn-block mb-1">
+              Embed This URL
+            </button>
+          </form>
         </div>
       </div>
-      <form className="newTab" onSubmit={onSubmit}>
-        <div className="form-group">
-          <label>URL for webpage to embed (via <code>&lt;iframe&gt;</code>)</label>
-          <input type="url" placeholder="https://..." className="form-control"
-           value={url} required
-           onChange={(e) -> setUrl e.target.value; setType 'iframe'}/>
-        </div>
-        <div className="form-group">
-          <label>Tab title (can be renamed later)</label>
-          <input type="text" placeholder="Cool Site" className="form-control"
-           value={title} required pattern=".*\S.*"
-           onChange={(e) -> setTitle e.target.value; setManualTitle true}/>
-        </div>
-        <button type="submit" className="btn btn-primary btn-block mb-1">
-          Create New Tab
-        </button>
-      </form>
     </div>
   </div>
 
@@ -158,6 +158,8 @@ export mangleTab = (tab) ->
     "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
 
   ## Automatic title
+  unless tab.title.trim()
+    tab.manualTitle = false
   if tab.manualTitle == false
     if tab.type == 'iframe'
       tab.title = (new URL tab.url).hostname

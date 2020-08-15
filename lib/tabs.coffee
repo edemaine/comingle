@@ -28,9 +28,13 @@ export tabTypes =
     title: 'Web'
   cocreate:
     title: 'Cocreate'
+    category: 'Whiteboard'
+    instance: 'board'
   jitsi:
     title: 'Jitsi'
     longTitle: 'Jitsi Meet'
+    category: 'Video Conference'
+    instance: 'room'
   youtube:
     title: 'YouTube'
 
