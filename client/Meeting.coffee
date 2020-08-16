@@ -159,4 +159,5 @@ export Meeting = ->
       </OverlayTrigger>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab}
-   onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}/>
+   onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
+   tabPhrase="room"/>

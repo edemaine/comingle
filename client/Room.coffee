@@ -231,10 +231,17 @@ export Room = ({loading, roomId}) ->
   onRenderTabSet = (node, {buttons}) ->
     return if node.getType() == 'border'
     buttons.push \
-      <button key="add" className="flexlayout__tab_toolbar_button-fa"
-       title="Add Tab" onClick={(e) -> tabNew node.getId()}>
-        <FontAwesomeIcon icon={faPlus}/>
-      </button>
+      <OverlayTrigger key="add" placement="bottom" overlay={(tipProps) ->
+        <Tooltip {tipProps...}>
+          Add Tab<br/>
+          <small>Add shared tab to room: web page, whiteboard, video conference, etc.</small>
+        </Tooltip>
+      }>
+        <button className="flexlayout__tab_toolbar_button-fa"
+         onClick={(e) -> tabNew node.getId()}>
+          <FontAwesomeIcon icon={faPlus}/>
+        </button>
+      </OverlayTrigger>
   onAction = (action) ->
     switch action.type
       when FlexLayout.Actions.RENAME_TAB
@@ -254,4 +261,4 @@ export Room = ({loading, roomId}) ->
       tabsetUsed.current[tabset.getId()] = (new Date).getTime()
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
-   onAction={onAction} onModelChange={onModelChange}/>
+   onAction={onAction} onModelChange={onModelChange} tabPhrase="tab"/>
