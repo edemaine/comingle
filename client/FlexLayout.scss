@@ -19,3 +19,60 @@
 .flexlayout__tab_button_leading, .flexlayout__border_button_leading {
   padding-right: 0.5ex;
 }
+
+// Color top-level splitters (separating rooms) differently
+$roomColor_base: hsl(195, 10%, 95%);
+$roomColor_1: scale_color($roomColor_base, $lightness:-3%);
+$roomColor_2: scale_color($roomColor_base, $lightness:-10%);
+$roomColor_3: scale_color($roomColor_base, $lightness:-15%);
+$roomColor_4: scale_color($roomColor_base, $lightness:-20%);
+$roomColor_5: scale_color($roomColor_base, $lightness:-25%);
+$roomColor_6: scale_color($roomColor_base, $lightness:-30%);
+#react-root > .flexlayout__layout {
+  > .flexlayout__splitter {
+    background-color: $roomColor_2;
+    &:hover {
+      background-color: $roomColor_4;
+    }
+    &_drag {
+      background-color: $roomColor_5;
+    }
+  }
+  > .flexlayout__drag_rect {
+    background-color: $roomColor_1;
+    border-color: $roomColor_4;
+  }
+  > .flexlayout__tabset {
+    background-color: $roomColor_1;
+    > .flexlayout__tabset_header_outer {
+      background-color: $roomColor_1;
+      .flexlayout__tab_button {
+        .flexlayout__tab_button_textbox {
+          background-color: $roomColor_3;
+        }
+        &--selected, &:hover {
+          background-color: $roomColor_3;
+        }
+        &_textbox {
+          background-color: $roomColor_3;
+        }
+      }
+    }
+    > .flexlayout__tabset-selected {
+      background-image: linear-gradient($color_background, $roomColor_4);
+    }
+    > .flexlayout__tabset-maximized {
+      background-image: linear-gradient($roomColor_6, $roomColor_2);
+    }
+  }
+  > .flexlayout__border_left {
+    background-color: $roomColor_2;
+    border-right: $roomColor_3;
+    .flexlayout__border_button {
+      background-color: $roomColor_3;
+      &--selected, &:hover {
+        background-color: $roomColor_3;
+      }
+    }
+  }
+}
