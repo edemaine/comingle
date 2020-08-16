@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useReducer} from 'react'
 import {Switch, Route, useParams, useLocation, useHistory} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen} from '@fortawesome/free-solid-svg-icons'
+import {faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
 
 import {RoomList} from './RoomList'
 import {Room} from './Room'
@@ -70,12 +70,20 @@ export Meeting = ->
           type: 'tab'
           name: Rooms.findOne(id)?.title ? id
           component: 'Room'
+          config: showDeleted: false
         tabset = FlexLayout.getActiveTabset model
         model.doAction FlexLayout.Actions.addNode tab,
           tabset.getId(), FlexLayout.DockLocation.CENTER, -1
       FlexLayout.forceSelectTab model, id
     undefined
   , [location.hash]
+  [showDeleted, setShowDeleted] = useReducer(
+    (state, {id, value}) ->
+      model.doAction FlexLayout.Actions.updateNodeAttributes id,
+        config: showDeleted: value
+      state[id] = value
+      state
+  , {})
   presenceId = getPresenceId()
   name = useTracker -> Session.get 'name'
   updatePresence = ->
@@ -132,7 +140,7 @@ export Meeting = ->
       when 'RoomList' then <RoomList loading={loading}/>
       when 'Room'
         if node.isVisible()
-          <Room loading={loading} roomId={node.getId()}/>
+          <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
         else
           null  # don't render hidden rooms, in particular to cancel all calls
   tooltip = (node) -> (props) ->
@@ -148,11 +156,37 @@ export Meeting = ->
       <FontAwesomeIcon icon={faDoorOpen}/>
     </OverlayTrigger>
   onRenderTab = (node, renderState) ->
-    #return if node.getComponent() == 'roomsTab'
+    return if node.getComponent() == 'RoomList'
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className="tab-title">{renderState.content}</span>
       </OverlayTrigger>
+    if node.isVisible()  # special buttons for visible tabs
+      id = node.getId()
+      buttons = renderState.buttons
+      type = if node.getParent().getType() == 'border' then 'border' else 'tab'
+      showDeleted = node.getConfig()?.showDeleted
+      label =
+        if showDeleted
+          "Hide Deleted Tabs"
+        else
+          "Show Deleted Tabs"
+      buttons?.push \
+        <div key="deleted"
+         className="flexlayout__#{type}_button_trailing"
+         aria-label={label}
+         onClick={-> setShowDeleted {id, value: not showDeleted}}
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
+          <OverlayTrigger placement="bottom" overlay={(props) ->
+            <Tooltip {...props}>
+              {label}<br/>
+              <small>Currently {unless showDeleted then <b>not</b>} showing deleted tabs.</small>
+            </Tooltip>
+          }>
+            <FontAwesomeIcon icon={if showDeleted then faEye else faEyeSlash}/>
+          </OverlayTrigger>
+        </div>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab}
    onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}

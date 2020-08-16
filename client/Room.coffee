@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useReducer, useRef} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
-import {Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Button, ButtonGroup, Tooltip, OverlayTrigger, Overlay} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faTimes, faRedoAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faRedoAlt, faVideo, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
@@ -36,7 +36,7 @@ tabIcon = (tab) ->
     else
       null
 
-export Room = ({loading, roomId}) ->
+export Room = ({loading, roomId, showDeleted}) ->
   {meetingId} = useParams()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(
@@ -44,7 +44,9 @@ export Room = ({loading, roomId}) ->
   , {})
   {loading, room, tabs} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
-    tabs = Tabs.find(room: roomId).fetch()
+    query = room: roomId
+    query.deleted = $ne: true unless showDeleted
+    tabs = Tabs.find(query).fetch()
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
     tabs: tabs
@@ -193,8 +195,17 @@ export Room = ({loading, roomId}) ->
       <code>{tab.url}</code><br/>
       created by {tab.creator?.name ? 'unknown'}<br/>
       on {formatDate tab.created}
+      {if tab.deleted
+        <i>
+          <br/>deleted by {tab.updator?.name ? 'unknown'}
+          <br/>on {formatDate tab.updated}
+        </i>
+      }
     </Tooltip>
   onRenderTab = (node, renderState) ->
+    closeRef = useRef()
+    [closeClick, setCloseClick] = useState false
+    [closeHover, setCloseHover] = useState false
     return if node.getComponent() == 'TabNew'
     tab = id2tab[node.getId()]
     return unless tab
@@ -235,6 +246,48 @@ export Room = ({loading, roomId}) ->
           }>
             <FontAwesomeIcon icon={faRedoAlt}/>
           </OverlayTrigger>
+        </div>
+      closeTab = ->
+        Meteor.call 'tabEdit',
+          id: tab._id
+          deleted: not tab.deleted
+          updator: getCreator()
+        setCloseHover false
+        setCloseClick false
+      verb = if tab.deleted then 'Restore' else 'Delete'
+      buttons?.push \
+        <div key="delete" className="flexlayout__#{type}_button_trailing"
+         aria-label="Close Tab for Everyone"
+         onClick={-> setCloseClick not closeClick}
+         onMouseEnter={-> setCloseHover true}
+         onMouseLeave={-> setCloseHover false}
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
+          <span ref={closeRef}>
+            {if tab.deleted
+               <FontAwesomeIcon icon={faTrashRestore}/>
+             else
+               <FontAwesomeIcon icon={faTrash}/>
+            }
+          </span>
+          <Overlay target={closeRef.current} placement="bottom"
+           show={closeHover or closeClick}>
+            <Tooltip>
+              {verb} Tab for Everyone<br/>
+              <small>Trashed tabs can still be restored using the room's eye icon.</small>
+              {if closeClick
+                 <ButtonGroup className="mt-1">
+                   <Button variant="danger" size="sm" onClick={closeTab}>
+                     {verb} Tab
+                   </Button>
+                   <Button variant="success" size="sm"
+                    onClick={-> setCloseHover false; setCloseClick false}>
+                     Cancel
+                   </Button>
+                 </ButtonGroup>
+              }
+            </Tooltip>
+          </Overlay>
         </div>
   onRenderTabSet = (node, {buttons}) ->
     return if node.getType() == 'border'
