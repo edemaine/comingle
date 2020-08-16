@@ -154,10 +154,9 @@ export Room = ({loading, roomId}) ->
           FlexLayout.forceSelectTab model, tabLayout.id
         model.doAction FlexLayout.Actions.setActiveTabset location
     ## Start new tab in every empty tabset
-    model.visitNodes (node) ->
-      if node.getType() == 'tabset'
-        if node.getChildren().length == 0
-          tabNew node.getId()
+    for tabset in FlexLayout.getTabsets model
+      if tabset.getChildren().length == 0
+        tabNew tabset.getId()
     undefined
   , [model, tabs]
   ## End of hooks

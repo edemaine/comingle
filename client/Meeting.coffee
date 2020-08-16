@@ -70,12 +70,9 @@ export Meeting = ->
           type: 'tab'
           name: Rooms.findOne(id)?.title ? id
           component: 'Room'
-        if tabset = model.getActiveTabset()
-          model.doAction FlexLayout.Actions.addNode tab,
-            tabset.getId(), FlexLayout.DockLocation.CENTER, -1
-        else
-          model.doAction FlexLayout.Actions.addNode tab,
-            'root', FlexLayout.DockLocation.RIGHT
+        tabset = FlexLayout.getActiveTabset model
+        model.doAction FlexLayout.Actions.addNode tab,
+          tabset.getId(), FlexLayout.DockLocation.CENTER, -1
       FlexLayout.forceSelectTab model, id
     undefined
   , [location.hash]
@@ -91,8 +88,7 @@ export Meeting = ->
         visible: []
         invisible: []
     model.visitNodes (node) ->
-      if node.getType() == FlexLayout.TabNode.TYPE and
-         node.getId() != 'roomsTab'
+      if node.getType() == 'tab' and node.getId() != 'roomsTab'
         if node.isVisible()
           presence.rooms.visible.push node.getId()
         else

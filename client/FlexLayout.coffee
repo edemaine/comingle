@@ -12,13 +12,28 @@ import {capitalize} from './lib/capitalize'
 titleLimit = 20
 
 export Layout = (props) ->
+  ## Shorten titles that are longer than titleLimit.
   titleFactory = (node) ->
     title = node.getName()
     if title.length > titleLimit
       title = title[...titleLimit-1] + '…'
     title
+  ## Disable maximization when a single tabset.
+  onModelChange = (model) ->
+    tabsets = getTabsets model
+    ## Can't set this via model.doAction or else we get in an infinite loop:
+    enableMaximize = (tabsets.length > 1)
+    if enableMaximize != model._getAttribute 'tabSetEnableMaximize'
+      model.doAction Actions.updateModelAttributes
+        tabSetEnableMaximize: enableMaximize
+    if tabsets.length == 1 and tabsets[0].isMaximized()
+      model.doAction Actions.updateNodeAttributes tabsets[0].getId(),
+        maximized: false
+    props.onModelChange? model
+  onModelChange props.model  # initialize
   <FlexLayout {...props}
    titleFactory={titleFactory}
+   onModelChange={onModelChange}
    icons={
      close:
        <OverlayTrigger placement="bottom" overlay={(tipProps) ->
