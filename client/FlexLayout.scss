@@ -30,13 +30,15 @@ $roomColor_5: scale_color($roomColor_base, $lightness:-25%);
 $roomColor_6: scale_color($roomColor_base, $lightness:-30%);
 #react-root > .flexlayout__layout {
   > .flexlayout__splitter {
+    /* Regular approach: light to dark
     background-color: $roomColor_2;
-    &:hover {
-      background-color: $roomColor_4;
-    }
-    &_drag {
-      background-color: $roomColor_5;
-    }
+    &:hover { background-color: $roomColor_4; }
+    &_drag { background-color: $roomColor_5; }
+    */
+    // Flipped from regular approach: dark to light
+    background-color: $roomColor_6;
+    &:hover { background-color: $roomColor_4; }
+    &_drag { background-color: $roomColor_3; }
   }
   > .flexlayout__drag_rect {
     background-color: $roomColor_1;
