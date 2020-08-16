@@ -79,8 +79,9 @@ export Meeting = ->
   , [location.hash]
   [showDeleted, setShowDeleted] = useReducer(
     (state, {id, value}) ->
-      model.doAction FlexLayout.Actions.updateNodeAttributes id,
-        config: showDeleted: value
+      if model.getNodeById id
+        model.doAction FlexLayout.Actions.updateNodeAttributes id,
+          config: showDeleted: value
       state[id] = value
       state
   , {})
