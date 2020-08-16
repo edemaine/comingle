@@ -169,7 +169,7 @@ export Room = ({loading, roomId}) ->
       buttons = renderState.buttons
       type = if node.getParent().getType() == 'border' then 'border' else 'tab'
       if url = tab.url
-        buttons.push \
+        buttons?.push \
           <div key="link" className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
            title="Save tab URL to clipboard"
            onClick={(e) -> navigator.clipboard.writeText url}
@@ -177,7 +177,7 @@ export Room = ({loading, roomId}) ->
            onTouchStart={(e) -> e.stopPropagation()}>
             <FontAwesomeIcon icon={clipboardLink}/>
           </div>
-      buttons.push \
+      buttons?.push \
         <div key="reload"
          className="flexlayout__#{type}_button_trailing"
          title="Reload Tab"
