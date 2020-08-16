@@ -5,6 +5,15 @@ import {Session} from 'meteor/session'
 
 import {allow} from './TabIFrame'
 import {Tabs, zoomRegExp} from '/lib/tabs'
+import {meteorCallPromise} from '/lib/meteorPromise'
+
+## https://github.com/zoom/sample-app-web/blob/master/CDN/js/tool.js
+base64 = (str) ->
+  ## first we use encodeURIComponent to get percent-encoded UTF-8,
+  ## then we convert the percent encodings into raw bytes which
+  ## can be fed into btoa.
+  btoa encodeURIComponent(str).replace /%([0-9A-F]{2})/g, (match, hex) ->
+    String.fromCharCode "0x#{hex}"
 
 export TabZoom = ({tabId, room}) ->
   tab = useTracker -> Tabs.findOne tabId
@@ -28,11 +37,17 @@ export TabZoom = ({tabId, room}) ->
     url += "&uname=#{encodeURIComponent name}" if name
     window.location.replace url
 
-  [zoomEmbed, setZoomEmbed] = useState()
+  [zoomWebSupport, setZoomWebSupport] = useState()
   useMemo ->
-    Meteor.call 'zoomEmbed', (error, response) ->
+    Meteor.call 'zoomWebSupport', (error, response) ->
       return console.error error if error?
-      setZoomEmbed response
+      setZoomWebSupport response
+  [embedUrl, setEmbedUrl] = useState()
+  zoomWeb = ->
+    {signature, apiKey} = await meteorCallPromise 'zoomSign', zoomID
+    name = Session.get 'name'
+    setEmbedUrl "/zoom.html?name=#{base64 name}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&apiKey=#{apiKey}"
+  return <iframe src={embedUrl} allow={allow}/> if embedUrl
 
   <div className="card">
     <div className="card-body">
@@ -53,15 +68,17 @@ export TabZoom = ({tabId, room}) ->
       </Row>
       <Row>
         <Col xs={4}>
-          <Button block disabled={not zoomEmbed}>Web Client</Button>
+          <Button block disabled={not zoomWebSupport} onClick={zoomWeb}>
+            Web Client
+          </Button>
         </Col>
         <Col xs={8}>
           <p>Zoom's web client embeds into Comingle and requires no installation, but the quality is somewhat lower, and <a href="https://support.zoom.us/hc/en-us/articles/360027397692-Desktop-client-mobile-app-and-web-client-comparison">some features are missing</a>.</p>
-          {unless zoomEmbed
+          {unless zoomWebSupport
             <p>However, the Comingle server needs to be configured to support this.</p>
           }
         </Col>
       </Row>
+      <p>If you want to make this decision again, select the &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
     </div>
   </div>
-  #<iframe src={tab.url} allow={allow}/>

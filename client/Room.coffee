@@ -244,7 +244,7 @@ export Room = ({loading, roomId, showDeleted}) ->
          onTouchStart={(e) -> e.stopPropagation()}>
           <OverlayTrigger placement="bottom" overlay={(props) ->
             <Tooltip {...props}>
-              Reload tab<br/>
+              Reload Tab<br/>
               <small>If it's not working, try rebooting.</small>
             </Tooltip>
           }>
