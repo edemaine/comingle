@@ -133,8 +133,12 @@ export Meeting = ->
         history.replace "/m/#{meetingId}"
   factory = (node) ->
     switch node.getComponent()
-      when 'Room' then <Room loading={loading} roomId={node.getId()}/>
       when 'RoomList' then <RoomList loading={loading}/>
+      when 'Room'
+        if node.isVisible()
+          <Room loading={loading} roomId={node.getId()}/>
+        else
+          null  # don't render hidden rooms, in particular to cancel all calls
   tooltip = (node) -> (props) ->
     room = id2room[node.getId()]
     return <span/> unless room
