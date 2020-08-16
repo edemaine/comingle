@@ -18,6 +18,7 @@ import {Loading} from './Loading'
 import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
+import {TabZoom} from './TabZoom'
 
 tabTitle = (tab) ->
   tab.title or 'Untitled'
@@ -25,6 +26,8 @@ tabComponent = (tab) ->
   switch tab.type
     when 'jitsi'
       'TabJitsi'
+    when 'zoom'
+      'TabZoom'
     else # iframe, cocreate, youtube -- for now
       'TabIFrame'
 tabIcon = (tab) ->
@@ -174,6 +177,7 @@ export Room = ({loading, roomId, showDeleted}) ->
     switch node.getComponent()
       when 'TabIFrame' then <TabIFrame tabId={node.getId()}/>
       when 'TabJitsi' then <TabJitsi tabId={node.getId()} room={room}/>
+      when 'TabZoom' then <TabZoom tabId={node.getId()} room={room}/>
       when 'TabNew'
         <TabNew {...{node, meetingId, roomId,
                      replaceTabNew, existingTabTypes}}/>

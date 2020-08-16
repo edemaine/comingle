@@ -53,6 +53,12 @@ export tabTypes =
       "#{trimURL server}/comingle/#{Random.id()}"
   youtube:
     title: 'YouTube'
+  zoom:
+    title: 'Zoom'
+    category: 'Zoom'
+    alwaysRender: true
+    onePerRoom: true
+    keepVisible: true
 
 Meteor.methods
   tabNew: (tab) ->
@@ -95,6 +101,9 @@ Meteor.methods
     Tabs.update diff.id,
       $set: set
 
+export zoomRegExp =
+    ///^(https://[^/]*zoom.us/) (?: j/([0-9]*))? (?: \?pwd=(\w*))? ///
+
 export mangleTab = (tab, dropManualTitle) ->
   tab.url = tab.url.trim()
   return tab unless tab.url and validURL tab.url
@@ -119,6 +128,10 @@ export mangleTab = (tab, dropManualTitle) ->
   ///i, (match, nocookie, video) ->
     tab.type = 'youtube'
     "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
+
+  ## Zoom URL detection
+  if ///^https://[^/]*zoom.us/ ///.test tab.url
+    tab.type = 'zoom'
 
   ## Automatic title
   unless tab.title?.trim()

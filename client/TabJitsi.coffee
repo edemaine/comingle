@@ -2,7 +2,6 @@ import React from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {allow} from './TabIFrame'
-import {AppSettings} from './App'
 import {Tabs} from '/lib/tabs'
 
 export TabJitsi = ({tabId, room}) ->

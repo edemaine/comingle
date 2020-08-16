@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react'
+import {Form} from 'react-bootstrap'
 
-import {validURL, tabTypes, mangleTab} from '/lib/tabs'
+import {validURL, tabTypes, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
 import {getCreator} from './lib/presenceId'
 import {capitalize} from './lib/capitalize'
@@ -15,6 +16,11 @@ export tabTypePage =
     topDescription: <p>This server uses <b><a href="https://meet.jit.si/">Jitsi Meet</a></b> for video conferencing.</p>
   youtube:
     topDescription: <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
+  zoom:
+    topDescription:
+      <p>If you create a Zoom meeting yourself, you can embed it here.</p>
+    bottomDescription:
+      <p>Or paste a Zoom invitation link:</p>
 
 export TabNew = ({node, meetingId, roomId,
                   replaceTabNew, existingTabTypes}) ->
@@ -24,6 +30,23 @@ export TabNew = ({node, meetingId, roomId,
   [manualTitle, setManualTitle] = useState false
   [submit, setSubmit] = useState false
   submitButton = useRef()
+
+  ## Zoom
+  [zoomID, setZoomID] = useState ''
+  [zoomPwd, setZoomPwd] = useState ''
+  useEffect ->
+    return unless type == 'zoom'
+    if zoomID
+      match = zoomRegExp.exec url
+      setUrl "#{match?[1] ? 'https://zoom.us/'}j/#{zoomID}" +
+        if zoomPwd then "?pwd=#{zoomPwd}" else ''
+  , [zoomID, zoomPwd, type]
+  useEffect ->
+    return unless type == 'zoom'
+    match = zoomRegExp.exec url
+    setZoomRoom match[2] if match?[2]
+    setZoomPwd match[3] if match?[3]
+  , [url, type]
 
   ## Automatic mangling after a little idle time
   urlDebounce = useDebounce url, 100
@@ -102,6 +125,23 @@ export TabNew = ({node, meetingId, roomId,
                 <p>Or paste the URL for an existing {tabTypes[type].instance}:</p>
               </>
             }
+            {if type == 'zoom'
+              <>
+                <Form.Group>
+                  <Form.Label>Room number</Form.Label>
+                  <Form.Control type="text" placeholder="123456789"
+                   value={zoomID}
+                   onChange={(e) -> setZoomRoom e.target.value}/>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Room password / hash (if needed)</Form.Label>
+                  <Form.Control type="text" placeholder="MzN..."
+                   value={zoomPwd}
+                   onChange={(e) -> setZoomPwd e.target.value}/>
+                </Form.Group>
+              </>
+            }
+            {tabTypePage[type].bottomDescription}
             <div className="form-group">
               <label>URL</label>
               <input type="url" placeholder="https://..." className="form-control"
