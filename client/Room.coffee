@@ -209,7 +209,7 @@ export Room = ({loading, roomId}) ->
         buttons?.push \
           <div key="link"
            className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
-           ariaLabel="Save tab URL to clipboard"
+           aria-label="Save tab URL to clipboard"
            onClick={(e) -> navigator.clipboard.writeText url}
            onMouseDown={(e) -> e.stopPropagation()}
            onTouchStart={(e) -> e.stopPropagation()}>
@@ -221,7 +221,7 @@ export Room = ({loading, roomId}) ->
           </div>
       buttons?.push \
         <div key="reload" className="flexlayout__#{type}_button_trailing"
-         ariaLabel="Reload Tab"
+         aria-label="Reload Tab"
          onClick={(e) -> model.doAction \
            FlexLayout.Actions.updateNodeAttributes node.getId(),
              component: 'TabReload'}
@@ -246,6 +246,7 @@ export Room = ({loading, roomId}) ->
         </Tooltip>
       }>
         <button className="flexlayout__tab_toolbar_button-fa"
+         aria-label="Add Tab"
          onClick={(e) -> tabNew node.getId()}>
           <FontAwesomeIcon icon={faPlus}/>
         </button>

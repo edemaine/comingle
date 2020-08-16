@@ -45,7 +45,7 @@ export Layout = (props) ->
          else
            <Tooltip {tipProps...}>Close New Tab</Tooltip>
        }>
-         <FontAwesomeIcon icon={faTimes}/>
+         <FontAwesomeIcon icon={faTimes} aria-label="Close New Tab"/>
        </OverlayTrigger>
      maximize:
        <OverlayTrigger placement="bottom" overlay={(tipProps) ->
@@ -54,7 +54,8 @@ export Layout = (props) ->
            <small>Temporarily hide all other {props.tabPhrase}s to focus on this one.</small>
          </Tooltip>
        }>
-         <FontAwesomeIcon icon={faExpandArrowsAlt}/>
+         <FontAwesomeIcon icon={faExpandArrowsAlt}
+          aria-label="Maximize This #{capitalize props.tabPhrase}"/>
        </OverlayTrigger>
      restore:
        <OverlayTrigger placement="bottom" overlay={(tipProps) ->
@@ -63,7 +64,8 @@ export Layout = (props) ->
            <small>Restore all other {props.tabPhrase}s.</small>
          </Tooltip>
        }>
-         <FontAwesomeIcon icon={faCompressArrowsAlt}/>
+         <FontAwesomeIcon icon={faCompressArrowsAlt}
+          aria-label="Unmaximize This #{capitalize props.tabPhrase}"/>
        </OverlayTrigger>
      more:
        <OverlayTrigger placement="bottom" overlay={(tipProps) ->
@@ -72,7 +74,8 @@ export Layout = (props) ->
            <small>Some additional {props.tabPhrase}s are hiding here because of the limited width.<br/>Select to see the list.</small>
          </Tooltip>
        }>
-         <FontAwesomeIcon icon={faWindowRestore} width="12px"/>
+         <FontAwesomeIcon icon={faWindowRestore} width="12px"
+          aria-label="Overflow #{capitalize props.tabPhrase}s"/>
        </OverlayTrigger>
    }
    i18nMapper={(label) -> switch label
