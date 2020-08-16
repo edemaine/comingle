@@ -65,34 +65,37 @@ export Room = ({loading, roomId}) ->
       layout: layout
   , [loading]
   ## Automatic tab layout algorithm.
-  tabDefaultLocation = (tab, tabNew) ->
+  tabDefaultLocation = (tab) ->
     if tabTypes[tab.type].keepVisible
       ## New tab is keepVisible; make sure it's in a tabset by itself.
-      if tabNew?
+      if tabNews[tab._id]?
         ## User added this tab via TabNew interface.
         ## If the TabNew is alone in its tabset, replace it there;
         ## otherwise, add to the right of its tabset.
-        if tabNew.getParent().getChildren().length == 1
+        if tabNews[tab._id].getParent().getChildren().length == 1
           null
         else
-          [tabNew.getParent().getId(), FlexLayout.DockLocation.RIGHT, -1]
+          [tabNews[tab._id].getParent().getId(), FlexLayout.DockLocation.RIGHT, -1]
       else
         ## Automatic layout: add to the right of the last tabset.
         [(FlexLayout.getTabsets model).pop().getId(),
          FlexLayout.DockLocation.RIGHT, -1]
     else
       ## New tab is not keepVisible.  Avoid hiding any keepVisible tabs.
-      if tabNew?
+      if tabNews[tab._id]?
         ## User added this tab via TabNew interface.  In-place replacement,
         ## unless there's a keepVisible tab adjacent in the same tabset.
         ## (For example, new room with just a Jitsi call and we add a tab.)
-        siblings = tabNew.getParent().getChildren()
-        index = siblings.indexOf tabNew
+        siblings = tabNews[tab._id].getParent().getChildren()
+        index = siblings.indexOf tabNews[tab._id]
         if (index == 0 or not
             tabTypes[id2tab[siblings[index-1].getId()]?.type]?.keepVisible) and
            (index == siblings.length-1 or not
             tabTypes[id2tab[siblings[index+1].getId()]?.type]?.keepVisible)
           return null
+        ## Delete TabNew now, which may reveal keepVisible sibling.
+        model.doAction FlexLayout.Actions.deleteTab tabNews[tab._id].getId()
+        delete tabNews[tab._id]
       ## Append non-keepVisible tab to least recently used tabset
       ## that does not have a keepVisible tab visible, if one exists.
       freeTabsets = []
@@ -139,9 +142,6 @@ export Room = ({loading, roomId}) ->
       tabLayout.id = tab._id
       tabLayout.type = 'tab'
       location = tabDefaultLocation tab, tabNews[id]
-      if tabNews[id]? and location?  # delete TabNew
-        model.doAction FlexLayout.Actions.deleteTab tabNews[id].getId()
-        delete tabNews[id]
       if tabNews[id]?  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
           tabNews[id].getId(), tabLayout

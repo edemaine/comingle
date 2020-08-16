@@ -79,13 +79,14 @@ export RoomNew = ->
   submit = (e) ->
     e.preventDefault?()
     return unless title.trim().length
-    roomId = await roomWithTemplate
+    room =
       meeting: meetingId
       title: title.trim()
       creator: getCreator()
       template: e.template ? 'jitsi'
-    history.push "/m/#{meetingId}##{roomId}"
     setTitle ''
+    roomId = await roomWithTemplate room
+    history.push "/m/#{meetingId}##{roomId}"
   <form onSubmit={submit}>
     <div className="form-group"/>
     <div className="form-group">
