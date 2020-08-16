@@ -2,11 +2,15 @@
 
 export default Settings =
 
-  ## When creating a new meeting, create rooms with the specified titles
+  ## When creating a new meeting, create rooms with the specified
+  ## title and template.  Template can be '' (blank), 'cocreate', 'jitsi',
+  ## or a combination via plus, e.g., 'cocreate+jitsi'.
   newMeetingRooms: [
     title: 'Main Room'
+    template: 'jitsi'
   #,
-  #  title: 'Another Room'
+  #  title: 'Empty Room'
+  #  template: ''
   ]
 
   ## Default servers for each of the (open-source) services.

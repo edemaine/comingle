@@ -36,7 +36,9 @@ Meteor.methods
     Rooms.update diff.id,
       $set: set
 
-export roomWithTemplate = (room, template = '') ->
+export roomWithTemplate = (room) ->
+  template = room.template ? ''
+  delete room.template
   roomId = await meteorCallPromise 'roomNew', room
   for type in template.split '+' when type
     url = tabTypes[type].createNew()

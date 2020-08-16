@@ -83,7 +83,7 @@ export RoomNew = ->
       meeting: meetingId
       title: title.trim()
       creator: getCreator()
-    , e.template ? 'jitsi'
+      template: e.template ? 'jitsi'
     history.push "/m/#{meetingId}##{roomId}"
     setTitle ''
   <form onSubmit={submit}>
