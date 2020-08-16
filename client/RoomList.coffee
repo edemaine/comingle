@@ -1,9 +1,10 @@
 import React, {useState} from 'react'
+import useInterval from '@use-it/interval'
 import {Link, useParams, useHistory} from 'react-router-dom'
-import {SplitButton, Dropdown} from 'react-bootstrap'
+import {SplitButton, Dropdown, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUser} from '@fortawesome/free-solid-svg-icons'
+import {faUser, faHandPaper} from '@fortawesome/free-solid-svg-icons'
 
 import {Rooms, roomWithTemplate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
@@ -12,6 +13,7 @@ import {Header} from './Header'
 import {Name} from './Name'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {sortNames, uniqCountNames} from './lib/sortNames'
+import {formatTimeDelta} from './lib/dates'
 
 export RoomList = ({loading}) ->
   {meetingId} = useParams()
@@ -56,6 +58,32 @@ export RoomInfo = ({room, presence}) ->
     clusters = uniqCountNames presence, (p) -> p.name
   myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
   <Link to="/m/#{meetingId}##{room._id}" className="list-group-item list-group-item-action room-info #{myPresenceClass}">
+    {if myPresence or room.raised
+      help = "#{if room.raised then 'Lower' else 'Raise'} Hand"
+      toggleHand = ->
+        Meteor.call 'roomEdit',
+          id: room._id
+          raised: not room.raised
+          updator: getCreator()
+      <div className="raise-hand #{if room.raised then 'active' else ''}"
+       aria-label={help}>
+        <OverlayTrigger placement="top" overlay={(props) ->
+          <Tooltip {...props}>{help}</Tooltip>
+        }>
+          <FontAwesomeIcon aria-label={help} icon={faHandPaper}
+           onClick={toggleHand}/>
+        </OverlayTrigger>
+        {if room.raised and typeof room.raised != 'boolean'
+          [timer, setTimer] = useState formatTimeDelta (new Date) - room.raised
+          useInterval ->
+            setTimer formatTimeDelta (new Date) - room.raised
+          , 1000
+          <div className="timer">
+            {timer}
+          </div>
+        }
+      </div>
+    }
     <span className="title">{room.title}</span>
     {if clusters?.length
       <div className="presence">

@@ -20,11 +20,33 @@ nav
 
 .room-info
   color: black
+  &:hover
+    color: #003e80
+  &:active
+    color: #0069d9
 
   &.room-info-visible
     background-color: #b8daff  // list-group-item-primary
   &.room-info-invisible
     background-color: hsl(220,6%,95%)  // list-group-item-secondary, but brighter
+
+  .raise-hand
+    float: right
+    margin-right: -0.75rem
+    opacity: 10%
+    &:hover
+      opacity: 25%
+    &:active
+      opacity: 50%
+    &.active
+      opacity: 100%
+      &:hover
+        opacity: 75%
+  .timer
+    position: absolute
+    z-index: 1
+    transform: rotate(90deg)
+    transform-origin: 0.55rem 0.75rem //0.65rem 0.65rem
 
   .presence
     font-size: small

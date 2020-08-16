@@ -25,9 +25,11 @@ Meteor.methods
     check diff,
       id: String
       title: Match.Optional String
+      raised: Match.Optional Boolean
       updator: creatorPattern
     unless @isSimulation
       diff.updated = new Date
+      diff.raised = diff.updated if diff.raised
     room = checkRoom diff.id
     set = {}
     for key, value of diff when key != 'id'
