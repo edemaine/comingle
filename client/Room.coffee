@@ -207,23 +207,34 @@ export Room = ({loading, roomId}) ->
       type = if node.getParent().getType() == 'border' then 'border' else 'tab'
       if url = tab.url
         buttons?.push \
-          <div key="link" className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
-           title="Save tab URL to clipboard"
+          <div key="link"
+           className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
+           ariaLabel="Save tab URL to clipboard"
            onClick={(e) -> navigator.clipboard.writeText url}
            onMouseDown={(e) -> e.stopPropagation()}
            onTouchStart={(e) -> e.stopPropagation()}>
-            <FontAwesomeIcon icon={clipboardLink}/>
+            <OverlayTrigger placement="bottom" overlay={(props) ->
+              <Tooltip {...props}>Save tab URL to clipboard</Tooltip>
+            }>
+              <FontAwesomeIcon icon={clipboardLink}/>
+            </OverlayTrigger>
           </div>
       buttons?.push \
-        <div key="reload"
-         className="flexlayout__#{type}_button_trailing"
-         title="Reload Tab"
+        <div key="reload" className="flexlayout__#{type}_button_trailing"
+         ariaLabel="Reload Tab"
          onClick={(e) -> model.doAction \
            FlexLayout.Actions.updateNodeAttributes node.getId(),
              component: 'TabReload'}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
-          <FontAwesomeIcon icon={faRedoAlt}/>
+          <OverlayTrigger placement="bottom" overlay={(props) ->
+            <Tooltip {...props}>
+              Reload tab<br/>
+              <small>If it's not working, try rebooting.</small>
+            </Tooltip>
+          }>
+            <FontAwesomeIcon icon={faRedoAlt}/>
+          </OverlayTrigger>
         </div>
   onRenderTabSet = (node, {buttons}) ->
     return if node.getType() == 'border'
