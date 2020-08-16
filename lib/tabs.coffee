@@ -1,3 +1,5 @@
+import {Random} from 'meteor/random'
+
 import {validId, creatorPattern} from './id'
 import {checkMeeting} from './meetings'
 import {checkRoom} from './rooms'
@@ -22,6 +24,7 @@ export checkURL = (url) ->
   unless validURL url
     throw new Error "Invalid URL #{url}"
   true
+export trimURL = (x) -> x.replace /\/+$/, ''
 
 export tabTypes =
   iframe:
@@ -30,6 +33,13 @@ export tabTypes =
     title: 'Cocreate'
     category: 'Whiteboard'
     instance: 'board'
+    createNew: ->
+      server = Settings.defaultServers.cocreate ?
+               'https://cocreate.csail.mit.edu'
+      url = "#{trimURL server}/api/roomNew?grid=1"
+      response = await fetch url
+      json = await response.json()
+      json.url
   jitsi:
     title: 'Jitsi'
     longTitle: 'Jitsi Meet'
@@ -38,6 +48,9 @@ export tabTypes =
     alwaysRender: true
     onePerRoom: true
     keepVisible: true
+    createNew: ->
+      server = Settings.defaultServers.jitsi ? 'https://meet.jit.si'
+      "#{trimURL server}/comingle/#{Random.id()}"
   youtube:
     title: 'YouTube'
 
@@ -80,3 +93,40 @@ Meteor.methods
       set.updated = new Date
     Tabs.update diff.id,
       $set: set
+
+export mangleTab = (tab, dropManualTitle) ->
+  tab.url = tab.url.trim()
+  return tab unless tab.url and validURL tab.url
+
+  ## Force type if we recognize default servers
+  for service in ['cocreate', 'jitsi']
+    server = Settings.defaultServers[service]
+    continue unless server?
+    if tab.url.startsWith server
+      tab.type = service
+
+  ## YouTube URL mangling into embed link, based on examples from
+  ## https://gist.github.com/rodrigoborgesdeoliveira/987683cfbfcc8d800192da1e73adc486
+  tab.url = tab.url.replace ///
+    ^ (?: http s? : )? //
+    (?: youtu\.be/ |
+      (?: www\. | m\. )? youtube (-nocookie)? .com /
+        (?: v/ | vi/ | e/ | embed/ |
+          (?: watch )? \? (?: feature=[^&]* & )? v i? = )
+    )
+    ( [\w\-]+ ) [^]*
+  ///i, (match, nocookie, video) ->
+    tab.type = 'youtube'
+    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
+
+  ## Automatic title
+  unless tab.title?.trim()
+    tab.manualTitle = false
+  if tab.manualTitle == false
+    if tab.type == 'iframe'
+      tab.title = (new URL tab.url).hostname
+    else
+      tab.title = tabTypes[tab.type].title if tab.type of tabTypes
+  delete tab.manualTitle if dropManualTitle
+
+  tab

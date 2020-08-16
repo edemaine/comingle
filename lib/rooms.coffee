@@ -1,5 +1,7 @@
 import {validId, creatorPattern} from './id'
 import {checkMeeting} from './meetings'
+import {meteorCallPromise} from './meteorPromise'
+import {tabTypes, mangleTab} from './tabs'
 
 export Rooms = new Mongo.Collection 'rooms'
 
@@ -33,3 +35,18 @@ Meteor.methods
     return unless (key for key of set).length  # nothing to update
     Rooms.update diff.id,
       $set: set
+
+export roomWithTemplate = (room, template = '') ->
+  roomId = await meteorCallPromise 'roomNew', room
+  for type in template.split '+' when type
+    url = tabTypes[type].createNew()
+    url = await url if url.then?
+    await meteorCallPromise 'tabNew', mangleTab(
+      meeting: room.meeting
+      room: roomId
+      type: type
+      title: ''
+      url: url
+      creator: room.creator
+    , true)
+  roomId

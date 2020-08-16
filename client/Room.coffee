@@ -147,9 +147,7 @@ export Room = ({loading, roomId}) ->
           tabNews[id].getId(), tabLayout
         delete tabNews[id]
       else
-        console.log tabLayout, location
         model.doAction FlexLayout.Actions.addNode tabLayout, ...location
-        console.log model.toJson()
         if tabTypes[tab.type]?.alwaysRender
           FlexLayout.forceSelectTab model, tabLayout.id
         model.doAction FlexLayout.Actions.setActiveTabset location

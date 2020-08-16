@@ -5,15 +5,13 @@ import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser} from '@fortawesome/free-solid-svg-icons'
 
-import {Rooms} from '/lib/rooms'
+import {Rooms, roomWithTemplate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
 import {Header} from './Header'
 import {Name} from './Name'
-import {tabTypePage, mangleTab} from './TabNew'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {sortNames, uniqCountNames} from './lib/sortNames'
-import {meteorCallPromise} from './lib/meteorPromise'
 
 export RoomList = ({loading}) ->
   {meetingId} = useParams()
@@ -81,24 +79,12 @@ export RoomNew = ->
   submit = (e) ->
     e.preventDefault?()
     return unless title.trim().length
-    Meteor.call 'roomNew',
+    roomId = await roomWithTemplate
       meeting: meetingId
       title: title.trim()
       creator: getCreator()
-    , (error, roomId) ->
-      return console.error error if error?
-      for type in (e.template ? 'jitsi').split '+' when type
-        url = tabTypePage[type].createNew()
-        url = await url if url.then?
-        await meteorCallPromise 'tabNew', mangleTab(
-          meeting: meetingId
-          room: roomId
-          type: type
-          title: ''
-          url: url
-          creator: getCreator()
-        , true)
-      history.push "/m/#{meetingId}##{roomId}"
+    , e.template ? 'jitsi'
+    history.push "/m/#{meetingId}##{roomId}"
     setTitle ''
   <form onSubmit={submit}>
     <div className="form-group"/>

@@ -1,31 +1,18 @@
 import React, {useState, useEffect, useRef} from 'react'
-import {Random} from 'meteor/random'
 
-import {validURL, tabTypes} from '/lib/tabs'
+import {validURL, tabTypes, mangleTab} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
 import {getCreator} from './lib/presenceId'
 import {capitalize} from './lib/capitalize'
 import Settings from '/settings.coffee'
-
-trimURL = (x) -> x.replace /\/+$/, ''
 
 export tabTypePage =
   iframe:
     topDescription: <p>Paste the URL for any embeddable website, e.g., Wikipedia:</p>
   cocreate:
     topDescription: <p>This server uses <b><a href="https://github.com/edemaine/cocreate">Cocreate</a></b> for a shared whiteboard.</p>
-    createNew: ->
-      server = Settings.defaultServers.cocreate ?
-               'https://cocreate.csail.mit.edu'
-      url = "#{trimURL server}/api/roomNew?grid=1"
-      response = await fetch url
-      json = await response.json()
-      json.url
   jitsi:
     topDescription: <p>This server uses <b><a href="https://meet.jit.si/">Jitsi Meet</a></b> for video conferencing.</p>
-    createNew: ->
-      server = Settings.defaultServers.jitsi ? 'https://meet.jit.si'
-      "#{trimURL server}/comingle/#{Random.id()}"
   youtube:
     topDescription: <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
 
@@ -99,9 +86,9 @@ export TabNew = ({node, meetingId, roomId,
                 WARNING: This room already has a {tabTypes[type].longTitle ? tabTypes[type].title} tab. Do you really want another?
               </div>
             }
-            {if tabTypePage[type].createNew
+            {if tabTypes[type].createNew
               onClick = ->
-                url = tabTypePage[type].createNew()
+                url = tabTypes[type].createNew()
                 url = await url if url.then?
                 setUrl url
                 setSubmit true
@@ -136,40 +123,3 @@ export TabNew = ({node, meetingId, roomId,
       </div>
     </div>
   </div>
-
-export mangleTab = (tab, dropManualTitle) ->
-  tab.url = tab.url.trim()
-  return tab unless tab.url and validURL tab.url
-
-  ## Force type if we recognize default servers
-  for service in ['cocreate', 'jitsi']
-    server = Settings.defaultServers[service]
-    continue unless server?
-    if tab.url.startsWith server
-      tab.type = service
-
-  ## YouTube URL mangling into embed link, based on examples from
-  ## https://gist.github.com/rodrigoborgesdeoliveira/987683cfbfcc8d800192da1e73adc486
-  tab.url = tab.url.replace ///
-    ^ (?: http s? : )? //
-    (?: youtu\.be/ |
-      (?: www\. | m\. )? youtube (-nocookie)? .com /
-        (?: v/ | vi/ | e/ | embed/ |
-          (?: watch )? \? (?: feature=[^&]* & )? v i? = )
-    )
-    ( [\w\-]+ ) [^]*
-  ///i, (match, nocookie, video) ->
-    tab.type = 'youtube'
-    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
-
-  ## Automatic title
-  unless tab.title?.trim()
-    tab.manualTitle = false
-  if tab.manualTitle == false
-    if tab.type == 'iframe'
-      tab.title = (new URL tab.url).hostname
-    else
-      tab.title = tabTypes[tab.type].title if tab.type of tabTypes
-  delete tab.manualTitle if dropManualTitle
-
-  tab
