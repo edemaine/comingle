@@ -17,8 +17,14 @@ repository.  It should look something like this:
 }
 
 DO NOT commit your changes to this file into Git; the secret needs to
-STAY SECRET.  If you're deploying via mup, it should pick up these keys.
-If you're developing locally, use "meteor --settings settings.json".
+STAY SECRET.  To ensure Git doesn't accidentally commit your changes, use
+
+    git update-index --assume-unchanged settings.json
+
+If you're deploying via mup, it should pick up these keys.
+If you're developing locally, use
+
+    meteor --settings settings.json
 ###
 
 Meteor.methods

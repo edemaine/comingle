@@ -36,6 +36,40 @@ Installation instructions:
 6. `mup deploy` each time you want to deploy code to server
    (initially and after each `git pull`)
 
+## Zoom Support
+
+To use the [Zoom Web Client SDK](https://github.com/zoom/sample-app-web),
+you need to sign up for an API Key &amp; Secret.  Go to the
+[Zoom Marketplace](https://marketplace.zoom.us/) and select "Create a JWT App".
+See https://marketplace.zoom.us/docs/sdk/native-sdks/web/getting-started/integrate
+
+Then add the API Key &amp; Secret into [`settings.json`](settings.json)
+at the root of this repository.  It should look something like this:
+
+```json
+{
+  "zoom": {
+    "apiKey": "YOUR_API_KEY",
+    "apiSecret": "YOUR_API_SECRET"
+  }
+}
+```
+
+DO NOT commit your changes to this file into Git; the secret needs to
+STAY SECRET.  To ensure Git doesn't accidentally commit your changes, use
+
+```
+git update-index --assume-unchanged settings.json
+```
+
+If you're deploying a public server via `mup`, it should pick up these keys.
+If you're developing on a local test server, use the following instead of
+`meteor`:
+
+```
+meteor --settings settings.json
+```
+
 ## MongoDB
 
 All of Comingle's data is stored in the Mongo database
