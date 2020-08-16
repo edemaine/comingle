@@ -36,10 +36,10 @@ tabIcon = (tab) ->
     else
       null
 tabDefaultLocation = (tab) ->
-  switch tab.type
-    when 'jitsi'
-      'border_right'
-    else
+  #switch tab.type
+  #  when 'jitsi'
+  #    'border_right'
+  #  else
       'activeTabset'
 
 export Room = ({loading, roomId}) ->
@@ -64,9 +64,9 @@ export Room = ({loading, roomId}) ->
     setModel FlexLayout.Model.fromJson
       global: {}
       borders: [
-        type: 'border'
-        location: 'right'
-        children: []
+        #type: 'border'
+        #location: 'right'
+        #children: []
       ]
       layout: layout
   , [loading]
