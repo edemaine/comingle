@@ -13,6 +13,7 @@ import {Name} from './Name'
 import {tabTypePage, mangleTab} from './TabNew'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {sortNames, uniqCountNames} from './lib/sortNames'
+import {meteorCallPromise} from './lib/meteorPromise'
 
 export RoomList = ({loading}) ->
   {meetingId} = useParams()
@@ -86,16 +87,17 @@ export RoomNew = ->
       creator: getCreator()
     , (error, roomId) ->
       return console.error error if error?
-      switch e.template ? 'jitsi'
-        when 'jitsi'
-          Meteor.call 'tabNew', mangleTab(
-            meeting: meetingId
-            room: roomId
-            type: 'jitsi'
-            title: ''
-            url: tabTypePage.jitsi.createNew()
-            creator: getCreator()
-          , true)
+      for type in (e.template ? 'jitsi').split '+'
+        url = tabTypePage[type].createNew()
+        url = await url if url.then?
+        await meteorCallPromise 'tabNew', mangleTab(
+          meeting: meetingId
+          room: roomId
+          type: type
+          title: ''
+          url: url
+          creator: getCreator()
+        , true)
       history.push "/m/#{meetingId}##{roomId}"
     setTitle ''
   <form onSubmit={submit}>
@@ -109,7 +111,10 @@ export RoomNew = ->
           Empty room
         </Dropdown.Item>
         <Dropdown.Item onClick={-> submit template: 'jitsi'}>
-          Jitsi Meeting (default)
+          Jitsi (default)
+        </Dropdown.Item>
+        <Dropdown.Item onClick={-> submit template: 'jitsi+cocreate'}>
+          Jitsi + Cocreate
         </Dropdown.Item>
       </SplitButton>
     </div>
