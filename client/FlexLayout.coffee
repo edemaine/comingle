@@ -29,3 +29,11 @@ export forceSelectTab = (model, tab) ->
   tab = model.getNodeById tab if typeof tab == 'string'
   unless tab.getParent().getSelectedNode() == tab
     model.doAction Actions.selectTab tab.getId()
+
+export getActiveTabset = (model) ->
+  tabset = model.getActiveTabset()
+  unless tabset  # if active tabset closed, take another tabset if exists
+    model.visitNodes (node) ->
+      if node.getType() == 'tabset'
+        tabset = node
+  tabset

@@ -40,7 +40,7 @@ tabDefaultLocation = (tab) ->
     when 'jitsi'
       'border_right'
     else
-      'lastTabSet'
+      'activeTabset'
 
 export Room = ({loading, roomId}) ->
   {meetingId} = useParams()
@@ -73,7 +73,6 @@ export Room = ({loading, roomId}) ->
   ## Synchronize model with room
   useEffect ->
     return unless model?
-    lastTabSet = null
     actions = []  # don't modify model while traversing
     laidOut = {}
     tabSettings = (tab) ->
@@ -92,7 +91,6 @@ export Room = ({loading, roomId}) ->
         else if node.getComponent() != 'TabNew'
           ## Delete tabs in stored layout that are no longer in room
           actions.push FlexLayout.Actions.deleteTab node.getId()
-      lastTabSet = node if node.getType() == 'tabset'
     model.doAction action for action in actions
     ## Add tabs in room but not yet layout
     for id, tab of id2tab when not laidOut[id]
@@ -100,7 +98,7 @@ export Room = ({loading, roomId}) ->
       tabLayout.id = tab._id
       tabLayout.type = 'tab'
       location = tabDefaultLocation tab
-      if id of tabNews and location != 'lastTabSet'  # delete TabNew
+      if id of tabNews and location != 'activeTabset'  # delete TabNew
         model.doAction FlexLayout.Actions.deleteTab tabNews[id].getId()
         delete tabNews[id]
       if id of tabNews  # replace TabNew
@@ -108,11 +106,13 @@ export Room = ({loading, roomId}) ->
           tabNews[id].getId(), tabLayout
         delete tabNews[id]
       else
-        location = lastTabSet.getId() if location == 'lastTabSet'
+        if location == 'activeTabset'
+          location = FlexLayout.getActiveTabset(model).getId()
         model.doAction FlexLayout.Actions.addNode tabLayout,
           location, FlexLayout.DockLocation.CENTER, -1
         if tabTypes[tab.type]?.alwaysRender
           FlexLayout.forceSelectTab model, tabLayout.id
+        model.doAction FlexLayout.Actions.setActiveTabset location
     ## Start new tab in every empty tabset
     model.visitNodes (node) ->
       if node.getType() == 'tabset'

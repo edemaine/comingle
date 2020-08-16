@@ -124,11 +124,7 @@ export Meeting = ->
   onModelChange = ->
     updatePresence()
     ## Maintain hash part of URL to point to "current" tab.
-    tabset = model.getActiveTabset()
-    unless tabset  # if active tabset closed, take another tabset if exists
-      model.visitNodes (node) ->
-        if node.getType() == 'tabset'
-          tabset = node
+    tabset = FlexLayout.getActiveTabset()
     if tabset and tab = tabset.getSelectedNode()
       unless location.hash == "##{tab.getId()}"
         history.replace "/m/#{meetingId}##{tab.getId()}"
