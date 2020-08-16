@@ -87,7 +87,7 @@ export RoomNew = ->
       creator: getCreator()
     , (error, roomId) ->
       return console.error error if error?
-      for type in (e.template ? 'jitsi').split '+'
+      for type in (e.template ? 'jitsi').split '+' when type
         url = tabTypePage[type].createNew()
         url = await url if url.then?
         await meteorCallPromise 'tabNew', mangleTab(
@@ -107,7 +107,7 @@ export RoomNew = ->
        value={title} onChange={(e) -> setTitle e.target.value}/>
       <SplitButton type="submit" className="btn-block" drop="up"
                    title="Create Room">
-        <Dropdown.Item onClick={-> submit template: 'empty'}>
+        <Dropdown.Item onClick={-> submit template: ''}>
           Empty room
         </Dropdown.Item>
         <Dropdown.Item onClick={-> submit template: 'jitsi'}>

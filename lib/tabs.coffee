@@ -37,6 +37,7 @@ export tabTypes =
     instance: 'room'
     alwaysRender: true
     onePerRoom: true
+    keepVisible: true
   youtube:
     title: 'YouTube'
 

@@ -37,3 +37,10 @@ export getActiveTabset = (model) ->
       if node.getType() == 'tabset'
         tabset = node
   tabset
+
+export getTabsets = (model) ->
+  tabsets = []
+  model.visitNodes (node) ->
+    if node.getType() == 'tabset'
+      tabsets.push node
+  tabsets

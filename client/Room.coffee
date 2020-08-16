@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer} from 'react'
+import React, {useState, useEffect, useReducer, useRef} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
@@ -35,12 +35,6 @@ tabIcon = (tab) ->
       <FontAwesomeIcon icon={faYoutube}/>
     else
       null
-tabDefaultLocation = (tab) ->
-  #switch tab.type
-  #  when 'jitsi'
-  #    'border_right'
-  #  else
-      'activeTabset'
 
 export Room = ({loading, roomId}) ->
   {meetingId} = useParams()
@@ -55,8 +49,8 @@ export Room = ({loading, roomId}) ->
     room: Rooms.findOne roomId
     tabs: tabs
   id2tab = useIdMap tabs
-  existingTabTypes = {}
-  existingTabTypes[tab.type] = true for tab in tabs
+  existingTabTypes = useIdMap tabs, 'type'
+  tabsetUsed = useRef {}
   ## Initialize model according to saved layout
   [model, setModel] = useState()
   useEffect ->
@@ -70,6 +64,53 @@ export Room = ({loading, roomId}) ->
       ]
       layout: layout
   , [loading]
+  ## Automatic tab layout algorithm.
+  tabDefaultLocation = (tab, tabNew) ->
+    if tabTypes[tab.type].keepVisible
+      ## New tab is keepVisible; make sure it's in a tabset by itself.
+      if tabNew?
+        ## User added this tab via TabNew interface.
+        ## If the TabNew is alone in its tabset, replace it there;
+        ## otherwise, add to the right of its tabset.
+        if tabNew.getParent().getChildren().length == 1
+          null
+        else
+          [tabNew.getParent().getId(), FlexLayout.DockLocation.RIGHT, -1]
+      else
+        ## Automatic layout: add to the right of the last tabset.
+        [(FlexLayout.getTabsets model).pop().getId(),
+         FlexLayout.DockLocation.RIGHT, -1]
+    else
+      ## New tab is not keepVisible.  Avoid hiding any keepVisible tabs.
+      if tabNew?
+        ## User added this tab via TabNew interface.  In-place replacement,
+        ## unless there's a keepVisible tab adjacent in the same tabset.
+        ## (For example, new room with just a Jitsi call and we add a tab.)
+        siblings = tabNew.getParent().getChildren()
+        index = siblings.indexOf tabNew
+        if (index == 0 or not
+            tabTypes[id2tab[siblings[index-1].getId()]?.type]?.keepVisible) and
+           (index == siblings.length-1 or not
+            tabTypes[id2tab[siblings[index+1].getId()]?.type]?.keepVisible)
+          return null
+      ## Append non-keepVisible tab to least recently used tabset
+      ## that does not have a keepVisible tab visible, if one exists.
+      freeTabsets = []
+      tabsets = FlexLayout.getTabsets model
+      for tabset in tabsets
+        unless tabTypes[id2tab[tabset.getSelectedNode()?.getId()]?.type]?.keepVisible
+          freeTabsets.push tabset.getId()
+      if freeTabsets.length
+        oldest = freeTabsets[0]
+        if tabsetUsed.current[oldest]? # not in tabsetUsed = infinitely old
+          for tabset in freeTabsets[1..]
+            if not tabsetUsed.current[tabset]? or
+               tabsetUsed.current[tabset] < tabsetUsed.current[oldest]
+              oldest = tabset
+        location = [oldest, FlexLayout.DockLocation.CENTER, -1]
+      else
+        ## Otherwise, add to the left of first tabset.
+        location = [tabsets[0].getId(), FlexLayout.DockLocation.LEFT, -1]
   ## Synchronize model with room
   useEffect ->
     return unless model?
@@ -97,19 +138,18 @@ export Room = ({loading, roomId}) ->
       tabLayout = tabSettings tab
       tabLayout.id = tab._id
       tabLayout.type = 'tab'
-      location = tabDefaultLocation tab
-      if id of tabNews and location != 'activeTabset'  # delete TabNew
+      location = tabDefaultLocation tab, tabNews[id]
+      if tabNews[id]? and location?  # delete TabNew
         model.doAction FlexLayout.Actions.deleteTab tabNews[id].getId()
         delete tabNews[id]
-      if id of tabNews  # replace TabNew
+      if tabNews[id]?  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
           tabNews[id].getId(), tabLayout
         delete tabNews[id]
       else
-        if location == 'activeTabset'
-          location = FlexLayout.getActiveTabset(model).getId()
-        model.doAction FlexLayout.Actions.addNode tabLayout,
-          location, FlexLayout.DockLocation.CENTER, -1
+        console.log tabLayout, location
+        model.doAction FlexLayout.Actions.addNode tabLayout, ...location
+        console.log model.toJson()
         if tabTypes[tab.type]?.alwaysRender
           FlexLayout.forceSelectTab model, tabLayout.id
         model.doAction FlexLayout.Actions.setActiveTabset location
@@ -206,6 +246,12 @@ export Room = ({loading, roomId}) ->
           title: action.data.text
           updator: getCreator()
     action
+  onModelChange = ->
+    ## Update localstorage saved layout whenever layout changes.
+    setLayout model.toJson().layout
+    ## Track when each tabset was active.
+    if tabset = model.getActiveTabset()
+      tabsetUsed.current[tabset.getId()] = (new Date).getTime()
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
-   onAction={onAction} onModelChange={-> setLayout model.toJson().layout}/>
+   onAction={onAction} onModelChange={onModelChange}/>
