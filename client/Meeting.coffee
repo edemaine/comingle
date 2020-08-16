@@ -174,7 +174,7 @@ export Meeting = ->
           "Show Deleted Tabs"
       buttons?.push \
         <div key="deleted"
-         className="flexlayout__#{type}_button_trailing"
+         className="flexlayout__#{type}_button_trailing flexlayout__tab_button_middle"
          aria-label={label}
          onClick={-> setShowDeleted {id, value: not showDeleted}}
          onMouseDown={(e) -> e.stopPropagation()}
