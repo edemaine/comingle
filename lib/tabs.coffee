@@ -98,6 +98,8 @@ Meteor.methods
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
       set.updated = new Date
+      set.archived = set.updated if set.archived
+      set.archiver = set.updator
     Tabs.update diff.id,
       $set: set
 

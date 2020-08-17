@@ -27,14 +27,15 @@ Meteor.methods
       title: Match.Optional String
       raised: Match.Optional Boolean
       updator: creatorPattern
-    unless @isSimulation
-      diff.updated = new Date
-      diff.raised = diff.updated if diff.raised
     room = checkRoom diff.id
     set = {}
     for key, value of diff when key != 'id'
       set[key] = value unless room[key] == value
     return unless (key for key of set).length  # nothing to update
+    unless @isSimulation
+      set.updated = new Date
+      set.raised = diff.updated if diff.raised
+      set.raiser = set.updator
     Rooms.update diff.id,
       $set: set
 

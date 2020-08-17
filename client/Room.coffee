@@ -201,8 +201,8 @@ export Room = ({loading, roomId, showArchived}) ->
       on {formatDate tab.created}
       {if tab.archived
         <i>
-          <br/>archived by {tab.updator?.name ? 'unknown'}
-          <br/>on {formatDate tab.updated}
+          <br/>archived by {tab.archiver?.name ? 'unknown'}
+          <br/>on {formatDate tab.archived}
         </i>
       }
     </Tooltip>
