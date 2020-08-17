@@ -89,7 +89,7 @@ Meteor.methods
     check diff,
       id: String
       title: Match.Optional String
-      deleted: Match.Optional Boolean
+      archived: Match.Optional Boolean
       updator: creatorPattern
     tab = checkTab diff.id
     set = {}

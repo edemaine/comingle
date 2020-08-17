@@ -38,7 +38,7 @@ tabIcon = (tab) ->
     else
       null
 
-export Room = ({loading, roomId, showDeleted}) ->
+export Room = ({loading, roomId, showArchived}) ->
   {meetingId} = useParams()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(
@@ -47,7 +47,7 @@ export Room = ({loading, roomId, showDeleted}) ->
   {loading, room, tabs} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
     query = room: roomId
-    query.deleted = $ne: true unless showDeleted
+    query.archived = $ne: true unless showArchived
     tabs = Tabs.find(query).fetch()
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
@@ -198,9 +198,9 @@ export Room = ({loading, roomId, showDeleted}) ->
       <code>{tab.url}</code><br/>
       created by {tab.creator?.name ? 'unknown'}<br/>
       on {formatDate tab.created}
-      {if tab.deleted
+      {if tab.archived
         <i>
-          <br/>deleted by {tab.updator?.name ? 'unknown'}
+          <br/>archived by {tab.updator?.name ? 'unknown'}
           <br/>on {formatDate tab.updated}
         </i>
       }
@@ -273,21 +273,21 @@ export Room = ({loading, roomId, showDeleted}) ->
       closeTab = ->
         Meteor.call 'tabEdit',
           id: tab._id
-          deleted: not tab.deleted
+          archived: not tab.archived
           updator: getCreator()
         setCloseHover false
         setCloseClick false
-      verb = if tab.deleted then 'Restore' else 'Delete'
+      verb = if tab.archived then 'Restore' else 'Archive'
       buttons?.push \
         <div key="delete" className="flexlayout__#{type}_button_trailing"
-         aria-label="Close Tab for Everyone"
+         aria-label="#{verb} Tab for Everyone"
          onClick={-> setCloseClick not closeClick}
          onMouseEnter={-> setCloseHover true}
          onMouseLeave={-> setCloseHover false}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
           <span ref={closeRef}>
-            {if tab.deleted
+            {if tab.archived
                <FontAwesomeIcon icon={faTrashRestore}/>
              else
                <FontAwesomeIcon icon={faTrash}/>

@@ -71,18 +71,18 @@ export Meeting = ->
           type: 'tab'
           name: Rooms.findOne(id)?.title ? id
           component: 'Room'
-          config: showDeleted: false
+          config: showArchived: false
         tabset = FlexLayout.getActiveTabset model
         model.doAction FlexLayout.Actions.addNode tab,
           tabset.getId(), FlexLayout.DockLocation.CENTER, -1
       FlexLayout.forceSelectTab model, id
     undefined
   , [location.hash]
-  [showDeleted, setShowDeleted] = useReducer(
+  [showArchived, setShowArchived] = useReducer(
     (state, {id, value}) ->
       if model.getNodeById id
         model.doAction FlexLayout.Actions.updateNodeAttributes id,
-          config: showDeleted: value
+          config: showArchived: value
       state[id] = value
       state
   , {})
@@ -196,26 +196,26 @@ export Meeting = ->
             <FontAwesomeIcon icon={clipboardLink}/>
           </OverlayTrigger>
         </div>
-      showDeleted = node.getConfig()?.showDeleted
+      showArchived = node.getConfig()?.showArchived
       label =
-        if showDeleted
-          "Hide Deleted Tabs"
+        if showArchived
+          "Hide Archived Tabs"
         else
-          "Show Deleted Tabs"
+          "Show Archived Tabs"
       buttons?.push \
-        <div key="deleted"
+        <div key="archived"
          className="flexlayout__#{type}_button_trailing flexlayout__tab_button_middle"
          aria-label={label}
-         onClick={-> setShowDeleted {id, value: not showDeleted}}
+         onClick={-> setShowArchived {id, value: not showArchived}}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
           <OverlayTrigger placement="bottom" overlay={(props) ->
             <Tooltip {...props}>
               {label}<br/>
-              <small>Currently {unless showDeleted then <b>not</b>} showing deleted tabs.</small>
+              <small>Currently {unless showArchived then <b>not</b>} showing archived tabs.</small>
             </Tooltip>
           }>
-            <FontAwesomeIcon icon={if showDeleted then faEye else faEyeSlash}/>
+            <FontAwesomeIcon icon={if showArchived then faEye else faEyeSlash}/>
           </OverlayTrigger>
         </div>
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
