@@ -83,22 +83,55 @@ export RoomList = ({loading}) ->
       <Header/>
       <MeetingTitle/>
       <Name/>
-      <Accordion defaultActiveKey="0">
-        <Card>
-          <CardToggle eventKey="0">
-            Room Search:
-          </CardToggle>
-          <Accordion.Collapse eventKey="0">
-            <Card.Body>
-              <FontAwesomeIcon icon={faTimesCircle} className="search-icon"
-               onClick={(e) -> e.stopPropagation(); setSearch ''}/>
-              <Form.Control type="text" value={search}
-               onChange={(e) -> setSearch e.target.value}>
-              </Form.Control>
-            </Card.Body>
-          </Accordion.Collapse>
-        </Card>
-      </Accordion>
+      {if rooms.length > 1
+        <Accordion defaultActiveKey="0">
+          <Card>
+            <CardToggle eventKey="0">
+              Room Search:
+            </CardToggle>
+            <Accordion.Collapse eventKey="0">
+              <Card.Body>
+                <FontAwesomeIcon icon={faTimesCircle} className="search-icon"
+                 onClick={(e) -> e.stopPropagation(); setSearch ''}/>
+                <Form.Control type="text" value={search}
+                 onChange={(e) -> setSearch e.target.value}>
+                </Form.Control>
+                <ButtonGroup size="sm" className="sorting w-100 text-center">
+                  <DropdownButton title="Sort By" variant="info">
+                    {for key in ['title', 'created', 'participants']
+                      <Dropdown.Item key={key} active={key == sortKey}
+                       onClick={do (key) -> (e) -> setSortKey key}>
+                        {capitalize key}
+                      </Dropdown.Item>
+                    }
+                  </DropdownButton>
+                  <OverlayTrigger placement="right" overlay={(props) ->
+                    <Tooltip {...props}>
+                      Currently sorting in {
+                        if reverse
+                          <b>decreasing</b>
+                        else
+                          <b>increasing</b>
+                      } order. <br/>
+                      Select to toggle.
+                    </Tooltip>
+                  }>
+                    <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
+                      {if reverse
+                         <FontAwesomeIcon aria-label="Decreasing Order"
+                          icon={faSortAlphaDownAlt}/>
+                       else
+                         <FontAwesomeIcon aria-label="Increasing Order"
+                          icon={faSortAlphaDown}/>
+                      }
+                    </Button>
+                  </OverlayTrigger>
+                </ButtonGroup>
+              </Card.Body>
+            </Accordion.Collapse>
+          </Card>
+        </Accordion>
+      }
       {if loading
         <Loading/>
       }
@@ -113,40 +146,6 @@ export RoomList = ({loading}) ->
        filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Archived Rooms:" startClosed
        filter={(room) -> room.archived}/>
-      <div className="mb-3"/>
-      {if rooms.length > 1
-        <ButtonGroup className="sorting mb-3 w-100 text-center">
-          <DropdownButton title="Sort By" variant="info">
-            {for key in ['title', 'created', 'participants']
-              <Dropdown.Item key={key} active={key == sortKey}
-               onClick={do (key) -> (e) -> setSortKey key}>
-                {capitalize key}
-              </Dropdown.Item>
-            }
-          </DropdownButton>
-          <OverlayTrigger placement="top" overlay={(props) ->
-            <Tooltip {...props}>
-              Currently sorting in {
-                if reverse
-                  <b>decreasing</b>
-                else
-                  <b>increasing</b>
-              } order. <br/>
-              Select to toggle.
-            </Tooltip>
-          }>
-            <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
-              {if reverse
-                 <FontAwesomeIcon aria-label="Decreasing Order"
-                  icon={faSortAlphaDownAlt}/>
-               else
-                 <FontAwesomeIcon aria-label="Increasing Order"
-                  icon={faSortAlphaDown}/>
-              }
-            </Button>
-          </OverlayTrigger>
-        </ButtonGroup>
-      }
     </div>
     <RoomNew/>
   </div>
