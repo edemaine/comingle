@@ -69,7 +69,7 @@ export RoomList = ({loading}) ->
           <Card.Body>
             <ListGroup>
               {for room in subrooms
-                <RoomInfo key={room._id} room={room}
+                <RoomInfo key={room._id} {...room}
                  presence={presenceByRoom[room._id]}/>
               }
             </ListGroup>
@@ -148,22 +148,22 @@ export RoomList = ({loading}) ->
     <RoomNew/>
   </div>
 
-export RoomInfo = ({room, presence}) ->
+export RoomInfo = ({_id, title, raised, presence}) ->
   {meetingId} = useParams()
   if presence?
     myPresence = findMyPresence presence
     clusters = sortNames presence, (p) -> p.name
     clusters = uniqCountNames presence, (p) -> p.name
   myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
-  <Link to="/m/#{meetingId}##{room._id}" className="list-group-item list-group-item-action room-info #{myPresenceClass}">
-    {if myPresence or room.raised
-      help = "#{if room.raised then 'Lower' else 'Raise'} Hand"
+  <Link to="/m/#{meetingId}##{_id}" className="list-group-item list-group-item-action room-info #{myPresenceClass}">
+    {if myPresence or raised
+      help = "#{if raised then 'Lower' else 'Raise'} Hand"
       toggleHand = ->
         Meteor.call 'roomEdit',
-          id: room._id
-          raised: not room.raised
+          id: _id
+          raised: not raised
           updator: getCreator()
-      <div className="raise-hand #{if room.raised then 'active' else ''}"
+      <div className="raise-hand #{if raised then 'active' else ''}"
        aria-label={help}>
         <OverlayTrigger placement="top" overlay={(props) ->
           <Tooltip {...props}>{help}</Tooltip>
@@ -171,10 +171,10 @@ export RoomInfo = ({room, presence}) ->
           <FontAwesomeIcon aria-label={help} icon={faHandPaper}
            onClick={toggleHand}/>
         </OverlayTrigger>
-        {if room.raised and typeof room.raised != 'boolean'
-          [timer, setTimer] = useState formatTimeDelta (new Date) - room.raised
+        {if raised and typeof raised != 'boolean'
+          [timer, setTimer] = useState formatTimeDelta (new Date) - raised
           useInterval ->
-            setTimer formatTimeDelta (new Date) - room.raised
+            setTimer formatTimeDelta (new Date) - raised
           , 1000
           <div className="timer">
             {timer}
@@ -182,7 +182,7 @@ export RoomInfo = ({room, presence}) ->
         }
       </div>
     }
-    <span className="title">{room.title}</span>
+    <span className="title">{title}</span>
     {if clusters?.length
       <div className="presence">
         {for person in clusters
