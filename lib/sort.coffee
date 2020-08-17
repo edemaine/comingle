@@ -1,3 +1,28 @@
+## Sorting titles with numbers in them.
+## Based on code from Coauthor (lib/groups.coffee).
+titleDigits = 10
+export titleKey = (title) ->
+  title = title.title if title.title?
+  title.toLowerCase().replace /\d+/g, (n) -> n.padStart titleDigits, '0'
+
+export sortByKey = (array, key) ->
+  if typeof key == 'string'
+    if key == 'title'
+      keyFun = titleKey
+    else
+      keyFun = (x) -> x[key]
+  else
+    keyFun = key
+  array.sort (x, y) ->
+    x = keyFun x
+    y = keyFun y
+    if x < y
+      -1
+    else if x > y
+      +1
+    else
+      0
+
 ## Sort by last name if available.
 ## Based on code from Coauthor (lib/users.coffee).
 

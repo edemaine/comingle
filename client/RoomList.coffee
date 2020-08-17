@@ -1,10 +1,10 @@
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams, useHistory} from 'react-router-dom'
-import {Accordion, Card, ListGroup, SplitButton, Dropdown, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Button, ButtonGroup, Card, Dropdown, DropdownButton, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUser, faHandPaper} from '@fortawesome/free-solid-svg-icons'
+import {faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt} from '@fortawesome/free-solid-svg-icons'
 
 import {Rooms, roomWithTemplate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
@@ -12,9 +12,10 @@ import {Loading} from './Loading'
 import {Header} from './Header'
 import {Name} from './Name'
 import {CardToggle} from './CardToggle'
+import {capitalize} from './lib/capitalize'
 import {getPresenceId, getCreator} from './lib/presenceId'
-import {sortNames, uniqCountNames} from './lib/sortNames'
 import {formatTimeDelta} from './lib/dates'
+import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 
 findMyPresence = (presence) ->
   presenceId = getPresenceId()
@@ -22,19 +23,34 @@ findMyPresence = (presence) ->
 
 export RoomList = ({loading}) ->
   {meetingId} = useParams()
+  [sortKey, setSortKey] = useState 'title'
+  [reverse, setReverse] = useState false
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
   presences = useTracker -> Presence.find(meeting: meetingId).fetch()
-  presenceByRoom = {}
-  for presence in presences
-    for type in ['visible', 'invisible']
-      for room in presence.rooms[type]
-        presenceByRoom[room] ?= []
-        presenceByRoom[room].push
-          type: type
-          name: presence.name
-          id: presence.id
+  presenceByRoom = useMemo ->
+    byRoom = {}
+    for presence in presences
+      for type in ['visible', 'invisible']
+        for room in presence.rooms[type]
+          byRoom[room] ?= []
+          byRoom[room].push
+            type: type
+            name: presence.name
+            id: presence.id
+    byRoom
+  , [presences]
+  sortedRooms = useMemo ->
+    sorted = sortByKey rooms[..],
+      if sortKey == 'participants'
+        (room) ->
+          titleKey "#{presenceByRoom[room._id]?.length ? 0}.#{room.title}"
+      else
+        sortKey
+    sorted.reverse() if reverse
+    sorted
+  , [rooms, sortKey, reverse, if sortKey == 'participants' then presenceByRoom]
   Sublist = ({heading, filter, startClosed}) ->
-    subrooms = rooms.filter filter
+    subrooms = sortedRooms.filter filter
     return null unless subrooms.length
     <Accordion defaultActiveKey={unless startClosed then "0"}>
       <Card>
@@ -70,6 +86,37 @@ export RoomList = ({loading}) ->
      filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
     <Sublist heading="Archived Rooms:" startClosed
      filter={(room) -> room.archived}/>
+    <ButtonGroup className="sorting mt-3 w-100 text-center">
+      <DropdownButton title="Sort By">
+        {for key in ['title', 'created', 'participants']
+          <Dropdown.Item key={key} active={key == sortKey}
+           onClick={do (key) -> (e) -> setSortKey key}>
+            {capitalize key}
+          </Dropdown.Item>
+        }
+      </DropdownButton>
+      <OverlayTrigger placement="top" overlay={(props) ->
+        <Tooltip {...props}>
+          Currently sorting in {
+            if reverse
+              <b>decreasing</b>
+            else
+              <b>increasing</b>
+          } order. <br/>
+          Select to toggle.
+        </Tooltip>
+      }>
+        <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
+          {if reverse
+             <FontAwesomeIcon aria-label="Decreasing Order"
+              icon={faSortAlphaDownAlt}/>
+           else
+             <FontAwesomeIcon aria-label="Increasing Order"
+              icon={faSortAlphaDown}/>
+          }
+        </Button>
+      </OverlayTrigger>
+    </ButtonGroup>
     <RoomNew/>
   </div>
 
