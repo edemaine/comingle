@@ -1,8 +1,16 @@
 export formatDate = (date) ->
   return 'unknown date' unless date
-  date.toLocaleDateString undefined,
-    dateStyle: 'full'
-    timeStyle: 'long'
+  date.toLocaleDateString(undefined,
+    weekday: 'short'
+    month: 'short'
+    day: 'numeric'
+    year: 'numeric'
+  ) + ' at ' + date.toLocaleTimeString(undefined,
+    hour: 'numeric'
+    minute: 'numeric'
+    hour12: false
+    timeZoneName: 'short'
+  )
 
 export formatTimeDelta = (delta) ->
   delta = Math.round delta / 1000
