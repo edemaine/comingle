@@ -111,9 +111,10 @@ export RoomList = ({loading}) ->
        filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Archived Rooms:" startClosed
        filter={(room) -> room.archived}/>
+      <div className="mb-3"/>
       {if rooms.length > 1
-        <ButtonGroup className="sorting my-3 w-100 text-center">
-          <DropdownButton title="Sort By">
+        <ButtonGroup className="sorting mb-3 w-100 text-center">
+          <DropdownButton title="Sort By" variant="info">
             {for key in ['title', 'created', 'participants']
               <Dropdown.Item key={key} active={key == sortKey}
                onClick={do (key) -> (e) -> setSortKey key}>
