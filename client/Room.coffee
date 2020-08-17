@@ -4,7 +4,7 @@ import FlexLayout from './FlexLayout'
 import {Button, ButtonGroup, Tooltip, OverlayTrigger, Overlay} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faRedoAlt, faVideo, faTrash, faTrashRestore, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 
 import {Rooms} from '/lib/rooms'
@@ -18,6 +18,7 @@ import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
 import {TabZoom} from './TabZoom'
+import {ArchiveButton} from './ArchiveButton'
 
 tabTitle = (tab) ->
   tab.title or 'Untitled'
@@ -206,9 +207,6 @@ export Room = ({loading, roomId, showArchived}) ->
       }
     </Tooltip>
   onRenderTab = (node, renderState) ->
-    closeRef = useRef()
-    [closeClick, setCloseClick] = useState false
-    [closeHover, setCloseHover] = useState false
     return if node.getComponent() == 'TabNew'
     tab = id2tab[node.getId()]
     return unless tab
@@ -270,48 +268,15 @@ export Room = ({loading, roomId, showArchived}) ->
             <FontAwesomeIcon icon={faRedoAlt}/>
           </OverlayTrigger>
         </div>
-      closeTab = ->
+      archiveTab = ->
         Meteor.call 'tabEdit',
           id: tab._id
           archived: not tab.archived
           updator: getCreator()
-        setCloseHover false
-        setCloseClick false
-      verb = if tab.archived then 'Restore' else 'Archive'
-      buttons?.push \
-        <div key="delete" className="flexlayout__#{type}_button_trailing"
-         aria-label="#{verb} Tab for Everyone"
-         onClick={-> setCloseClick not closeClick}
-         onMouseEnter={-> setCloseHover true}
-         onMouseLeave={-> setCloseHover false}
-         onMouseDown={(e) -> e.stopPropagation()}
-         onTouchStart={(e) -> e.stopPropagation()}>
-          <span ref={closeRef}>
-            {if tab.archived
-               <FontAwesomeIcon icon={faTrashRestore}/>
-             else
-               <FontAwesomeIcon icon={faTrash}/>
-            }
-          </span>
-          <Overlay target={closeRef.current} placement="bottom"
-           show={closeHover or closeClick}>
-            <Tooltip>
-              {verb} Tab for Everyone<br/>
-              <small>Trashed tabs can still be restored using the room's eye icon.</small>
-              {if closeClick
-                 <ButtonGroup className="mt-1">
-                   <Button variant="danger" size="sm" onClick={closeTab}>
-                     {verb} Tab
-                   </Button>
-                   <Button variant="success" size="sm"
-                    onClick={-> setCloseHover false; setCloseClick false}>
-                     Cancel
-                   </Button>
-                 </ButtonGroup>
-              }
-            </Tooltip>
-          </Overlay>
-        </div>
+      buttons?.push <ArchiveButton key="archive" type={type} noun="tab"
+        archived={tab.archived} onClick={archiveTab}
+        help="Archived tabs can still be restored using the room's eye icon."
+      />
   onRenderTabSet = (node, {buttons}) ->
     return if node.getType() == 'border'
     buttons.push \
