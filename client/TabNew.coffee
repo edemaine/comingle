@@ -44,7 +44,7 @@ export TabNew = ({node, meetingId, roomId,
   useEffect ->
     return unless type == 'zoom'
     match = zoomRegExp.exec url
-    setZoomRoom match[2] if match?[2]
+    setZoomID match[2] if match?[2]
     setZoomPwd match[3] if match?[3]
   , [url, type]
 
@@ -131,7 +131,7 @@ export TabNew = ({node, meetingId, roomId,
                   <Form.Label>Room number</Form.Label>
                   <Form.Control type="text" placeholder="123456789"
                    value={zoomID}
-                   onChange={(e) -> setZoomRoom e.target.value}/>
+                   onChange={(e) -> setZoomID e.target.value}/>
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>Room password / hash (if needed)</Form.Label>
