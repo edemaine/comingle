@@ -48,11 +48,12 @@ export Room = ({loading, roomId, showArchived}) ->
   {loading, room, tabs} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
     query = room: roomId
-    query.archived = $ne: true unless showArchived
+    query.archived = $in: [null, false] unless showArchived
     tabs = Tabs.find(query).fetch()
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
     tabs: tabs
+  , [loading, roomId, showArchived]
   id2tab = useIdMap tabs
   existingTabTypes = useIdMap tabs, 'type'
   tabsetUsed = useRef {}
