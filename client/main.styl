@@ -54,20 +54,21 @@ nav
   .raise-hand
     float: right
     margin-right: -0.75rem
-    opacity: 10%
-    &:hover
-      opacity: 25%
-    &:active
-      opacity: 50%
-    &.active
-      opacity: 100%
-      &:hover
-        opacity: 75%
-  .timer
-    position: absolute
     z-index: 1
-    transform: rotate(90deg)
-    transform-origin: 0.55rem 0.75rem //0.65rem 0.65rem
+    opacity: 0.1
+    &:hover
+      opacity: 0.25
+    &:active
+      opacity: 0.5
+    &.active
+      opacity: 1.0
+      &:hover
+        opacity: 0.75
+    .timer
+      position: absolute
+      transform: rotate(90deg)
+      transform-origin: 0.55rem 0.75rem //0.65rem 0.65rem
+      opacity: 1
 
   .presence
     font-size: small
