@@ -64,10 +64,14 @@ nav
       opacity: 1.0
       &:hover
         opacity: 0.75
+      svg
+        transform: scale(1)
+        animation: pulse 2s infinite ease-in-out
     .timer
       position: absolute
       transform: rotate(90deg)
       transform-origin: 0.55rem 0.75rem //0.65rem 0.65rem
+      z-index: 1
       opacity: 1
 
   .presence
@@ -77,3 +81,11 @@ nav
       margin-right: 1rem
     > .presence-invisible
       color: rgba(0,0,0,0.333333333) // #aaa
+
+@keyframes pulse
+  0%
+    transform: scale(1)
+  50%
+    transform: scale(1.2)
+  100%
+    transform: scale(1)
