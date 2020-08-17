@@ -4,9 +4,8 @@ import FlexLayout from './FlexLayout'
 import {Button, ButtonGroup, Tooltip, OverlayTrigger, Overlay} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faRedoAlt, faVideo, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faRedoAlt, faVideo, faTrash, faTrashRestore, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
-import {clipboardLink} from './icons/clipboardLink'
 
 import {Rooms} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
@@ -223,6 +222,25 @@ export Room = ({loading, roomId, showDeleted}) ->
       if url = tab.url
         buttons?.push \
           <div key="link"
+           className="flexlayout__#{type}_button_trailing"
+           aria-label="Open tab in separate browser tab"
+           onClick={(e) -> navigator.clipboard.writeText url}
+           onMouseDown={(e) -> e.stopPropagation()}
+           onTouchStart={(e) -> e.stopPropagation()}>
+            <OverlayTrigger placement="bottom" overlay={(props) ->
+              <Tooltip {...props}>
+                Open tab in separate browser tab<br/>
+                <small>Or right click for more browser options.</small>
+              </Tooltip>
+            }>
+              <a href={url} target="_blank">
+                <FontAwesomeIcon icon={faSignInAlt}/>
+              </a>
+            </OverlayTrigger>
+          </div>
+        ###
+        buttons?.push \
+          <div key="link"
            className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
            aria-label="Save tab URL to clipboard"
            onClick={(e) -> navigator.clipboard.writeText url}
@@ -234,6 +252,7 @@ export Room = ({loading, roomId, showDeleted}) ->
               <FontAwesomeIcon icon={clipboardLink}/>
             </OverlayTrigger>
           </div>
+        ###
       buttons?.push \
         <div key="reload" className="flexlayout__#{type}_button_trailing"
          aria-label="Reload Tab"
