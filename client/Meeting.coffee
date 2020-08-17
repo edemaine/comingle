@@ -6,6 +6,7 @@ import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
+import {clipboardLink} from './icons/clipboardLink'
 
 import {RoomList} from './RoomList'
 import {Room} from './Room'
@@ -166,6 +167,20 @@ export Meeting = ->
       id = node.getId()
       buttons = renderState.buttons
       type = if node.getParent().getType() == 'border' then 'border' else 'tab'
+      buttons?.push \
+        <div key="link"
+         className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
+         aria-label="Save tab URL to clipboard"
+         onClick={(e) -> navigator.clipboard.writeText \
+           Meteor.absoluteUrl "/m/#{meetingId}##{node.getId()}"}
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
+          <OverlayTrigger placement="bottom" overlay={(props) ->
+            <Tooltip {...props}>Save room link to clipboard</Tooltip>
+          }>
+            <FontAwesomeIcon icon={clipboardLink}/>
+          </OverlayTrigger>
+        </div>
       showDeleted = node.getConfig()?.showDeleted
       label =
         if showDeleted
