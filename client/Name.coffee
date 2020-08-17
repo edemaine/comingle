@@ -16,7 +16,7 @@ export Name = ->
   <Accordion defaultActiveKey="0">
     <Card>
       <CardToggle eventKey="0">
-        Your name:
+        Your Name:
       </CardToggle>
       <Accordion.Collapse eventKey="0">
         <Card.Body>

@@ -1,10 +1,10 @@
 import React, {useState, useMemo} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams, useHistory} from 'react-router-dom'
-import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt} from '@fortawesome/free-solid-svg-icons'
+import {faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
 
 import {Rooms, roomWithTemplate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
@@ -25,6 +25,7 @@ export RoomList = ({loading}) ->
   {meetingId} = useParams()
   [sortKey, setSortKey] = useState 'title'
   [reverse, setReverse] = useState false
+  [search, setSearch] = useState ''
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
   presences = useTracker -> Presence.find(meeting: meetingId).fetch()
   presenceByRoom = useMemo ->
@@ -51,6 +52,13 @@ export RoomList = ({loading}) ->
   , [rooms, sortKey, reverse, if sortKey == 'participants' then presenceByRoom]
   Sublist = ({heading, filter, startClosed}) ->
     subrooms = sortedRooms.filter filter
+    if search
+      pattern = search.toLowerCase()
+      match = (x) -> 0 <= x.toLowerCase().indexOf pattern
+      subrooms = subrooms.filter (room) ->
+        return true if match room.title
+        for presence in presenceByRoom[room._id] ? []
+          return true if match presence.name
     return null unless subrooms.length
     <Accordion defaultActiveKey={unless startClosed then "0"}>
       <Card>
@@ -64,9 +72,6 @@ export RoomList = ({loading}) ->
                 <RoomInfo key={room._id} room={room}
                  presence={presenceByRoom[room._id]}/>
               }
-              {if loading
-                <Loading/>
-              }
             </ListGroup>
           </Card.Body>
         </Accordion.Collapse>
@@ -76,6 +81,25 @@ export RoomList = ({loading}) ->
     <div className="RoomList flex-shrink-1 overflow-auto">
       <Header/>
       <Name/>
+      <Accordion defaultActiveKey="0">
+        <Card>
+          <CardToggle eventKey="0">
+            Room Search:
+          </CardToggle>
+          <Accordion.Collapse eventKey="0">
+            <Card.Body>
+              <FontAwesomeIcon icon={faTimesCircle} className="search-icon"
+               onClick={(e) -> e.stopPropagation(); setSearch ''}/>
+              <Form.Control type="text" value={search}
+               onChange={(e) -> setSearch e.target.value}>
+              </Form.Control>
+            </Card.Body>
+          </Accordion.Collapse>
+        </Card>
+      </Accordion>
+      {if loading
+        <Loading/>
+      }
       {unless rooms.length or loading
         <Alert variant="warning">
           No rooms in this meeting.
@@ -83,7 +107,7 @@ export RoomList = ({loading}) ->
       }
       <Sublist heading="Rooms You're In:"
        filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
-      <Sublist heading="Other Rooms:"
+      <Sublist heading="Available Rooms:"
        filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Archived Rooms:" startClosed
        filter={(room) -> room.archived}/>
