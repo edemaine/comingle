@@ -158,15 +158,30 @@ export Meeting = ->
       <FontAwesomeIcon icon={faDoorOpen}/>
     </OverlayTrigger>
   onRenderTab = (node, renderState) ->
-    return if node.getComponent() == 'RoomList'
+    type = if node.getParent().getType() == 'border' then 'border' else 'tab'
+    buttons = renderState.buttons
+    if node.getComponent() == 'RoomList'
+      buttons?.push \
+        <div key="link"
+         className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
+         aria-label="Save meeting link to clipboard"
+         onClick={(e) -> navigator.clipboard.writeText \
+           Meteor.absoluteUrl "/m/#{meetingId}"}
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
+          <OverlayTrigger placement="bottom" overlay={(props) ->
+            <Tooltip {...props}>Save meeting link to clipboard</Tooltip>
+          }>
+            <FontAwesomeIcon icon={clipboardLink}/>
+          </OverlayTrigger>
+        </div>
+      return
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className="tab-title">{renderState.content}</span>
       </OverlayTrigger>
     if node.isVisible()  # special buttons for visible tabs
       id = node.getId()
-      buttons = renderState.buttons
-      type = if node.getParent().getType() == 'border' then 'border' else 'tab'
       buttons?.push \
         <div key="link"
          className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
