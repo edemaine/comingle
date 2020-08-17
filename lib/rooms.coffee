@@ -34,7 +34,7 @@ Meteor.methods
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
       set.updated = new Date
-      set.raised = diff.updated if diff.raised
+      set.raised = set.updated if set.raised
       set.raiser = set.updator
     Rooms.update diff.id,
       $set: set
