@@ -1,6 +1,8 @@
 import React, {useEffect} from 'react'
+import {Accordion, Card, Form} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 
+import {CardToggle} from './CardToggle'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
@@ -11,10 +13,16 @@ export Name = ->
     Session.set 'name', nameDebounce
     undefined
   , [nameDebounce]
-  <form onSubmit={(e) -> e.preventDefault()}>
-    <div className="form-group">
-      <label className="text-center small w-100 mb-n1">Your name:</label>
-      <input type="text" placeholder="FirstName LastName" className="form-control"
-       value={name} onChange={(e) -> setName e.target.value}/>
-    </div>
-  </form>
+  <Accordion defaultActiveKey="0">
+    <Card>
+      <CardToggle eventKey="0">
+        Your name:
+      </CardToggle>
+      <Accordion.Collapse eventKey="0">
+        <Card.Body>
+          <Form.Control type="text" placeholder="FirstName LastName"
+           value={name} onChange={(e) -> setName e.target.value}/>
+        </Card.Body>
+      </Accordion.Collapse>
+    </Card>
+  </Accordion>

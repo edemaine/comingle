@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams, useHistory} from 'react-router-dom'
-import {SplitButton, Dropdown, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Card, ListGroup, SplitButton, Dropdown, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser, faHandPaper} from '@fortawesome/free-solid-svg-icons'
@@ -11,9 +11,14 @@ import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
 import {Header} from './Header'
 import {Name} from './Name'
+import {CardToggle} from './CardToggle'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {sortNames, uniqCountNames} from './lib/sortNames'
 import {formatTimeDelta} from './lib/dates'
+
+findMyPresence = (presence) ->
+  presenceId = getPresenceId()
+  presence?.find (p) -> p.id == presenceId
 
 export RoomList = ({loading}) ->
   {meetingId} = useParams()
@@ -28,32 +33,50 @@ export RoomList = ({loading}) ->
           type: type
           name: presence.name
           id: presence.id
+  Sublist = ({heading, filter, startClosed}) ->
+    subrooms = rooms.filter filter
+    return null unless subrooms.length
+    <Accordion defaultActiveKey={unless startClosed then "0"}>
+      <Card>
+        <CardToggle eventKey="0">
+          {heading}
+        </CardToggle>
+        <Accordion.Collapse eventKey="0">
+          <Card.Body>
+            <ListGroup>
+              {for room in subrooms
+                <RoomInfo key={room._id} room={room}
+                 presence={presenceByRoom[room._id]}/>
+              }
+              {if loading
+                <Loading/>
+              }
+            </ListGroup>
+          </Card.Body>
+        </Accordion.Collapse>
+      </Card>
+    </Accordion>
   <div className="RoomList">
     <Header/>
     <Name/>
-    {if rooms.length or loading
-      <div className="list-group">
-        {for room in rooms
-          <RoomInfo key={room._id} room={room}
-           presence={presenceByRoom[room._id]}/>
-        }
-        {if loading
-          <Loading/>
-        }
-      </div>
-    else
+    {unless rooms.length or loading
       <div className="alert alert-warning" role="alert">
         No rooms in this meeting.
       </div>
     }
+    <Sublist heading="Rooms You're In:"
+     filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
+    <Sublist heading="Other Rooms:"
+     filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
+    <Sublist heading="Archived Rooms:" startClosed
+     filter={(room) -> room.archived}/>
     <RoomNew/>
   </div>
 
 export RoomInfo = ({room, presence}) ->
   {meetingId} = useParams()
-  presenceId = getPresenceId()
   if presence?
-    myPresence = (presence?.find (p) -> p.id == presenceId)
+    myPresence = findMyPresence presence
     clusters = sortNames presence, (p) -> p.name
     clusters = uniqCountNames presence, (p) -> p.name
   myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
