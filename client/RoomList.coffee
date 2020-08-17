@@ -72,53 +72,55 @@ export RoomList = ({loading}) ->
         </Accordion.Collapse>
       </Card>
     </Accordion>
-  <div className="RoomList">
-    <Header/>
-    <Name/>
-    {unless rooms.length or loading
-      <Alert variant="warning">
-        No rooms in this meeting.
-      </Alert>
-    }
-    <Sublist heading="Rooms You're In:"
-     filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
-    <Sublist heading="Other Rooms:"
-     filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
-    <Sublist heading="Archived Rooms:" startClosed
-     filter={(room) -> room.archived}/>
-    {if rooms.length > 1
-      <ButtonGroup className="sorting mt-3 w-100 text-center">
-        <DropdownButton title="Sort By">
-          {for key in ['title', 'created', 'participants']
-            <Dropdown.Item key={key} active={key == sortKey}
-             onClick={do (key) -> (e) -> setSortKey key}>
-              {capitalize key}
-            </Dropdown.Item>
-          }
-        </DropdownButton>
-        <OverlayTrigger placement="top" overlay={(props) ->
-          <Tooltip {...props}>
-            Currently sorting in {
-              if reverse
-                <b>decreasing</b>
-              else
-                <b>increasing</b>
-            } order. <br/>
-            Select to toggle.
-          </Tooltip>
-        }>
-          <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
-            {if reverse
-               <FontAwesomeIcon aria-label="Decreasing Order"
-                icon={faSortAlphaDownAlt}/>
-             else
-               <FontAwesomeIcon aria-label="Increasing Order"
-                icon={faSortAlphaDown}/>
+  <div className="d-flex flex-column h-100">
+    <div className="RoomList flex-shrink-1 overflow-auto">
+      <Header/>
+      <Name/>
+      {unless rooms.length or loading
+        <Alert variant="warning">
+          No rooms in this meeting.
+        </Alert>
+      }
+      <Sublist heading="Rooms You're In:"
+       filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
+      <Sublist heading="Other Rooms:"
+       filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
+      <Sublist heading="Archived Rooms:" startClosed
+       filter={(room) -> room.archived}/>
+      {if rooms.length > 1
+        <ButtonGroup className="sorting my-3 w-100 text-center">
+          <DropdownButton title="Sort By">
+            {for key in ['title', 'created', 'participants']
+              <Dropdown.Item key={key} active={key == sortKey}
+               onClick={do (key) -> (e) -> setSortKey key}>
+                {capitalize key}
+              </Dropdown.Item>
             }
-          </Button>
-        </OverlayTrigger>
-      </ButtonGroup>
-    }
+          </DropdownButton>
+          <OverlayTrigger placement="top" overlay={(props) ->
+            <Tooltip {...props}>
+              Currently sorting in {
+                if reverse
+                  <b>decreasing</b>
+                else
+                  <b>increasing</b>
+              } order. <br/>
+              Select to toggle.
+            </Tooltip>
+          }>
+            <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
+              {if reverse
+                 <FontAwesomeIcon aria-label="Decreasing Order"
+                  icon={faSortAlphaDownAlt}/>
+               else
+                 <FontAwesomeIcon aria-label="Increasing Order"
+                  icon={faSortAlphaDown}/>
+              }
+            </Button>
+          </OverlayTrigger>
+        </ButtonGroup>
+      }
+    </div>
     <RoomNew/>
   </div>
 
@@ -188,7 +190,6 @@ export RoomNew = ->
     roomId = await roomWithTemplate room
     history.push "/m/#{meetingId}##{roomId}"
   <form onSubmit={submit}>
-    <div className="form-group"/>
     <div className="form-group">
       <input type="text" placeholder="Title" className="form-control"
        value={title} onChange={(e) -> setTitle e.target.value}/>
