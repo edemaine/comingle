@@ -53,7 +53,6 @@ export Room = ({loading, roomId, showArchived}) ->
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
     tabs: tabs
-  , [loading, roomId, showArchived]
   id2tab = useIdMap tabs
   existingTabTypes = useIdMap tabs, 'type'
   tabsetUsed = useRef {}
