@@ -1,7 +1,7 @@
 import React, {useState, useMemo} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams, useHistory} from 'react-router-dom'
-import {Accordion, Button, ButtonGroup, Card, Dropdown, DropdownButton, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt} from '@fortawesome/free-solid-svg-icons'
@@ -76,9 +76,9 @@ export RoomList = ({loading}) ->
     <Header/>
     <Name/>
     {unless rooms.length or loading
-      <div className="alert alert-warning" role="alert">
+      <Alert variant="warning">
         No rooms in this meeting.
-      </div>
+      </Alert>
     }
     <Sublist heading="Rooms You're In:"
      filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
@@ -86,37 +86,39 @@ export RoomList = ({loading}) ->
      filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
     <Sublist heading="Archived Rooms:" startClosed
      filter={(room) -> room.archived}/>
-    <ButtonGroup className="sorting mt-3 w-100 text-center">
-      <DropdownButton title="Sort By">
-        {for key in ['title', 'created', 'participants']
-          <Dropdown.Item key={key} active={key == sortKey}
-           onClick={do (key) -> (e) -> setSortKey key}>
-            {capitalize key}
-          </Dropdown.Item>
-        }
-      </DropdownButton>
-      <OverlayTrigger placement="top" overlay={(props) ->
-        <Tooltip {...props}>
-          Currently sorting in {
-            if reverse
-              <b>decreasing</b>
-            else
-              <b>increasing</b>
-          } order. <br/>
-          Select to toggle.
-        </Tooltip>
-      }>
-        <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
-          {if reverse
-             <FontAwesomeIcon aria-label="Decreasing Order"
-              icon={faSortAlphaDownAlt}/>
-           else
-             <FontAwesomeIcon aria-label="Increasing Order"
-              icon={faSortAlphaDown}/>
+    {if rooms.length > 1
+      <ButtonGroup className="sorting mt-3 w-100 text-center">
+        <DropdownButton title="Sort By">
+          {for key in ['title', 'created', 'participants']
+            <Dropdown.Item key={key} active={key == sortKey}
+             onClick={do (key) -> (e) -> setSortKey key}>
+              {capitalize key}
+            </Dropdown.Item>
           }
-        </Button>
-      </OverlayTrigger>
-    </ButtonGroup>
+        </DropdownButton>
+        <OverlayTrigger placement="top" overlay={(props) ->
+          <Tooltip {...props}>
+            Currently sorting in {
+              if reverse
+                <b>decreasing</b>
+              else
+                <b>increasing</b>
+            } order. <br/>
+            Select to toggle.
+          </Tooltip>
+        }>
+          <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
+            {if reverse
+               <FontAwesomeIcon aria-label="Decreasing Order"
+                icon={faSortAlphaDownAlt}/>
+             else
+               <FontAwesomeIcon aria-label="Increasing Order"
+                icon={faSortAlphaDown}/>
+            }
+          </Button>
+        </OverlayTrigger>
+      </ButtonGroup>
+    }
     <RoomNew/>
   </div>
 
