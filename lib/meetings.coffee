@@ -13,6 +13,7 @@ export checkMeeting = (meeting) ->
 Meteor.methods
   meetingNew: (meeting) ->
     check meeting,
+      title: Match.Optional String
       creator: creatorPattern
     unless @isSimulation
       meeting.created = new Date
@@ -24,3 +25,17 @@ Meteor.methods
           creator: meeting.creator
         , room
     meetingId
+  meetingEdit: (diff) ->
+    check diff,
+      id: String
+      title: Match.Optional String
+      updator: creatorPattern
+    unless @isSimulation
+      diff.updated = new Date
+    meeting = checkMeeting diff.id
+    set = {}
+    for key, value of diff when key != 'id'
+      set[key] = value unless meeting[key] == value
+    return unless (key for key of set).length  # nothing to update
+    Meetings.update diff.id,
+      $set: set

@@ -10,6 +10,7 @@ import {Rooms, roomWithTemplate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
 import {Header} from './Header'
+import {MeetingTitle} from './MeetingTitle'
 import {Name} from './Name'
 import {CardToggle} from './CardToggle'
 import {capitalize} from './lib/capitalize'
@@ -80,6 +81,7 @@ export RoomList = ({loading}) ->
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-shrink-1 overflow-auto">
       <Header/>
+      <MeetingTitle/>
       <Name/>
       <Accordion defaultActiveKey="0">
         <Card>
