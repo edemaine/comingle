@@ -61,7 +61,7 @@ export Room = ({loading, roomId, showArchived}) ->
   useEffect ->
     return if loading or model?
     setModel FlexLayout.Model.fromJson
-      global: {}
+      global: FlexLayout.defaultGlobal
       borders: [
         #type: 'border'
         #location: 'right'

@@ -9,6 +9,9 @@ export * from './lib/FlexLayout'
 import {Actions, Layout as FlexLayout} from './lib/FlexLayout'
 import {capitalize} from './lib/capitalize'
 
+export defaultGlobal =
+  tabSetTabStripHeight: 22
+
 titleLimit = 20
 
 export Layout = (props) ->

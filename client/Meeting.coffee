@@ -22,7 +22,7 @@ export MeetingContext = React.createContext {}
 
 initModel = ->
   model = FlexLayout.Model.fromJson
-    global:
+    global: Object.assign {}, FlexLayout.defaultGlobal,
       borderEnableDrop: false
     borders: [
       type: 'border'
@@ -173,7 +173,7 @@ export Meeting = ->
     if node.getComponent() == 'RoomList'
       buttons?.push \
         <div key="link"
-         className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
+         className="flexlayout__#{type}_button_trailing"
          aria-label="Save meeting link to clipboard"
          onClick={(e) -> navigator.clipboard.writeText \
            Meteor.absoluteUrl "/m/#{meetingId}"}
@@ -214,7 +214,7 @@ export Meeting = ->
           "Show Archived Tabs"
       buttons?.push \
         <div key="archived"
-         className="flexlayout__#{type}_button_trailing flexlayout__tab_button_middle"
+         className="flexlayout__#{type}_button_trailing"
          aria-label={label}
          onClick={-> setShowArchived {id, value: not showArchived}}
          onMouseDown={(e) -> e.stopPropagation()}

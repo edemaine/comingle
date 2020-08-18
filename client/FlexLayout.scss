@@ -1,8 +1,14 @@
+$font-size: 12px;
 @import "{}/node_modules/flexlayout-react/style/light.scss";
 
 // Override button placement
-.flexlayout__tab_button_trailing { margin-top: 0; }
-.flexlayout__tab_button_overflow { width: auto; padding-left: 6px; }
+.flexlayout__tab_button { padding: 2px 6px; }
+.flexlayout__tab_button_content { padding-right: 2px; }
+.flexlayout__tab_button_trailing { margin-left: 4px;
+  .fa-times { font-size: 120%; margin-top: 2px; margin-left: 1px; }
+  .fa-clipboard-link { font-size: 120%; margin-top: -3.5px }
+}
+.flexlayout__tab_button_overflow { padding-left: 4px; }
 
 .flexlayout__tab_toolbar_button-fa {
   background: transparent;
@@ -12,12 +18,12 @@
   border: none;
   outline-width: 0;
 }
-.flexlayout__tab_button_link { font-size: larger; margin-top: -3.5px }
-.flexlayout__tab_button_middle { margin-right: 3px }
 
 .flexlayout__tab_button_trailing:active { color: #555 }
-.flexlayout__tab_button_trailing a { color: inherit }
-.flexlayout__tab_button_trailing a:visited { color: inherit }
+.flexlayout__tab_button_trailing {
+  a, a:visited, a:hover { color: inherit }
+  a { padding-right: 0 }
+}a,
 
 .flexlayout__tab_button_leading, .flexlayout__border_button_leading {
   padding-right: 0.5ex;
