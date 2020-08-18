@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useContext} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams, useHistory} from 'react-router-dom'
 import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
@@ -10,6 +10,7 @@ import {Rooms, roomWithTemplate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
 import {Header} from './Header'
+import {MeetingContext} from './Meeting'
 import {MeetingTitle} from './MeetingTitle'
 import {Name} from './Name'
 import {CardToggle} from './CardToggle'
@@ -165,12 +166,21 @@ export RoomList = ({loading}) ->
 
 export RoomInfo = ({_id, title, raised, presence}) ->
   {meetingId} = useParams()
+  {openRoom} = useContext MeetingContext
   if presence?
     myPresence = findMyPresence presence
     clusters = sortNames presence, (p) -> p.name
     clusters = uniqCountNames presence, (p) -> p.name
   myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
-  <Link to="/m/#{meetingId}##{_id}" className="list-group-item list-group-item-action room-info #{myPresenceClass}">
+  onClick = (e) ->
+    ## Shift-click => open as background tab (without focusing)
+    if e.shiftKey
+      match = /#([^#]*)/.exec e.currentTarget.href
+      return unless match
+      e.preventDefault()
+      openRoom match[1], false
+  <Link to="/m/#{meetingId}##{_id}" onClick={onClick}
+   className="list-group-item list-group-item-action room-info #{myPresenceClass}">
     {if myPresence or raised
       help = "#{if raised then 'Lower' else 'Raise'} Hand"
       toggleHand = ->

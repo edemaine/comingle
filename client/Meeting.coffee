@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer} from 'react'
+import React, {useState, useEffect, useReducer, useMemo} from 'react'
 import {Switch, Route, useParams, useLocation, useHistory} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
@@ -17,6 +17,8 @@ import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {useIdMap} from './lib/useIdMap'
 import {formatDate} from './lib/dates'
+
+export MeetingContext = React.createContext {}
 
 initModel = ->
   model = FlexLayout.Model.fromJson
@@ -64,19 +66,26 @@ export Meeting = ->
           name: room.title
     undefined
   , [rooms]
+  openRoom = useMemo -> (id, focus = true) ->
+    tabset = FlexLayout.getActiveTabset model
+    selected = tabset.getSelectedNode()
+    unless model.getNodeById id
+      tab =
+        id: id
+        type: 'tab'
+        name: Rooms.findOne(id)?.title ? id
+        component: 'Room'
+        config: showArchived: false
+      model.doAction FlexLayout.Actions.addNode tab,
+        tabset.getId(), FlexLayout.DockLocation.CENTER, -1
+    FlexLayout.forceSelectTab model,
+      if focus or not selected
+        id
+      else
+        selected.getId()
   useEffect ->
     if location.hash and validId id = location.hash[1..]
-      unless model.getNodeById id
-        tab =
-          id: id
-          type: 'tab'
-          name: Rooms.findOne(id)?.title ? id
-          component: 'Room'
-          config: showArchived: false
-        tabset = FlexLayout.getActiveTabset model
-        model.doAction FlexLayout.Actions.addNode tab,
-          tabset.getId(), FlexLayout.DockLocation.CENTER, -1
-      FlexLayout.forceSelectTab model, id
+      openRoom id
     undefined
   , [location.hash]
   [showArchived, setShowArchived] = useReducer(
@@ -229,7 +238,9 @@ export Meeting = ->
           archived={room.archived} onClick={archiveRoom}
           help="Archived rooms can still be viewed and restored from the list at the bottom."
         />
-  <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-   onRenderTab={onRenderTab}
-   onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
-   tabPhrase="room"/>
+  <MeetingContext.Provider value={{openRoom}}>
+    <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
+     onRenderTab={onRenderTab}
+     onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
+     tabPhrase="room"/>
+  </MeetingContext.Provider>
