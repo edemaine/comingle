@@ -22,6 +22,12 @@ findMyPresence = (presence) ->
   presenceId = getPresenceId()
   presence?.find (p) -> p.id == presenceId
 
+sortKeys =
+  title: 'Title'
+  created: 'Creation time'
+  participants: 'Participant count'
+  raised: 'Raised hand timer'
+
 export RoomList = ({loading}) ->
   {meetingId} = useParams()
   [sortKey, setSortKey] = useState 'title'
@@ -41,13 +47,18 @@ export RoomList = ({loading}) ->
             id: presence.id
     byRoom
   , [presences]
-  sortedRooms = useMemo ->
-    sorted = sortByKey rooms[..],
-      if sortKey == 'participants'
-        (room) ->
-          titleKey "#{presenceByRoom[room._id]?.length ? 0}.#{room.title}"
+  sorters =
+    title: titleKey
+    created: (room) -> room.created
+    participants: (room) ->
+      titleKey "#{presenceByRoom[room._id]?.length ? 0}.#{room.title}"
+    raised: (room) ->
+      if room.raised
+        -room.raised.getTime()
       else
-        sortKey
+        -Infinity
+  sortedRooms = useMemo ->
+    sorted = sortByKey rooms[..], sorters[sortKey]
     sorted.reverse() if reverse
     sorted
   , [rooms, sortKey, reverse, if sortKey == 'participants' then presenceByRoom]
@@ -97,11 +108,11 @@ export RoomList = ({loading}) ->
                  onChange={(e) -> setSearch e.target.value}>
                 </Form.Control>
                 <ButtonGroup size="sm" className="sorting w-100 text-center">
-                  <DropdownButton title="Sort By" variant="info">
-                    {for key in ['title', 'created', 'participants']
+                  <DropdownButton title="Sort By" variant="light">
+                    {for key, phrase of sortKeys
                       <Dropdown.Item key={key} active={key == sortKey}
-                       onClick={do (key) -> (e) -> setSortKey key}>
-                        {capitalize key}
+                       onClick={do (key) -> (e) -> e.stopPropagation(); e.preventDefault(); setSortKey key}>
+                        {phrase}
                       </Dropdown.Item>
                     }
                   </DropdownButton>
@@ -116,7 +127,7 @@ export RoomList = ({loading}) ->
                       Select to toggle.
                     </Tooltip>
                   }>
-                    <Button variant="secondary" onClick={(e) -> setReverse not reverse}>
+                    <Button variant="light" onClick={(e) -> setReverse not reverse}>
                       {if reverse
                          <FontAwesomeIcon aria-label="Decreasing Order"
                           icon={faSortAlphaDownAlt}/>

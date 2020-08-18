@@ -6,16 +6,9 @@ export titleKey = (title) ->
   title.toLowerCase().replace /\d+/g, (n) -> n.padStart titleDigits, '0'
 
 export sortByKey = (array, key) ->
-  if typeof key == 'string'
-    if key == 'title'
-      keyFun = titleKey
-    else
-      keyFun = (x) -> x[key]
-  else
-    keyFun = key
   array.sort (x, y) ->
-    x = keyFun x
-    y = keyFun y
+    x = key x
+    y = key y
     if x < y
       -1
     else if x > y
