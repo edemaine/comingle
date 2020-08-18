@@ -226,10 +226,13 @@ export RoomInfo = ({_id, title, raised, presence}) ->
 export RoomNew = ->
   {meetingId} = useParams()
   [title, setTitle] = useState ''
-  history = useHistory()
+  {openRoom} = useContext MeetingContext
+  shift = false
   submit = (e) ->
     e.preventDefault?()
     return unless title.trim().length
+    shifted = shift
+    shift = false
     room =
       meeting: meetingId
       title: title.trim()
@@ -237,20 +240,27 @@ export RoomNew = ->
       template: e.template ? 'jitsi'
     setTitle ''
     roomId = await roomWithTemplate room
-    history.push "/m/#{meetingId}##{roomId}"
+    openRoom roomId, not shifted
+  onClick = (e) ->
+    if e.shiftKey
+      shift = true
+      setTimeout (-> shift = false), 0
   <form onSubmit={submit}>
     <div className="form-group">
       <input type="text" placeholder="Title" className="form-control"
-       value={title} onChange={(e) -> setTitle e.target.value}/>
+       value={title} onChange={(e) -> setTitle e.target.value}
+       onKeyDown={(e) -> if e.key == 'Shift' then shift = true}
+       onKeyUp={(e) -> if e.key == 'Shift' then shift = false}
+       onBlur={(e) -> shift = false}/>
       <SplitButton type="submit" className="btn-block" drop="up"
-                   title="Create Room">
-        <Dropdown.Item onClick={-> submit template: ''}>
+       title="Create Room" onClick={onClick}>
+        <Dropdown.Item onClick={(e) -> onClick e; submit template: ''}>
           Empty room
         </Dropdown.Item>
-        <Dropdown.Item onClick={-> submit template: 'jitsi'}>
+        <Dropdown.Item onClick={(e) -> onClick e; submit template: 'jitsi'}>
           Jitsi (default)
         </Dropdown.Item>
-        <Dropdown.Item onClick={-> submit template: 'jitsi+cocreate'}>
+        <Dropdown.Item onClick={(e) -> onClick e; submit template: 'jitsi+cocreate'}>
           Jitsi + Cocreate
         </Dropdown.Item>
       </SplitButton>
