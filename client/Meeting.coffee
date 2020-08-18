@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
+import {ArchiveButton} from './ArchiveButton'
 import {RoomList} from './RoomList'
 import {Room} from './Room'
 import {Rooms} from '/lib/rooms'
@@ -218,6 +219,16 @@ export Meeting = ->
             <FontAwesomeIcon icon={if showArchived then faEye else faEyeSlash}/>
           </OverlayTrigger>
         </div>
+      archiveRoom = ->
+        Meteor.call 'roomEdit',
+          id: room._id
+          archived: not room.archived
+          updator: getCreator()
+      if room = id2room[id]
+        buttons?.push <ArchiveButton key="archive" type={type} noun="room"
+          archived={room.archived} onClick={archiveRoom}
+          help="Archived rooms can still be viewed and restored from the list at the bottom."
+        />
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab}
    onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}

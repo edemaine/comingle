@@ -26,6 +26,7 @@ Meteor.methods
       id: String
       title: Match.Optional String
       raised: Match.Optional Boolean
+      archived: Match.Optional Boolean
       updator: creatorPattern
     room = checkRoom diff.id
     set = {}
@@ -34,8 +35,12 @@ Meteor.methods
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
       set.updated = new Date
-      set.raised = set.updated if set.raised
-      set.raiser = set.updator
+      if set.archived
+        set.archived = set.updated
+        set.archiver = set.updator
+      if set.raised
+        set.raised = set.updated
+        set.raiser = set.updator
     Rooms.update diff.id,
       $set: set
 

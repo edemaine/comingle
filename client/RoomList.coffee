@@ -154,9 +154,11 @@ export RoomList = ({loading}) ->
       <Sublist heading="Rooms You're In:"
        filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Available Rooms:"
-       filter={(room) -> not findMyPresence presenceByRoom[room._id]}/>
+       filter={(room) -> not room.archived and
+                         not findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Archived Rooms:" startClosed
-       filter={(room) -> room.archived}/>
+       filter={(room) -> room.archived and
+                         not findMyPresence presenceByRoom[room._id]}/>
     </div>
     <RoomNew/>
   </div>
