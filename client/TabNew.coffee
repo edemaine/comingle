@@ -5,7 +5,6 @@ import {validURL, tabTypes, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
 import {getCreator} from './lib/presenceId'
 import {capitalize} from './lib/capitalize'
-import Settings from '/settings.coffee'
 
 export tabTypePage =
   iframe:

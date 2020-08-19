@@ -1,6 +1,5 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
-import {useTracker} from 'meteor/react-meteor-data'
 
 import {FrontPage} from './FrontPage'
 import {Meeting} from './Meeting'

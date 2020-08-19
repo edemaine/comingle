@@ -1,6 +1,6 @@
 import React, {useState, useMemo} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
-import {Alert, Form, Button, Row, Col} from 'react-bootstrap'
+import {Alert, Button, Row, Col} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 
 import {allow} from './TabIFrame'
@@ -15,7 +15,7 @@ base64 = (str) ->
   btoa encodeURIComponent(str).replace /%([0-9A-F]{2})/g, (match, hex) ->
     String.fromCharCode "0x#{hex}"
 
-export TabZoom = ({tabId, room}) ->
+export TabZoom = ({tabId}) ->
   tab = useTracker -> Tabs.findOne tabId
   return null unless tab
   match = zoomRegExp.exec tab.url

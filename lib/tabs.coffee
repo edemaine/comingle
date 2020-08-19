@@ -1,3 +1,5 @@
+import {Mongo} from 'meteor/mongo'
+import {check, Match} from 'meteor/check'
 import {Random} from 'meteor/random'
 
 import {validId, creatorPattern} from './id'
@@ -78,7 +80,7 @@ Meteor.methods
     #  else
     #    throw new Error "Invalid tab type: #{tab?.type}"
     check tab, pattern
-    meeting = checkMeeting tab.meeting
+    checkMeeting tab.meeting
     room = checkRoom tab.room
     if tab.meeting != room.meeting
       throw new Error "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useReducer, useMemo} from 'react'
-import {Switch, Route, useParams, useLocation, useHistory} from 'react-router-dom'
+import {useParams, useLocation, useHistory} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
@@ -78,6 +78,7 @@ export Meeting = ->
         config: showArchived: false
       model.doAction FlexLayout.Actions.addNode tab,
         tabset.getId(), FlexLayout.DockLocation.CENTER, -1
+    console.log focus, selected?.getId()
     FlexLayout.forceSelectTab model,
       if focus or not selected
         id

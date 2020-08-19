@@ -1,3 +1,6 @@
+import {Mongo} from 'meteor/mongo'
+import {check, Match} from 'meteor/check'
+
 import {validId, checkId} from './id.coffee'
 import {checkMeeting} from './meetings.coffee'
 
@@ -16,7 +19,7 @@ Meteor.methods
         visible: [Match.Where validId]
         invisible: [Match.Where validId]
     unless @isSimulation
-      meeting = checkMeeting presence.meeting
+      checkMeeting presence.meeting
       connections[@connection.id] = presence.id
       presence.updated = new Date
     Presence.update

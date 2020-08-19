@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useReducer, useRef} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
-import {Button, ButtonGroup, Tooltip, OverlayTrigger, Overlay} from 'react-bootstrap'
+import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'

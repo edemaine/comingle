@@ -1,3 +1,4 @@
+import {check, Match} from 'meteor/check'
 import crypto from 'crypto'
 
 ###
@@ -32,10 +33,11 @@ Meteor.methods
     Meteor.settings.zoom?.apiKey and
     Meteor.settings.zoom?.apiSecret
   zoomSign: (meetingID, role = 0) ->
+    check meetingID, String
+    check role, Match.OneOf 0, 1
     ## https://marketplace.zoom.us/docs/sdk/native-sdks/web/essential/signature
     timestamp = (new Date).getTime() - 30000
     msg = Buffer.from(Meteor.settings.zoom.apiKey + meetingID + timestamp + role).toString 'base64'
-    console.log Meteor.settings.zoom.apiSecret
     hash = crypto.createHmac('sha256', Meteor.settings.zoom.apiSecret).update(msg).digest 'base64'
     console.log "#{Meteor.settings.zoom.apiKey}.#{meetingID}.#{timestamp}.#{role}.#{hash}"
     signature: Buffer.from("#{Meteor.settings.zoom.apiKey}.#{meetingID}.#{timestamp}.#{role}.#{hash}").toString 'base64'

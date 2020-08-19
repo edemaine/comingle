@@ -1,3 +1,6 @@
+import {Mongo} from 'meteor/mongo'
+import {check, Match} from 'meteor/check'
+
 import {validId, creatorPattern} from './id'
 import {checkMeeting} from './meetings'
 import {meteorCallPromise} from './meteorPromise'
@@ -19,7 +22,7 @@ Meteor.methods
       creator: creatorPattern
     unless @isSimulation
       room.created = new Date
-    meeting = checkMeeting room.meeting
+    checkMeeting room.meeting
     Rooms.insert room
   roomEdit: (diff) ->
     check diff,

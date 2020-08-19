@@ -1,3 +1,6 @@
+import {Mongo} from 'meteor/mongo'
+import {check, Match} from 'meteor/check'
+
 import {validId, creatorPattern} from './id'
 import {roomWithTemplate} from './rooms'
 import Settings from '../settings.coffee'

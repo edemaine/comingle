@@ -1,7 +1,6 @@
-import React, {useRef} from 'react'
+import React from 'react'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import FontAwesomeSVG from '@fortawesome/fontawesome-svg-core'
 import {faTimes, faExpandArrowsAlt, faCompressArrowsAlt, faWindowRestore} \
   from '@fortawesome/free-solid-svg-icons'
 

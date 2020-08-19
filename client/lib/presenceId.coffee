@@ -1,8 +1,6 @@
 import {Random} from 'meteor/random'
 import {Session} from 'meteor/session'
 
-import useLocalStorage from './useLocalStorage'
-
 ## Modeled after Cocreate's remoteId mechanism
 
 presenceId = Random.id()

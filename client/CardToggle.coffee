@@ -1,5 +1,5 @@
 import React, {useContext} from 'react'
-import {Accordion, AccordionContext, useAccordionToggle, Card} from 'react-bootstrap'
+import {AccordionContext, useAccordionToggle, Card} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faChevronCircleUp, faChevronCircleDown} from '@fortawesome/free-solid-svg-icons'
 
