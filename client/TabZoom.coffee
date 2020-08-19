@@ -28,9 +28,9 @@ export TabZoom = ({tabId}) ->
   zoomNative = ->
     ## Zoom client URL schemes are documented here:
     ## https://marketplace.zoom.us/docs/guides/guides/client-url-schemes
-    MobileDetect = (await import('mobile-detect')).default
-    md = new MobileDetect window.navigator.userAgent
-    prefix = if md.mobile() then 'zoomus' else 'zoommtg'
+    UAParser = (await import('ua-parser-js')).default
+    ua = new UAParser
+    prefix = if ua.getDevice().type == 'mobile' then 'zoomus' else 'zoommtg'
     url = "#{prefix}://zoom.us/join?confno=#{zoomID}"
     url += "&pwd=#{zoomPwd}" if zoomPwd
     name = Session.get 'name'
