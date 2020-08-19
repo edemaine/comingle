@@ -13,6 +13,7 @@ import {Header} from './Header'
 import {MeetingContext} from './Meeting'
 import {MeetingTitle} from './MeetingTitle'
 import {Name} from './Name'
+import {Warnings} from './Warnings'
 import {CardToggle} from './CardToggle'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {formatTimeDelta} from './lib/dates'
@@ -92,6 +93,7 @@ export RoomList = ({loading}) ->
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-shrink-1 overflow-auto">
       <Header/>
+      <Warnings/>
       <MeetingTitle/>
       <Name/>
       {if rooms.length > 1
