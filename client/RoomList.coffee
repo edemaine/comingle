@@ -91,7 +91,7 @@ export RoomList = ({loading}) ->
       </Card>
     </Accordion>
   <div className="d-flex flex-column h-100">
-    <div className="RoomList flex-shrink-1 overflow-auto">
+    <div className="RoomList flex-shrink-1 overflow-auto pb-2">
       <Header/>
       <Warnings/>
       <MeetingTitle/>
