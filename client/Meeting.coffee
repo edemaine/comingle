@@ -68,7 +68,6 @@ export Meeting = ->
   , [rooms]
   openRoom = useMemo -> (id, focus = true) ->
     tabset = FlexLayout.getActiveTabset model
-    selected = tabset.getSelectedNode()
     unless model.getNodeById id
       tab =
         id: id
@@ -77,13 +76,9 @@ export Meeting = ->
         component: 'Room'
         config: showArchived: false
       model.doAction FlexLayout.Actions.addNode tab,
-        tabset.getId(), FlexLayout.DockLocation.CENTER, -1
-    console.log focus, selected?.getId()
-    FlexLayout.forceSelectTab model,
-      if focus or not selected
-        id
-      else
-        selected.getId()
+        tabset.getId(), FlexLayout.DockLocation.CENTER, -1, focus
+    else
+      FlexLayout.forceSelectTab model, id
   useEffect ->
     if location.hash and validId id = location.hash[1..]
       openRoom id
