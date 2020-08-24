@@ -7,7 +7,7 @@
     "lint": "eslint --ext .coffee ."
   },
   "dependencies": {
-    "@babel/runtime": "^7.8.4",
+    "@babel/runtime": "^7.11.2",
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-brands-svg-icons": "^5.14.0",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
@@ -15,8 +15,8 @@
     "@use-it/event-listener": "^0.1.5",
     "@use-it/interval": "^0.1.3",
     "bootstrap": "^4.5.2",
-    "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#add-tab-without-select",
-    "meteor-node-stubs": "^1.0.0",
+    "flexlayout-react": "git+https://github.com/caplin/FlexLayout.git#746dc5fdffd1ab46b37dc3b4b71f43d9e563e45a",
+    "meteor-node-stubs": "^1.0.1",
     "pug": "^3.0.0",
     "react": "^16.13.0",
     "react-bootstrap": "^1.3.0",
