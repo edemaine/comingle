@@ -111,7 +111,13 @@ export zoomRegExp =
 
 export mangleTab = (tab, dropManualTitle) ->
   tab.url = tab.url.trim()
-  return tab unless tab.url and validURL tab.url
+  return tab unless tab.url
+
+  ## Automatic https:// protocol if unspecified
+  if /^\w+[\./]/.test tab.url
+    tab.url = "https://#{tab.url}"
+
+  return tab unless validURL tab.url
 
   ## Force type if we recognize default servers
   for service in ['cocreate', 'jitsi']
