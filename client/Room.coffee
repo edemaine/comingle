@@ -237,7 +237,7 @@ export Room = ({loading, roomId, showArchived}) ->
                 <small>Or right click for more browser options.</small>
               </Tooltip>
             }>
-              <a href={url} target="_blank">
+              <a href={url} target="_blank" rel="noopener">
                 <FontAwesomeIcon icon={faSignInAlt}/>
               </a>
             </OverlayTrigger>
