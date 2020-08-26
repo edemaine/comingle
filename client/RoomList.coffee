@@ -182,7 +182,7 @@ export RoomInfo = ({_id, title, raised, presence}) ->
       openRoom match[1], false
   <Link to="/m/#{meetingId}##{_id}" onClick={onClick}
    className="list-group-item list-group-item-action room-info #{myPresenceClass}">
-    {if myPresence or raised
+    {if raised or myPresence?.type == 'visible'
       help = "#{if raised then 'Lower' else 'Raise'} Hand"
       toggleHand = ->
         Meteor.call 'roomEdit',
