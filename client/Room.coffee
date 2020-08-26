@@ -71,7 +71,7 @@ export Room = ({loading, roomId, showArchived}) ->
   , [loading]
   ## Automatic tab layout algorithm.
   tabDefaultLocation = (tab) ->
-    if tabTypes[tab.type].keepVisible
+    if tabTypes[tab.type]?.keepVisible
       ## New tab is keepVisible; make sure it's in a tabset by itself.
       if tabNews[tab._id]?
         ## User added this tab via TabNew interface.
@@ -167,12 +167,18 @@ export Room = ({loading, roomId, showArchived}) ->
     return <Loading/>
   tabNew = (parent) ->
     return unless model?
+    ## Add TabNew to the clicked tabset, unless it has a keepVisible tab
+    ## showing, in which case put it in the algorithm's default location.
+    if tabTypes[id2tab[parent.getSelectedNode?()?.getId?()]?.type]?.keepVisible
+      location = tabDefaultLocation {}
+    else
+      location = [parent.getId(), FlexLayout.DockLocation.CENTER, -1]
     model.doAction FlexLayout.Actions.addNode
       type: 'tab'
       name: 'New Tab'
       component: 'TabNew'
       enableRename: false
-    , parent, FlexLayout.DockLocation.CENTER, -1
+    , ...location
   factory = (node) ->
     switch node.getComponent()
       when 'TabIFrame' then <TabIFrame tabId={node.getId()}/>
@@ -288,7 +294,7 @@ export Room = ({loading, roomId, showArchived}) ->
       }>
         <button className="flexlayout__tab_toolbar_button-fa"
          aria-label="Add Tab"
-         onClick={(e) -> tabNew node.getId()}>
+         onClick={(e) -> tabNew node}>
           <FontAwesomeIcon icon={faPlus}/>
         </button>
       </OverlayTrigger>
