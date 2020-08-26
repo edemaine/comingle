@@ -227,13 +227,13 @@ export Room = ({loading, roomId, showArchived}) ->
         buttons?.push \
           <div key="link"
            className="flexlayout__#{type}_button_trailing"
-           aria-label="Open tab in separate browser tab"
+           aria-label="Open in separate browser tab"
            onClick={(e) -> navigator.clipboard.writeText url}
            onMouseDown={(e) -> e.stopPropagation()}
            onTouchStart={(e) -> e.stopPropagation()}>
             <OverlayTrigger placement="bottom" overlay={(props) ->
               <Tooltip {...props}>
-                Open tab in separate browser tab<br/>
+                Open in separate browser tab<br/>
                 <small>Or right click for more browser options.</small>
               </Tooltip>
             }>
