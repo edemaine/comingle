@@ -17,6 +17,7 @@ import {Warnings} from './Warnings'
 import {CardToggle} from './CardToggle'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {formatTimeDelta} from './lib/dates'
+import timesync from './lib/timesync'
 import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 
 findMyPresence = (presence) ->
@@ -199,11 +200,13 @@ export RoomInfo = ({_id, title, raised, presence}) ->
            onClick={toggleHand}/>
         </OverlayTrigger>
         {if raised and typeof raised != 'boolean'
-          [timer, setTimer] = useState formatTimeDelta (new Date) - raised
-          useInterval ->
-            delta = (new Date) - raised
+          recomputeTimer = ->
+            delta = timesync.offset + (new Date).getTime() - raised
             delta = 0 if delta < 0
-            setTimer formatTimeDelta delta
+            formatTimeDelta delta
+          [timer, setTimer] = useState recomputeTimer
+          useInterval ->
+            setTimer recomputeTimer()
           , 1000
           <div className="timer">
             {timer}
