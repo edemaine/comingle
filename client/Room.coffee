@@ -159,7 +159,7 @@ export Room = ({loading, roomId, showArchived}) ->
     ## Start new tab in every empty tabset
     for tabset in FlexLayout.getTabsets model
       if tabset.getChildren().length == 0
-        tabNew tabset.getId()
+        tabNew tabset
     undefined
   , [model, tabs]
   ## End of hooks
