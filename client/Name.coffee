@@ -26,3 +26,4 @@ export Name = ->
       </Accordion.Collapse>
     </Card>
   </Accordion>
+Name.displayName = 'Name'

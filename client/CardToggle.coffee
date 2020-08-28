@@ -15,3 +15,4 @@ export CardToggle = ({children, eventKey}) ->
       <FontAwesomeIcon icon={faChevronCircleDown} className="float-right"/>
     }
   </Card.Header>
+CardToggle.displayName = 'CardToggle'

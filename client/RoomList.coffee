@@ -92,6 +92,7 @@ export RoomList = ({loading}) ->
         </Accordion.Collapse>
       </Card>
     </Accordion>
+  Sublist.displayName = Sublist
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-shrink-1 overflow-auto pb-2">
       <Header/>
@@ -166,6 +167,7 @@ export RoomList = ({loading}) ->
     </div>
     <RoomNew/>
   </div>
+RoomList.displayName = 'RoomList'
 
 export RoomInfo = ({_id, title, raised, presence}) ->
   {meetingId} = useParams()
@@ -229,6 +231,7 @@ export RoomInfo = ({_id, title, raised, presence}) ->
       </div>
     }
   </Link>
+RoomInfo.displayName = 'RoomInfo'
 
 export RoomNew = ->
   {meetingId} = useParams()
@@ -273,3 +276,4 @@ export RoomNew = ->
       </SplitButton>
     </div>
   </form>
+RoomNew.displayName = 'RoomNew'

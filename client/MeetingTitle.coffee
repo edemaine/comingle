@@ -45,3 +45,4 @@ export MeetingTitle = ->
     </Card>
   </Accordion>
   ###
+MeetingTitle.displayName = 'MeetingTitle'

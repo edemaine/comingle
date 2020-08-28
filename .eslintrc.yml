@@ -31,3 +31,6 @@ rules:
     - error
     - always
   'meteor/no-session': off
+settings:
+  react:
+    version: detect

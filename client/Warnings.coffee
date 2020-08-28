@@ -39,3 +39,4 @@ export Warnings = ->
        onClose={-> updateWarning {op: 'hide', id}}>
         {warning.body}
       </Alert>
+Warnings.displayName = 'Warnings'

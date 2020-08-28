@@ -20,3 +20,4 @@ export App = ->
       </Route>
     </Switch>
   </Router>
+App.displayName = 'App'

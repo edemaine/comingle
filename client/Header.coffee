@@ -4,6 +4,7 @@ LinkToFrontPage = (props) ->
   <a href={Meteor.absoluteUrl()} target="_blank" {...props}>
     {props.children}
   </a>
+LinkToFrontPage.displayName = 'LinkToFrontPage'
 
 export Header = ->
   <nav>
@@ -14,3 +15,4 @@ export Header = ->
       Comingle
     </LinkToFrontPage>
   </nav>
+Header.displayName = 'Header'

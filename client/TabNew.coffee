@@ -162,3 +162,4 @@ export TabNew = ({node, meetingId, roomId,
       </div>
     </div>
   </div>
+TabNew.displayName = 'TabNew'

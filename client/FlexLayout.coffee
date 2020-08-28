@@ -83,6 +83,7 @@ export Layout = (props) ->
    i18nMapper={(label) -> switch label
      when 'Close', 'Maximize', 'Restore' then null}
   />
+Layout.displayName = 'Layout'
 
 export forceSelectTab = (model, tab) ->
   tab = model.getNodeById tab if typeof tab == 'string'

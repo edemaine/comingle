@@ -240,3 +240,4 @@ export Meeting = ->
      onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
      tabPhrase="room"/>
   </MeetingContext.Provider>
+Meeting.displayName = 'Meeting'

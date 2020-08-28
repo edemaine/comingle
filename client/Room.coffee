@@ -30,7 +30,7 @@ tabComponent = (tab) ->
       'TabZoom'
     else # iframe, cocreate, youtube -- for now
       'TabIFrame'
-tabIcon = (tab) ->
+tabIcon = (tab) -> # eslint-disable-line react/display-name
   switch tab?.type  # undefined for TabNew
     when 'jitsi'
       <FontAwesomeIcon icon={faVideo}/>
@@ -179,7 +179,7 @@ export Room = ({loading, roomId, showArchived}) ->
       component: 'TabNew'
       enableRename: false
     , ...location
-  factory = (node) ->
+  factory = (node) -> # eslint-disable-line react/display-name
     switch node.getComponent()
       when 'TabIFrame' then <TabIFrame tabId={node.getId()}/>
       when 'TabJitsi' then <TabJitsi tabId={node.getId()} room={room}/>
@@ -191,13 +191,13 @@ export Room = ({loading, roomId, showArchived}) ->
         model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
           component: tabComponent id2tab[node.getId()]
         <Loading/>
-  iconFactory = (node) ->
+  iconFactory = (node) -> # eslint-disable-line react/display-name
     icon = tabIcon id2tab[node.getId()]
     return icon unless icon?
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
       {icon}
     </OverlayTrigger>
-  tooltip = (node) -> (props) ->
+  tooltip = (node) -> (props) -> # eslint-disable-line react/display-name
     tab = id2tab[node.getId()]
     return <span/> unless room
     <Tooltip {...props}>
@@ -318,3 +318,4 @@ export Room = ({loading, roomId, showArchived}) ->
   <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
    onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
    onAction={onAction} onModelChange={onModelChange} tabPhrase="tab"/>
+Room.displayName = 'Room'

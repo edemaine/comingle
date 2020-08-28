@@ -82,3 +82,4 @@ export TabZoom = ({tabId}) ->
       <p>If you want to make this decision again, select the &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
     </div>
   </div>
+TabZoom.displayName = 'TabZoom'

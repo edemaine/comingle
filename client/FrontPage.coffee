@@ -33,3 +33,4 @@ export FrontPage = ->
       </Button>
     </ButtonGroup>
   </Jumbotron>
+FrontPage.displayName = 'FrontPage'

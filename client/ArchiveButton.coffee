@@ -45,3 +45,4 @@ export ArchiveButton = ({type, noun, archived, help, onClick}) ->
       </Tooltip>
     </Overlay>
   </div>
+ArchiveButton.displayName = 'ArchiveButton'

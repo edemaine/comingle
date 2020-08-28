@@ -7,3 +7,4 @@ export Loading = ->
       Loading...
     </div>
   </div>
+Loading.displayName = 'Loading'

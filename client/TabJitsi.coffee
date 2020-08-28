@@ -52,3 +52,4 @@ export TabJitsi = ({tabId, room}) ->
   ).join '&'
 
   <iframe src={url} allow={allow}/>
+TabJitsi.displayName = 'TabJitsi'
