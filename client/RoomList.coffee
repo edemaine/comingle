@@ -201,7 +201,9 @@ export RoomInfo = ({_id, title, raised, presence}) ->
         {if raised and typeof raised != 'boolean'
           [timer, setTimer] = useState formatTimeDelta (new Date) - raised
           useInterval ->
-            setTimer formatTimeDelta (new Date) - raised
+            delta = (new Date) - raised
+            delta = 0 if delta < 0
+            setTimer formatTimeDelta delta
           , 1000
           <div className="timer">
             {timer}
