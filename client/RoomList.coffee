@@ -55,7 +55,8 @@ export RoomList = ({loading}) ->
       titleKey "#{presenceByRoom[room._id]?.length ? 0}.#{room.title}"
     raised: (room) ->
       if room.raised
-        -room.raised.getTime()
+        ## room.raised will briefly be true instead of a time
+        -(room.raised.getTime?() ? 0)
       else
         -Infinity
   sortedRooms = useMemo ->
