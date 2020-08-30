@@ -1,5 +1,6 @@
 export formatDate = (date) ->
   return 'unknown date' unless date
+  return 'unknown date' if date == true
   date.toLocaleDateString(undefined,
     weekday: 'short'
     month: 'short'

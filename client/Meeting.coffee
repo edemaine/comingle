@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useReducer, useMemo} from 'react'
 import {useParams, useLocation, useHistory} from 'react-router-dom'
-import FlexLayout from './FlexLayout'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
@@ -8,6 +7,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
+import FlexLayout from './FlexLayout'
 import {ArchiveButton} from './ArchiveButton'
 import {RoomList} from './RoomList'
 import {Room} from './Room'
@@ -140,12 +140,14 @@ export Meeting = ->
     if tabset and tab = tabset.getSelectedNode()
       unless location.hash == "##{tab.getId()}"
         history.replace "/m/#{meetingId}##{tab.getId()}"
+      Session.set 'currentRoom', tab.getId()
     else
       if location.hash
         history.replace "/m/#{meetingId}"
+      Session.set 'currentRoom', undefined
   factory = (node) ->
     switch node.getComponent()
-      when 'RoomList' then <RoomList loading={loading}/>
+      when 'RoomList' then <RoomList loading={loading} model={model}/>
       when 'Room'
         if node.isVisible()
           <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>

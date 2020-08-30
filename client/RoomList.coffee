@@ -1,11 +1,13 @@
-import React, {useState, useMemo, useContext} from 'react'
+import React, {useState, useMemo, useContext, useRef} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
-import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, Overlay, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
+import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
 
+import FlexLayout from './FlexLayout'
 import {Rooms, roomWithTemplate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
@@ -16,7 +18,7 @@ import {Name} from './Name'
 import {Warnings} from './Warnings'
 import {CardToggle} from './CardToggle'
 import {getPresenceId, getCreator} from './lib/presenceId'
-import {formatTimeDelta} from './lib/dates'
+import {formatTimeDelta, formatDate} from './lib/dates'
 import timesync from './lib/timesync'
 import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 
@@ -30,11 +32,12 @@ sortKeys =
   participants: 'Participant count'
   raised: 'Raised hand timer'
 
-export RoomList = ({loading}) ->
+export RoomList = ({loading, model}) ->
   {meetingId} = useParams()
   [sortKey, setSortKey] = useState 'title'
   [reverse, setReverse] = useState false
   [search, setSearch] = useState ''
+  [selected, setSelected] = useState()
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
   presences = useTracker -> Presence.find(meeting: meetingId).fetch()
   presenceByRoom = useMemo ->
@@ -85,8 +88,15 @@ export RoomList = ({loading}) ->
           <Card.Body>
             <ListGroup>
               {for room in subrooms
-                <RoomInfo key={room._id} {...room}
-                 presence={presenceByRoom[room._id]}/>
+                do (id = room._id) ->
+                  <RoomInfo key={room._id} room={room}
+                   presence={presenceByRoom[room._id]}
+                   selected={selected == room._id}
+                   setSelected={(select) ->
+                     if select then setSelected id else setSelected null}
+                   leave={->
+                     model.doAction FlexLayout.Actions.deleteTab id}
+                  />
               }
             </ListGroup>
           </Card.Body>
@@ -170,31 +180,63 @@ export RoomList = ({loading}) ->
   </div>
 RoomList.displayName = 'RoomList'
 
-export RoomInfo = ({_id, title, raised, presence}) ->
+export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
   {meetingId} = useParams()
   {openRoom} = useContext MeetingContext
+  link = useRef()
   if presence?
     myPresence = findMyPresence presence
     clusters = sortNames presence, (p) -> p.name
     clusters = uniqCountNames presence, (p) -> p.name
   myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
-  onClick = (e) ->
-    ## Shift-click => open as background tab (without focusing)
-    if e.shiftKey
-      match = /#([^#]*)/.exec e.currentTarget.href
-      return unless match
-      e.preventDefault()
-      openRoom match[1], false
-  <Link to="/m/#{meetingId}##{_id}" onClick={onClick}
+  onClick = (force) -> (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    currentRoom = Session.get 'currentRoom'
+    ## Open room with focus in the following cases:
+    ##   * We're not in any rooms
+    ##   * Shift-click => force open as foreground tab
+    ##   * We clicked on the Switch button (force == true)
+    if not currentRoom? or e.shiftKey or force == true
+      openRoom room._id, true
+      setSelected false
+    ## Open room as background tab (without focusing) in the following cases:
+    ##   * Ctrl/Command-click => force open as background tab
+    ##   * We clicked on the Join In Background button (force == false)
+    else if e.ctrlKey or e.metaKey or force == false
+      openRoom room._id, false
+      setSelected false
+    else
+      setSelected not selected
+  onLeave = (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    leave()
+    setSelected false
+  <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()}
    className="list-group-item list-group-item-action room-info #{myPresenceClass}">
-    {if raised or myPresence?.type == 'visible'
-      help = "#{if raised then 'Lower' else 'Raise'} Hand"
-      toggleHand = ->
+    {if room.raised or myPresence?.type == 'visible'
+      if room.raised
+        help =
+          <>
+            {if myPresence?.type == 'visible'
+              <><b>Lower Hand</b><br/></>
+            }
+            raised by {room.raiser?.name ? 'unknown'}<br/>
+            on {formatDate room.raised}
+          </>
+      else
+        help = <b>Raise Hand</b>
+      toggleHand = (e) ->
+        e.preventDefault()
+        e.stopPropagation()
+        ## Allow toggling hand only if actively in room
+        return unless myPresence?.type == 'visible'
         Meteor.call 'roomEdit',
-          id: _id
-          raised: not raised
+          id: room._id
+          raised: not room.raised
           updator: getCreator()
-      <div className="raise-hand #{if raised then 'active' else ''}"
+      <div className="raise-hand #{if room.raised then 'active' else ''}"
        aria-label={help}>
         <OverlayTrigger placement="top" overlay={(props) ->
           <Tooltip {...props}>{help}</Tooltip>
@@ -202,9 +244,9 @@ export RoomInfo = ({_id, title, raised, presence}) ->
           <FontAwesomeIcon aria-label={help} icon={faHandPaper}
            onClick={toggleHand}/>
         </OverlayTrigger>
-        {if raised and typeof raised != 'boolean'
+        {if room.raised and typeof room.raised != 'boolean'
           recomputeTimer = ->
-            delta = timesync.offset + (new Date).getTime() - raised
+            delta = timesync.offset + (new Date).getTime() - room.raised
             delta = 0 if delta < 0
             formatTimeDelta delta
           [timer, setTimer] = useState recomputeTimer
@@ -217,7 +259,7 @@ export RoomInfo = ({_id, title, raised, presence}) ->
         }
       </div>
     }
-    <span className="title">{title}</span>
+    <span className="title">{room.title}</span>
     {if clusters?.length
       <div className="presence">
         {for person in clusters
@@ -230,6 +272,31 @@ export RoomInfo = ({_id, title, raised, presence}) ->
           </span>
         }
       </div>
+    }
+    {if selected
+      <ButtonGroup vertical className="mx-n2 mt-2 d-block">
+        {unless myPresence?.type == 'visible'
+          <Button variant="warning" onClick={onClick true}>
+            Switch To Room<br/>
+            <small><b>Leaves</b> current room</small>
+          </Button>
+        }
+        {if myPresence
+          <Button variant="danger" onClick={onLeave}>
+            Leave Room<br/>
+            {if myPresence.type == 'visible'
+              <small><b>Leaves</b> current room</small>
+            else
+              <small>Close background room</small>
+            }
+          </Button>
+        else
+          <Button variant="secondary" onClick={onClick false}>
+            Join In Background<br/>
+            <small><b>Stays</b> in current room</small>
+          </Button>
+        }
+      </ButtonGroup>
     }
   </Link>
 RoomInfo.displayName = 'RoomInfo'
