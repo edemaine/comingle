@@ -55,9 +55,10 @@ export RoomList = ({loading}) ->
     participants: (room) ->
       titleKey "#{presenceByRoom[room._id]?.length ? 0}.#{room.title}"
     raised: (room) ->
-      if room.raised
+      if raised = room.raised
         ## room.raised will briefly be true instead of a time
-        -(room.raised.getTime?() ? 0)
+        raised = new Date if typeof raised == 'boolean'
+        -raised.getTime()
       else
         -Infinity
   sortedRooms = useMemo ->
