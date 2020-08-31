@@ -70,21 +70,37 @@ export Room = ({loading, roomId, showArchived}) ->
       layout: layout
   , [loading]
   ## Automatic tab layout algorithm.
+  direction = (tabset, keepVisible) ->
+    rect = tabset.getRect()
+    if rect.width < rect.height  # taller than wide
+      if keepVisible
+        FlexLayout.DockLocation.TOP
+      else
+        FlexLayout.DockLocation.BOTTOM
+    else                         # wider than tall
+      if keepVisible
+        FlexLayout.DockLocation.RIGHT
+      else
+        FlexLayout.DockLocation.LEFT
   tabDefaultLocation = (tab) ->
     if tabTypes[tab.type]?.keepVisible
       ## New tab is keepVisible; make sure it's in a tabset by itself.
       if tabNews[tab._id]?
         ## User added this tab via TabNew interface.
         ## If the TabNew is alone in its tabset, replace it there;
-        ## otherwise, add to the right of its tabset.
-        if tabNews[tab._id].getParent().getChildren().length == 1
+        ## otherwise, delete TabNew and add to right/bottom of its tabset.
+        parent = tabNews[tab._id].getParent()
+        console.log parent.getChildren().length
+        if parent.getChildren().length == 1
           null
         else
-          [tabNews[tab._id].getParent().getId(), FlexLayout.DockLocation.RIGHT, -1]
+          model.doAction FlexLayout.Actions.deleteTab tabNews[tab._id].getId()
+          delete tabNews[tab._id]
+          [parent.getId(), direction(parent, true), -1]
       else
-        ## Automatic layout: add to the right of the last tabset.
-        [(FlexLayout.getTabsets model).pop().getId(),
-         FlexLayout.DockLocation.RIGHT, -1]
+        ## Automatic layout: add to the right/bottom of the last tabset.
+        parent = FlexLayout.getTabsets(model).pop()
+        [parent.getId(), direction(parent, true), -1]
     else
       ## New tab is not keepVisible.  Avoid hiding any keepVisible tabs.
       if tabNews[tab._id]?
@@ -117,8 +133,8 @@ export Room = ({loading, roomId, showArchived}) ->
               oldest = tabset
         location = [oldest, FlexLayout.DockLocation.CENTER, -1]
       else
-        ## Otherwise, add to the left of first tabset.
-        location = [tabsets[0].getId(), FlexLayout.DockLocation.LEFT, -1]
+        ## Otherwise, add to the left/top of first tabset.
+        location = [tabsets[0].getId(), direction(tabsets[0], false), -1]
   ## Synchronize model with room
   useEffect ->
     return unless model?
