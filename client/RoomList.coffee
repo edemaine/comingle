@@ -18,7 +18,7 @@ import {Name} from './Name'
 import {Warnings} from './Warnings'
 import {CardToggle} from './CardToggle'
 import {getPresenceId, getCreator} from './lib/presenceId'
-import {formatTimeDelta, formatDate} from './lib/dates'
+import {formatTimeDelta, formatDateTime} from './lib/dates'
 import timesync from './lib/timesync'
 import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 
@@ -232,7 +232,7 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
               <><b>Lower Hand</b><br/></>
             }
             raised by {room.raiser?.name ? 'unknown'}<br/>
-            on {formatDate room.raised}
+            on {formatDateTime room.raised}
           </>
       else
         help = <b>Raise Hand</b>

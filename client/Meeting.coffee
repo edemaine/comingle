@@ -4,11 +4,12 @@ import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import FlexLayout from './FlexLayout'
 import {ArchiveButton} from './ArchiveButton'
+import {ChatRoom} from './ChatRoom'
 import {RoomList} from './RoomList'
 import {Room} from './Room'
 import {Rooms} from '/lib/rooms'
@@ -16,7 +17,7 @@ import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {useIdMap} from './lib/useIdMap'
-import {formatDate} from './lib/dates'
+import {formatDateTime} from './lib/dates'
 
 export MeetingContext = React.createContext {}
 
@@ -33,6 +34,13 @@ initModel = ->
         type: 'tab'
         name: "Meeting Rooms"
         component: 'RoomList'
+        enableClose: false
+        enableDrag: false
+      ,
+        id: 'chat'
+        type: 'tab'
+        name: "Meeting Chat"
+        component: 'ChatRoom'
         enableClose: false
         enableDrag: false
       ]
@@ -104,7 +112,7 @@ export Meeting = ->
         visible: []
         invisible: []
     model.visitNodes (node) ->
-      if node.getType() == 'tab' and node.getId() != 'roomsTab'
+      if node.getType() == 'tab' and node.getComponent() == 'Room'
         if node.isVisible()
           presence.rooms.visible.push node.getId()
         else
@@ -145,25 +153,32 @@ export Meeting = ->
       if location.hash
         history.replace "/m/#{meetingId}"
       Session.set 'currentRoom', undefined
-  factory = (node) ->
+  factory = (node) -> # eslint-disable-line react/display-name
     switch node.getComponent()
-      when 'RoomList' then <RoomList loading={loading} model={model}/>
+      when 'RoomList'
+        <RoomList loading={loading} model={model}/>
+      when 'ChatRoom'
+        <ChatRoom channel={meetingId} audience="everyone"/>
       when 'Room'
         if node.isVisible()
           <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
         else
           null  # don't render hidden rooms, in particular to cancel all calls
-  tooltip = (node) -> (props) ->
+  tooltip = (node) -> (props) -> # eslint-disable-line react/display-name
     room = id2room[node.getId()]
     return <span/> unless room
     <Tooltip {...props}>
       Room &ldquo;{room.title}&rdquo;<br/>
       created by {room.creator?.name ? 'unknown'}<br/>
-      on {formatDate room.created}
+      on {formatDateTime room.created}
     </Tooltip>
-  iconFactory = (node) ->
+  iconFactory = (node) -> # eslint-disable-line react/display-name
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
-      <FontAwesomeIcon icon={faDoorOpen}/>
+      {if node.getComponent() == 'ChatRoom'
+        <FontAwesomeIcon icon={faComment}/>
+      else
+        <FontAwesomeIcon icon={faDoorOpen}/>
+      }
     </OverlayTrigger>
   onRenderTab = (node, renderState) ->
     type = if node.getParent().getType() == 'border' then 'border' else 'tab'
@@ -183,7 +198,7 @@ export Meeting = ->
             <FontAwesomeIcon icon={clipboardLink}/>
           </OverlayTrigger>
         </div>
-      return
+    return if node.getParent().getType() == 'border'
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className="tab-title">{renderState.content}</span>

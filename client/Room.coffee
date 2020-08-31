@@ -4,7 +4,7 @@ import FlexLayout from './FlexLayout'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 
 import {Rooms} from '/lib/rooms'
@@ -12,8 +12,9 @@ import {Tabs, tabTypes} from '/lib/tabs'
 import {getCreator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
-import {formatDate} from './lib/dates'
+import {formatDateTime} from './lib/dates'
 import {Loading} from './Loading'
+import {ChatRoom} from './ChatRoom'
 import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
@@ -63,9 +64,17 @@ export Room = ({loading, roomId, showArchived}) ->
     setModel FlexLayout.Model.fromJson
       global: FlexLayout.defaultGlobal
       borders: [
-        #type: 'border'
-        #location: 'right'
-        #children: []
+        type: 'border'
+        location: 'right'
+        selected: -1  # chat closed by default
+        children: [
+          id: 'chat'
+          type: 'tab'
+          name: "Room Chat"
+          component: 'ChatRoom'
+          enableClose: false
+          enableDrag: false
+        ]
       ]
       layout: layout
   , [loading]
@@ -90,7 +99,6 @@ export Room = ({loading, roomId, showArchived}) ->
         ## If the TabNew is alone in its tabset, replace it there;
         ## otherwise, delete TabNew and add to right/bottom of its tabset.
         parent = tabNews[tab._id].getParent()
-        console.log parent.getChildren().length
         if parent.getChildren().length == 1
           null
         else
@@ -153,7 +161,7 @@ export Room = ({loading, roomId, showArchived}) ->
           actions.push FlexLayout.Actions.updateNodeAttributes node.getId(),
             tabSettings tab
           laidOut[tab._id] = true
-        else if node.getComponent() != 'TabNew'
+        else if node.getComponent() not in ['TabNew', 'ChatRoom']
           ## Delete tabs in stored layout that are no longer in room
           actions.push FlexLayout.Actions.deleteTab node.getId()
     model.doAction action for action in actions
@@ -197,6 +205,7 @@ export Room = ({loading, roomId, showArchived}) ->
     , ...location
   factory = (node) -> # eslint-disable-line react/display-name
     switch node.getComponent()
+      when 'ChatRoom' then <ChatRoom channel={roomId} audience="room"/>
       when 'TabIFrame' then <TabIFrame tabId={node.getId()}/>
       when 'TabJitsi' then <TabJitsi tabId={node.getId()} room={room}/>
       when 'TabZoom' then <TabZoom tabId={node.getId()} room={room}/>
@@ -208,23 +217,26 @@ export Room = ({loading, roomId, showArchived}) ->
           component: tabComponent id2tab[node.getId()]
         <Loading/>
   iconFactory = (node) -> # eslint-disable-line react/display-name
-    icon = tabIcon id2tab[node.getId()]
+    if node.getComponent() == 'ChatRoom'
+      icon = <FontAwesomeIcon icon={faComment}/>
+    else
+      icon = tabIcon id2tab[node.getId()]
     return icon unless icon?
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
       {icon}
     </OverlayTrigger>
   tooltip = (node) -> (props) -> # eslint-disable-line react/display-name
     tab = id2tab[node.getId()]
-    return <span/> unless room
+    return <span/> unless tab
     <Tooltip {...props}>
       Tab &ldquo;{tab.title}&rdquo;<br/>
       <code>{tab.url}</code><br/>
       created by {tab.creator?.name ? 'unknown'}<br/>
-      on {formatDate tab.created}
+      on {formatDateTime tab.created}
       {if tab.archived
         <i>
           <br/>archived by {tab.archiver?.name ? 'unknown'}
-          <br/>on {formatDate tab.archived}
+          <br/>on {formatDateTime tab.archived}
         </i>
       }
     </Tooltip>

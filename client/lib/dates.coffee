@@ -1,17 +1,23 @@
+export formatDateTime = (date) ->
+  return 'unknown date' unless date
+  return 'unknown date' if date == true
+  "#{formatDate date} at #{formatTime date}"
+
 export formatDate = (date) ->
   return 'unknown date' unless date
   return 'unknown date' if date == true
-  date.toLocaleDateString(undefined,
+  date.toLocaleDateString undefined,
     weekday: 'short'
     month: 'short'
     day: 'numeric'
     year: 'numeric'
-  ) + ' at ' + date.toLocaleTimeString(undefined,
+
+export formatTime = (date) ->
+  date.toLocaleTimeString undefined,
     hour: 'numeric'
     minute: 'numeric'
     hour12: false
     timeZoneName: 'short'
-  )
 
 export formatTimeDelta = (delta) ->
   delta = Math.round delta / 1000

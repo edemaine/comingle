@@ -26,3 +26,4 @@ edemaine:static-pug
 fourseven:scss
 typescript@3.7.6
 session@1.2.0
+rocketchat:streamer
