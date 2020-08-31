@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useContext, useRef} from 'react'
+import React, {useState, useMemo, useContext, useRef, useCallback} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
 import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, Overlay, OverlayTrigger} from 'react-bootstrap'
@@ -69,6 +69,12 @@ export RoomList = ({loading, model}) ->
     sorted.reverse() if reverse
     sorted
   , [rooms, sortKey, reverse, if sortKey == 'participants' then presenceByRoom]
+  roomList = useRef()
+  selectRoom = useCallback (id) ->
+    setSelected id
+    return unless id?
+    roomList.current?.querySelector("""[data-room="#{id}"]""")?.scrollIntoView()
+  , []
   Sublist = ({heading, filter, startClosed}) ->
     subrooms = sortedRooms.filter filter
     if search
@@ -105,7 +111,7 @@ export RoomList = ({loading, model}) ->
     </Accordion>
   Sublist.displayName = Sublist
   <div className="d-flex flex-column h-100">
-    <div className="RoomList flex-shrink-1 overflow-auto pb-2">
+    <div className="RoomList flex-shrink-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
       <Warnings/>
       <MeetingTitle/>
@@ -176,7 +182,7 @@ export RoomList = ({loading, model}) ->
        filter={(room) -> room.archived and
                          not findMyPresence presenceByRoom[room._id]}/>
     </div>
-    <RoomNew/>
+    <RoomNew selectRoom={selectRoom}/>
   </div>
 RoomList.displayName = 'RoomList'
 
@@ -188,7 +194,9 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
     myPresence = findMyPresence presence
     clusters = sortNames presence, (p) -> p.name
     clusters = uniqCountNames presence, (p) -> p.name
-  myPresenceClass = if myPresence then "room-info-#{myPresence.type}" else ""
+  roomInfoClass = ''
+  roomInfoClass += " room-info-#{myPresence.type}" if myPresence
+  roomInfoClass += " room-info-selected" if selected
   onClick = (force) -> (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -214,7 +222,8 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
     leave()
     setSelected false
   <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()}
-   className="list-group-item list-group-item-action room-info #{myPresenceClass}">
+   className="list-group-item list-group-item-action room-info#{roomInfoClass}"
+   data-room={room._id}>
     {if room.raised or myPresence?.type == 'visible'
       if room.raised
         help =
@@ -301,16 +310,21 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
   </Link>
 RoomInfo.displayName = 'RoomInfo'
 
-export RoomNew = ->
+blankModifiers = ->
+  shiftKey: false
+  ctrlKey: false
+  metaKey: false
+
+export RoomNew = ({selectRoom}) ->
   {meetingId} = useParams()
   [title, setTitle] = useState ''
   {openRoom} = useContext MeetingContext
-  shift = false
+  modifiers = blankModifiers()
   submit = (e) ->
     e.preventDefault?()
     return unless title.trim().length
-    shifted = shift
-    shift = false
+    submitModifiers = modifiers
+    modifiers = blankModifiers()
     room =
       meeting: meetingId
       title: title.trim()
@@ -318,18 +332,35 @@ export RoomNew = ->
       template: e.template ? 'jitsi'
     setTitle ''
     roomId = await roomWithTemplate room
-    openRoom roomId, not shifted
+    if submitModifiers.shiftKey
+      openRoom roomId, true
+      selectRoom null
+    else if submitModifiers.ctrlKey or submitModifiers.metaKey
+      openRoom roomId, false
+      selectRoom null
+    else
+      selectRoom roomId
   onClick = (e) ->
-    if e.shiftKey
-      shift = true
-      setTimeout (-> shift = false), 0
+    for key of modifiers
+      if e[key]
+        modifiers[key] = true
+        do (key) -> setTimeout (-> modifiers[key] = false), 0
+  onKey = (down) -> (e) ->
+    switch e.key
+      when 'Shift'
+        modifiers.shiftKey = down
+      when 'Control'
+        modifiers.ctrlKey = down
+      when 'Meta'
+        modifiers.metaKey = down
+      when 'Enter'
+        submit e if down  # needed to support Control-Enter
   <form onSubmit={submit}>
     <div className="form-group">
       <input type="text" placeholder="Title" className="form-control"
        value={title} onChange={(e) -> setTitle e.target.value}
-       onKeyDown={(e) -> if e.key == 'Shift' then shift = true}
-       onKeyUp={(e) -> if e.key == 'Shift' then shift = false}
-       onBlur={(e) -> shift = false}/>
+       onKeyDown={onKey true} onKeyUp={onKey false}
+       onBlur={(e) -> modifiers = blankModifiers()}/>
       <SplitButton type="submit" className="btn-block" drop="up"
        title="Create Room" onClick={onClick}>
         <Dropdown.Item onClick={(e) -> onClick e; submit template: ''}>
