@@ -310,66 +310,48 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
   </Link>
 RoomInfo.displayName = 'RoomInfo'
 
-blankModifiers = ->
-  shiftKey: false
-  ctrlKey: false
-  metaKey: false
-
 export RoomNew = ({selectRoom}) ->
   {meetingId} = useParams()
   [title, setTitle] = useState ''
   {openRoom} = useContext MeetingContext
-  modifiers = blankModifiers()
-  submit = (e) ->
+  submit = (e, template) ->
     e.preventDefault?()
     return unless title.trim().length
-    submitModifiers = modifiers
-    modifiers = blankModifiers()
+    {shiftKey, ctrlKey, metaKey} = e
     room =
       meeting: meetingId
       title: title.trim()
       creator: getCreator()
-      template: e.template ? 'jitsi'
+      template: template ? 'jitsi'
     setTitle ''
     roomId = await roomWithTemplate room
-    if submitModifiers.shiftKey
+    if shiftKey
       openRoom roomId, true
       selectRoom null
-    else if submitModifiers.ctrlKey or submitModifiers.metaKey
+    else if ctrlKey or metaKey
       openRoom roomId, false
       selectRoom null
     else
       selectRoom roomId
-  onClick = (e) ->
-    for key of modifiers
-      if e[key]
-        modifiers[key] = true
-        do (key) -> setTimeout (-> modifiers[key] = false), 0
-  onKey = (down) -> (e) ->
-    switch e.key
-      when 'Shift'
-        modifiers.shiftKey = down
-      when 'Control'
-        modifiers.ctrlKey = down
-      when 'Meta'
-        modifiers.metaKey = down
-      when 'Enter'
-        submit e if down  # needed to support Control-Enter
+  ## We need to manually capture Enter so that e.g. Ctrl-Enter works.
+  ## This has the added benefit of getting modifiers' state.
+  onKeyDown = (e) ->
+    if e.key == 'Enter'
+      submit e
   <form onSubmit={submit}>
     <div className="form-group">
       <input type="text" placeholder="Title" className="form-control"
        value={title} onChange={(e) -> setTitle e.target.value}
-       onKeyDown={onKey true} onKeyUp={onKey false}
-       onBlur={(e) -> modifiers = blankModifiers()}/>
+       onKeyDown={onKeyDown}/>
       <SplitButton type="submit" className="btn-block" drop="up"
-       title="Create Room" onClick={onClick}>
-        <Dropdown.Item onClick={(e) -> onClick e; submit template: ''}>
+       title="Create Room" onClick={submit}>
+        <Dropdown.Item onClick={(e) -> submit e, ''}>
           Empty room
         </Dropdown.Item>
-        <Dropdown.Item onClick={(e) -> onClick e; submit template: 'jitsi'}>
+        <Dropdown.Item onClick={(e) -> submit e, 'jitsi'}>
           Jitsi (default)
         </Dropdown.Item>
-        <Dropdown.Item onClick={(e) -> onClick e; submit template: 'jitsi+cocreate'}>
+        <Dropdown.Item onClick={(e) -> submit e, 'jitsi+cocreate'}>
           Jitsi + Cocreate
         </Dropdown.Item>
       </SplitButton>
