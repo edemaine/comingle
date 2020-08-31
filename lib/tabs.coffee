@@ -57,10 +57,14 @@ export tabTypes =
     title: 'YouTube'
   zoom:
     title: 'Zoom'
-    category: 'Zoom'
+    category: 'Video Conference'
     alwaysRender: true
     onePerRoom: true
     keepVisible: true
+
+export categories =
+  'Video Conference':
+    onePerRoom: true
 
 Meteor.methods
   tabNew: (tab) ->

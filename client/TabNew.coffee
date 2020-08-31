@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Form} from 'react-bootstrap'
 
-import {validURL, tabTypes, mangleTab, zoomRegExp} from '/lib/tabs'
+import {validURL, tabTypes, categories, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
 import {getCreator} from './lib/presenceId'
 import {capitalize} from './lib/capitalize'
@@ -10,21 +10,29 @@ export tabTypePage =
   iframe:
     topDescription: <p>Paste the URL for any embeddable website, e.g., Wikipedia:</p>
   cocreate:
-    topDescription: <p>This server uses <b><a href="https://github.com/edemaine/cocreate">Cocreate</a></b> for a shared whiteboard.</p>
+    topDescription: <p>This server uses <a className="font-weight-bold" href="https://github.com/edemaine/cocreate">Cocreate</a> for a shared whiteboard.</p>
   jitsi:
-    topDescription: <p>This server uses <b><a href="https://meet.jit.si/">Jitsi Meet</a></b> for video conferencing.</p>
+    topDescription: <p>This server recommends <a className="font-weight-bold" href="https://meet.jit.si/">Jitsi Meet</a> for video conferencing, because it allows free creation of unlimited rooms.</p>
   youtube:
-    topDescription: <p>Paste a YouTube link and we'll turn it into its embeddable form:</p>
+    topDescription: <p>Paste a <a className="font-weight-bold" href="https://www.youtube.com/">YouTube</a> link and we'll turn it into its embeddable form:</p>
   zoom:
     topDescription:
-      <p>If you create a Zoom meeting yourself, you can embed it here.</p>
+      <p>If you create a <a className="font-weight-bold" href="https://zoom.us/">Zoom</a> meeting yourself, you can embed it here.</p>
     bottomDescription:
       <p>Or paste a Zoom invitation link:</p>
+
+tabTypesByCategory = {}
+do -> # avoid namespace pollution
+  for tabType, tabData of tabTypes
+    category = tabData.category ? tabData.title
+    tabTypesByCategory[category] ?= {}
+    tabTypesByCategory[category][tabType] = tabData
 
 export TabNew = ({node, meetingId, roomId,
                   replaceTabNew, existingTabTypes}) ->
   [url, setUrl] = useState ''
   [title, setTitle] = useState ''
+  [category, setCategory] = useState 'Web'
   [type, setType] = useState 'iframe'
   [manualTitle, setManualTitle] = useState false
   [submit, setSubmit] = useState false
@@ -62,6 +70,16 @@ export TabNew = ({node, meetingId, roomId,
     undefined
   , [urlDebounce, titleDebounce, submit]
 
+  onCategory = (categoryName) -> (e) ->
+    e.preventDefault()
+    unless category == categoryName
+      setCategory categoryName
+      for tabType of tabTypesByCategory[categoryName]
+        break  # choose first tabType within category
+      setType tabType
+  onType = (tabType) -> (e) ->
+    e.preventDefault()
+    setType tabType
   onSubmit = (e) ->
     e.preventDefault()
     return unless validURL url
@@ -86,22 +104,44 @@ export TabNew = ({node, meetingId, roomId,
       <div className="card form-group">
         <div className="card-header">
           <ul className="nav nav-tabs card-header-tabs" role="tablist">
-            {for tabType, tabData of tabTypes
-              selected = (type == tabType)
-              if tabData.onePerRoom and existingTabTypes[tabType]
-                continue unless selected
-              <li key={tabType} className="nav-item" role="presentation">
+            {for categoryName, categoryTabTypes of tabTypesByCategory
+              selected = (category == categoryName)
+              <li key={categoryName} className="nav-item" role="presentation">
                 <a className="nav-link #{if selected then 'active'}"
                  href="#" role="tab" aria-selected="#{selected}"
-                 onClick={do (tabType) -> (e) -> e.preventDefault(); setType tabType}>
-                  {tabData.category ? tabData.title}
+                 onClick={onCategory categoryName}>
+                  {categoryName}
                 </a>
               </li>
             }
           </ul>
         </div>
+        {if (tabType for tabType of tabTypesByCategory[category]).length > 1
+          <div className="card-header">
+            <ul className="nav nav-tabs card-header-tabs" role="tablist">
+              {for tabType, tabData of tabTypesByCategory[category]
+                selected = (type == tabType)
+                disabled = tabData.onePerRoom and existingTabTypes[tabType]
+                <li key={tabType} disabled={disabled} className="nav-item" role="presentation">
+                  <a className="nav-link #{if selected then 'active'}"
+                   href="#" role="tab" aria-selected="#{selected}"
+                   onClick={onType tabType}>
+                    {tabData.title}
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        }
         <div className="card-body">
           <form className="newTab" onSubmit={onSubmit}>
+            {if categories[category]?.onePerRoom and
+                (tabType for tabType of tabTypesByCategory[category] \
+                 when existingTabTypes[tabType]).length
+              <div className="alert alert-warning">
+                WARNING: This room already has a {category} tab. Do you really want another?
+              </div>
+            }
             {tabTypePage[type].topDescription}
             {if tabTypes[type].onePerRoom and existingTabTypes[type]
               <div className="alert alert-warning">
