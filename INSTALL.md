@@ -70,6 +70,48 @@ If you're developing on a local test server, use the following instead of
 meteor --settings settings.json
 ```
 
+## Application Performance Management (APM)
+
+To monitor server performance, you can use one of the following:
+
+* [Monti APM](https://montiapm.com/)
+  (no setup required, free for 8-hour retention); or
+* deploy your own
+  [open-source Kadira server](https://github.com/kadira-open/kadira-server).
+  To get this running (on a different machine), I recommend
+  [kadira-compose](https://github.com/edemaine/kadira-compose).
+
+After creating an application on one of the servers above,
+edit `settings.json` to look like the following
+(omit `endpoint` if you're using Monti):
+
+```json
+{
+  "kadira": {
+    "appId": "xxxxxxxxxxxxxxxxx",
+    "appSecret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "endpoint": "https://your-kadira-server:22022"
+  }
+}
+```
+
+If you want Zoom support and APM, `settings.json` should look like this
+(omit `endpoint` if you're using Monti):
+
+```json
+{
+  "zoom": {
+    "apiKey": "YOUR_API_KEY",
+    "apiSecret": "YOUR_API_SECRET"
+  },
+  "kadira": {
+    "appId": "xxxxxxxxxxxxxxxxx",
+    "appSecret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "endpoint": "https://your-kadira-server:22022"
+  }
+}
+```
+
 ## MongoDB
 
 All of Comingle's data is stored in the Mongo database
