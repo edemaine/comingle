@@ -3,6 +3,7 @@ global._ = require('meteor/underscore')._
 
 import '/lib/main.coffee'
 import './chat'
+import './indexes'
 import './meetings'
 import './rooms'
 import './presence'
