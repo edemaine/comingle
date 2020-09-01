@@ -1,3 +1,4 @@
+import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
 
 import {checkId, creatorPattern} from '/lib/id'

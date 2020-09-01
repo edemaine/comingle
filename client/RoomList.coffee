@@ -1,7 +1,7 @@
 import React, {useState, useMemo, useContext, useRef, useCallback} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
-import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, Overlay, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -109,7 +109,7 @@ export RoomList = ({loading, model}) ->
         </Accordion.Collapse>
       </Card>
     </Accordion>
-  Sublist.displayName = Sublist
+  Sublist.displayName = 'Sublist'
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-shrink-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
@@ -149,7 +149,7 @@ export RoomList = ({loading, model}) ->
                       Select to toggle.
                     </Tooltip>
                   }>
-                    <Button variant="light" onClick={(e) -> setReverse not reverse}>
+                    <Button variant="light" onClick={-> setReverse not reverse}>
                       {if reverse
                          <FontAwesomeIcon aria-label="Decreasing Order"
                           icon={faSortAlphaDownAlt}/>

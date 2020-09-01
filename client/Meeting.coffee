@@ -188,7 +188,7 @@ export Meeting = ->
         <div key="link"
          className="flexlayout__#{type}_button_trailing"
          aria-label="Save meeting link to clipboard"
-         onClick={(e) -> navigator.clipboard.writeText \
+         onClick={-> navigator.clipboard.writeText \
            Meteor.absoluteUrl "/m/#{meetingId}"}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
@@ -209,7 +209,7 @@ export Meeting = ->
         <div key="link"
          className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
          aria-label="Save tab URL to clipboard"
-         onClick={(e) -> navigator.clipboard.writeText \
+         onClick={-> navigator.clipboard.writeText \
            Meteor.absoluteUrl "/m/#{meetingId}##{node.getId()}"}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>

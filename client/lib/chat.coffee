@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react'
+import {Mongo} from 'meteor/mongo'
 
 import {ChatStream} from '/lib/chat'
 

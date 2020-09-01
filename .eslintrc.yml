@@ -18,19 +18,23 @@ plugins:
   - meteor
   - react
 rules:
-  indent:
-    - error
-    - 2
+  indent: off  # incompatible with CoffeeScript
+    #- error
+    #- 2
   linebreak-style:
     - error
     - unix
+  no-useless-escape: off  # incompatible with CoffeeScript's ///
   quotes:
     - error
     - single
   semi:
     - error
     - always
-  'meteor/no-session': off
+  react/no-unescaped-entities:
+    - warn
+    - forbid: ['>', '"', '}']
+  meteor/no-session: off
 settings:
   react:
     version: detect

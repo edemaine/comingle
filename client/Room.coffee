@@ -256,7 +256,7 @@ export Room = ({loading, roomId, showArchived}) ->
           <div key="link"
            className="flexlayout__#{type}_button_trailing"
            aria-label="Open in separate browser tab"
-           onClick={(e) -> navigator.clipboard.writeText url}
+           onClick={-> navigator.clipboard.writeText url}
            onMouseDown={(e) -> e.stopPropagation()}
            onTouchStart={(e) -> e.stopPropagation()}>
             <OverlayTrigger placement="bottom" overlay={(props) ->
@@ -275,7 +275,7 @@ export Room = ({loading, roomId, showArchived}) ->
           <div key="link"
            className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
            aria-label="Save tab URL to clipboard"
-           onClick={(e) -> navigator.clipboard.writeText url}
+           onClick={-> navigator.clipboard.writeText url}
            onMouseDown={(e) -> e.stopPropagation()}
            onTouchStart={(e) -> e.stopPropagation()}>
             <OverlayTrigger placement="bottom" overlay={(props) ->
@@ -288,7 +288,7 @@ export Room = ({loading, roomId, showArchived}) ->
       buttons?.push \
         <div key="reload" className="flexlayout__#{type}_button_trailing"
          aria-label="Reload Tab"
-         onClick={(e) -> model.doAction \
+         onClick={-> model.doAction \
            FlexLayout.Actions.updateNodeAttributes node.getId(),
              component: 'TabReload'}
          onMouseDown={(e) -> e.stopPropagation()}
@@ -322,7 +322,7 @@ export Room = ({loading, roomId, showArchived}) ->
       }>
         <button className="flexlayout__tab_toolbar_button-fa"
          aria-label="Add Tab"
-         onClick={(e) -> tabNew node}
+         onClick={-> tabNew node}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
           <FontAwesomeIcon icon={faPlus}/>

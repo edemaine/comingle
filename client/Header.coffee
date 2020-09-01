@@ -1,7 +1,7 @@
 import React from 'react'
 
 LinkToFrontPage = (props) ->
-  <a href={Meteor.absoluteUrl()} target="_blank" {...props}>
+  <a href={Meteor.absoluteUrl()} target="_blank" {...props}> {### eslint-disable-line react/jsx-no-target-blank ###}
     {props.children}
   </a>
 LinkToFrontPage.displayName = 'LinkToFrontPage'
