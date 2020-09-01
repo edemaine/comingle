@@ -322,7 +322,9 @@ export Room = ({loading, roomId, showArchived}) ->
       }>
         <button className="flexlayout__tab_toolbar_button-fa"
          aria-label="Add Tab"
-         onClick={(e) -> tabNew node}>
+         onClick={(e) -> tabNew node}
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
           <FontAwesomeIcon icon={faPlus}/>
         </button>
       </OverlayTrigger>
