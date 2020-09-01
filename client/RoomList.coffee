@@ -116,8 +116,8 @@ export RoomList = ({loading, model}) ->
       <Warnings/>
       <MeetingTitle/>
       <Name/>
-      {if rooms.length > 1
-        <Accordion defaultActiveKey="0">
+      {if rooms.length > 0
+        <Accordion>
           <Card>
             <CardToggle eventKey="0">
               Room Search:
