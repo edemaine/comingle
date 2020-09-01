@@ -25,7 +25,7 @@ export Warnings = ->
           "Comingle and Jitsi do not run well in #{browser}."
       when 'Firefox'
         browserWarning =
-          <span>Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1401592">does not support Simulcast</a> so it does not work well with larger Jitsi calls.</span>
+          <span>Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1401592">does not support Simulcast</a> so it does not work well with Jitsi calls; even if it works for you, it may slow down everyone else.</span>
     if browserWarning?
       updateWarning
         op: 'add'
