@@ -12,13 +12,14 @@ ChatStream.allowWrite 'none'  # all messages from server
 export Chat = new Mongo.Collection 'chat'
 
 Meteor.methods
-  chatLastN: (channel, n) ->
+  chatLastN: (channel, n, before) ->
     checkId channel
     check n, Match.Integer
-    Chat.find
-      channel: channel
-    ,
-      sort: date: -1
+    check before, Match.Maybe Date
+    query = channel: channel
+    query.sent = $lt: before if before?
+    Chat.find query,
+      sort: sent: -1
       limit: n
     .fetch()
   chatSince: (channel, date) ->
