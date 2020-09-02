@@ -5,7 +5,8 @@ import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, F
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
+import {faDoorOpen, faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
+import {faClone} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
 import {Rooms, roomWithTemplate, roomDuplicate} from '/lib/rooms'
@@ -300,12 +301,14 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
       <ButtonGroup vertical className="mx-n2 mt-2 d-block">
         {unless myPresence?.type == 'visible'
           <Button variant="warning" onClick={onClick true}>
-            Switch To Room<br/>
+            <small className="mr-1"><FontAwesomeIcon icon={faDoorOpen}/></small>
+            Switch to Room<br/>
             <small><b>Leaves</b> current room</small>
           </Button>
         }
         {if myPresence
           <Button variant="danger" onClick={onLeave}>
+            <small className="mr-1"><FontAwesomeIcon icon={faTimes}/></small>
             Leave Room<br/>
             {if myPresence.type == 'visible'
               <small><b>Leaves</b> this room</small>
@@ -314,13 +317,14 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
             }
           </Button>
         else
-          <Button variant="secondary" onClick={onClick false}>
-            Join In Background<br/>
+          <Button variant="secondary" onClick={onClick false} className="px-1">
+            Join in Background<br/>
             <small><b>Stays</b> in current room</small>
           </Button>
         }
         {if myPresence?.type == 'visible'
           <Button variant="primary" onClick={onSplit}>
+            <small className="mr-1"><FontAwesomeIcon icon={faClone}/></small>
             Split Room<br/>
             <small><b>Duplicate</b> this room (forking discussion)</small>
           </Button>
