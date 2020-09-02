@@ -4,7 +4,7 @@ import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment, faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faDoorOpen, faEye, faEyeSlash, faQuestion} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import FlexLayout from './FlexLayout'
@@ -154,6 +154,17 @@ export Meeting = ->
       if location.hash
         history.replace "/m/#{meetingId}"
       Session.set 'currentRoom', undefined
+    
+    if model.getRoot().getChildren().every (tabset) -> tabset.getChildren().length == 0
+      welcomeTabJson =
+        id: 'welcome'
+        type: 'tab'
+        name: 'Welcome'
+        component: 'Welcome'
+        enableClose: true
+        enableDrag: true
+      model.doAction FlexLayout.Actions.addNode welcomeTabJson, model.getRoot().getChildren()[0].getId(), FlexLayout.DockLocation.CENTER, -1
+  
   factory = (node) -> # eslint-disable-line react/display-name
     switch node.getComponent()
       when 'RoomList'
@@ -162,6 +173,10 @@ export Meeting = ->
         <ChatRoom channel={meetingId} audience="everyone"
          visible={node.isVisible()} extraData={node.getExtraData()}
          updateTab={-> FlexLayout.updateNode model, node.getId()}/>
+      when 'Welcome'
+        <>
+          Welcome to Comingle!
+        </>
       when 'Room'
         if node.isVisible()
           <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
@@ -185,6 +200,8 @@ export Meeting = ->
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
       {if node.getComponent() == 'ChatRoom'
         <FontAwesomeIcon icon={faComment}/>
+      else if node.getComponent() == 'Welcome'
+        <FontAwesomeIcon icon={faQuestion}/>
       else
         <FontAwesomeIcon icon={faDoorOpen}/>
       }
@@ -207,6 +224,7 @@ export Meeting = ->
             <FontAwesomeIcon icon={clipboardLink}/>
           </OverlayTrigger>
         </div>
+<<<<<<< HEAD
     else if node.getComponent() == 'ChatRoom'
       return ChatRoom.onRenderTab node, renderState
     return if node.getParent().getType() == 'border'
@@ -214,6 +232,9 @@ export Meeting = ->
     return unless room
     className = 'tab-title'
     className += ' archived' if room.archived
+=======
+    return if node.getComponent() != 'Room'
+>>>>>>> 539726e... Added a welcome tab
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className={className}>{renderState.content}</span>
