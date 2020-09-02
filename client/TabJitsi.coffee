@@ -34,11 +34,11 @@ export TabJitsi = ({tabId, room}) ->
       'interfaceConfig.TOOLBAR_BUTTONS': [
         'microphone', 'camera', 'closedcaptions', 'desktop',
         'embedmeeting', 'fullscreen', 'fodeviceselection', 'hangup',
-        'profile', 'chat', 'recording', 'livestreaming', 'etherpad',
+        'profile', 'recording', 'livestreaming', 'etherpad',
         'settings', 'videoquality', 'filmstrip', 'feedback', 'stats',
         'shortcuts', 'tileview', 'videobackgroundblur', 'download', 'help',
         'mute-everyone'
-      ] # omit 'security', 'invite', 'raisehand', 'sharedvideo' [YouTube]
+      ] # omit 'chat', 'security', 'invite', 'raisehand', 'sharedvideo' [YouTube]
       'interfaceConfig.SETTINGS_SECTIONS': [
         'devices', 'language', 'moderator'
       ] # omit 'profile' and 'calendar'
