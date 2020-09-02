@@ -8,7 +8,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
 
 import FlexLayout from './FlexLayout'
-import {Rooms, roomWithTemplate} from '/lib/rooms'
+import {Rooms, roomWithTemplate, roomDuplicate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
 import {Header} from './Header'
@@ -70,10 +70,16 @@ export RoomList = ({loading, model}) ->
     sorted
   , [rooms, sortKey, reverse, if sortKey == 'participants' then presenceByRoom]
   roomList = useRef()
-  selectRoom = useCallback (id) ->
+  selectRoom = useCallback (id, scroll) ->
     setSelected id
     return unless id?
-    roomList.current?.querySelector("""[data-room="#{id}"]""")?.scrollIntoView()
+    if scroll
+      setTimeout ->
+        elt = roomList.current?.querySelector """[data-room="#{id}"]"""
+        elt?.scrollIntoView
+          behavior: 'smooth'
+          block: 'nearest'
+      , 0
   , []
   Sublist = ({heading, filter, startClosed}) ->
     subrooms = sortedRooms.filter filter
@@ -98,8 +104,7 @@ export RoomList = ({loading, model}) ->
                   <RoomInfo key={room._id} room={room}
                    presence={presenceByRoom[room._id]}
                    selected={selected == room._id}
-                   setSelected={(select) ->
-                     if select then setSelected id else setSelected null}
+                   selectRoom={selectRoom}
                    leave={->
                      model.doAction FlexLayout.Actions.deleteTab id}
                   />
@@ -186,7 +191,7 @@ export RoomList = ({loading, model}) ->
   </div>
 RoomList.displayName = 'RoomList'
 
-export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
+export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
   {openRoom} = useContext MeetingContext
   link = useRef()
@@ -207,20 +212,29 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
     ##   * We clicked on the Switch button (force == true)
     if not currentRoom? or e.shiftKey or force == true
       openRoom room._id, true
-      setSelected false
+      selectRoom null
     ## Open room as background tab (without focusing) in the following cases:
     ##   * Ctrl/Command-click => force open as background tab
     ##   * We clicked on the Join In Background button (force == false)
     else if e.ctrlKey or e.metaKey or force == false
       openRoom room._id, false
-      setSelected false
+      selectRoom null
+    ## Otherwise, toggle whether this room is selected.
+    else if selected
+      selectRoom null
     else
-      setSelected not selected
+      selectRoom room._id
   onLeave = (e) ->
     e.preventDefault()
     e.stopPropagation()
     leave()
-    setSelected false
+    selectRoom null
+  onSplit = (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    newRoom = await roomDuplicate room, getCreator()
+    openRoom newRoom, false
+    selectRoom newRoom, false
   <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()}
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
@@ -294,7 +308,7 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
           <Button variant="danger" onClick={onLeave}>
             Leave Room<br/>
             {if myPresence.type == 'visible'
-              <small><b>Leaves</b> current room</small>
+              <small><b>Leaves</b> this room</small>
             else
               <small>Close background room</small>
             }
@@ -303,6 +317,12 @@ export RoomInfo = ({room, presence, selected, setSelected, leave}) ->
           <Button variant="secondary" onClick={onClick false}>
             Join In Background<br/>
             <small><b>Stays</b> in current room</small>
+          </Button>
+        }
+        {if myPresence?.type == 'visible'
+          <Button variant="primary" onClick={onSplit}>
+            Split Room<br/>
+            <small><b>Duplicate</b> this room (forking discussion)</small>
           </Button>
         }
       </ButtonGroup>
@@ -332,7 +352,7 @@ export RoomNew = ({selectRoom}) ->
       openRoom roomId, false
       selectRoom null
     else
-      selectRoom roomId
+      selectRoom roomId, true
   ## We need to manually capture Enter so that e.g. Ctrl-Enter works.
   ## This has the added benefit of getting modifiers' state.
   onKeyDown = (e) ->

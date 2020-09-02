@@ -7,7 +7,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faComment, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 
-import {Rooms} from '/lib/rooms'
+import {Rooms, roomTabs} from '/lib/rooms'
 import {Tabs, tabTypes} from '/lib/tabs'
 import {getCreator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
@@ -48,12 +48,9 @@ export Room = ({loading, roomId, showArchived}) ->
   , {})
   {loading, room, tabs} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
-    query = room: roomId
-    query.archived = $in: [null, false] unless showArchived
-    tabs = Tabs.find(query).fetch()
     loading: loading or not sub.ready()
     room: Rooms.findOne roomId
-    tabs: tabs
+    tabs: roomTabs roomId, showArchived
   id2tab = useIdMap tabs
   existingTabTypes = useIdMap tabs, 'type'
   tabsetUsed = useRef {}
