@@ -62,7 +62,7 @@ export TabZoom = ({tabId}) ->
           <Button block onClick={zoomNative}>Native Client</Button>
         </Col>
         <Col xs={8}>
-          <p>Zoom's desktop or mobile Zoom client has the best quality but will open in a separate window, not within comingle.</p>
+          <p>Zoom's desktop or mobile Zoom client has the <b>best quality</b> but will open in a separate window, not within Comingle.</p>
           <p>You must also <a href="https://zoom.us/download">install Zoom</a> before using this option.</p>
         </Col>
       </Row>
@@ -73,7 +73,7 @@ export TabZoom = ({tabId}) ->
           </Button>
         </Col>
         <Col xs={8}>
-          <p>Zoom's web client embeds into Comingle and requires no installation, but the quality is somewhat lower, and <a href="https://support.zoom.us/hc/en-us/articles/360027397692-Desktop-client-mobile-app-and-web-client-comparison">some features are missing</a>.</p>
+          <p>Zoom's web client embeds into Comingle and requires no installation, but the <b>quality is lower</b>, and <a href="https://support.zoom.us/hc/en-us/articles/360027397692-Desktop-client-mobile-app-and-web-client-comparison">some features are missing</a>.</p>
           {unless zoomWebSupport
             <p>However, the Comingle server needs to be configured to support this.</p>
           }
