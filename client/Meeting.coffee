@@ -223,17 +223,13 @@ export Meeting = ->
             <FontAwesomeIcon icon={clipboardLink}/>
           </OverlayTrigger>
         </div>
-<<<<<<< HEAD
     else if node.getComponent() == 'ChatRoom'
       return ChatRoom.onRenderTab node, renderState
-    return if node.getParent().getType() == 'border'
+    return if node.getComponent() != 'Room'
     room = id2room[node.getId()]
     return unless room
     className = 'tab-title'
     className += ' archived' if room.archived
-=======
-    return if node.getComponent() != 'Room'
->>>>>>> 539726e... Added a welcome tab
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className={className}>{renderState.content}</span>
