@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer, useMemo} from 'react'
+import React, {useState, useEffect, useReducer, useRef, useMemo} from 'react'
 import {useParams, useLocation, useHistory} from 'react-router-dom'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
@@ -78,6 +78,7 @@ export Meeting = ->
     loading: not sub.ready()
     rooms: Rooms.find().fetch()
   id2room = useIdMap rooms
+  layoutRef = useRef null
   useEffect ->
     for room in rooms
       if model.getNodeById room._id
@@ -85,19 +86,24 @@ export Meeting = ->
           name: room.title
     undefined
   , [rooms]
+  makeRoomTabJson = (id) ->
+    id: id
+    type: 'tab'
+    name: Rooms.findOne(id)?.title ? id
+    component: 'Room'
+    config: showArchived: false
   openRoom = useMemo -> (id, focus = true) ->
     tabset = FlexLayout.getActiveTabset model
     unless model.getNodeById id
-      tab =
-        id: id
-        type: 'tab'
-        name: Rooms.findOne(id)?.title ? id
-        component: 'Room'
-        config: showArchived: false
+      tab = makeRoomTabJson id
       model.doAction FlexLayout.Actions.addNode tab,
         tabset.getId(), FlexLayout.DockLocation.CENTER, -1, focus
     else
       FlexLayout.forceSelectTab model, id
+  openRoomWithDragAndDrop = (id) ->
+    unless model.getNodeById id
+      json = makeRoomTabJson id
+      layoutRef.current.addTabWithDragAndDrop "Open #{json.name} (Drag to location)", json, this.onAdded
   useEffect ->
     if location.hash and validId id = location.hash[1..]
       openRoom id
@@ -282,10 +288,13 @@ export Meeting = ->
           archived={room.archived} onClick={archiveRoom}
           help="Archived rooms can still be viewed and restored from the list at the bottom."
         />
-  <MeetingContext.Provider value={{openRoom}}>
+  <div><MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop}}>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
      onRenderTab={onRenderTab}
      onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
+     ref={layoutRef}
      tabPhrase="room"/>
-  </MeetingContext.Provider>
+  </MeetingContext.Provider></div>
 Meeting.displayName = 'Meeting'
+
+console.log FlexLayout.Layout
