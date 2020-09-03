@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useReducer, useRef} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
-import {Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faComment, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
@@ -203,7 +203,10 @@ export Room = ({loading, roomId, showArchived}) ->
     , ...location
   factory = (node) -> # eslint-disable-line react/display-name
     switch node.getComponent()
-      when 'ChatRoom' then <ChatRoom channel={roomId} audience="room"/>
+      when 'ChatRoom'
+        <ChatRoom channel={roomId} audience="room"
+         visible={node.isVisible()} extraData={node.getExtraData()}
+         updateTab={-> FlexLayout.updateNode model, node.getId()}/>
       when 'TabIFrame' then <TabIFrame tabId={node.getId()}/>
       when 'TabJitsi' then <TabJitsi tabId={node.getId()} room={room}/>
       when 'TabZoom' then <TabZoom tabId={node.getId()} room={room}/>
@@ -240,6 +243,8 @@ export Room = ({loading, roomId, showArchived}) ->
     </Tooltip>
   onRenderTab = (node, renderState) ->
     return if node.getComponent() == 'TabNew'
+    if node.getComponent() == 'ChatRoom'
+      return ChatRoom.onRenderTab node, renderState
     tab = id2tab[node.getId()]
     return unless tab
     renderState.content =

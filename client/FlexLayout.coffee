@@ -104,3 +104,6 @@ export getTabsets = (model) ->
     if node.getType() == 'tabset'
       tabsets.push node
   tabsets
+
+export updateNode = (model, id) ->
+  model.doAction Actions.updateNodeAttributes id, {}

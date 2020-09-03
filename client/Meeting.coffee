@@ -159,7 +159,9 @@ export Meeting = ->
       when 'RoomList'
         <RoomList loading={loading} model={model}/>
       when 'ChatRoom'
-        <ChatRoom channel={meetingId} audience="everyone"/>
+        <ChatRoom channel={meetingId} audience="everyone"
+         visible={node.isVisible()} extraData={node.getExtraData()}
+         updateTab={-> FlexLayout.updateNode model, node.getId()}/>
       when 'Room'
         if node.isVisible()
           <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
@@ -199,6 +201,8 @@ export Meeting = ->
             <FontAwesomeIcon icon={clipboardLink}/>
           </OverlayTrigger>
         </div>
+    else if node.getComponent() == 'ChatRoom'
+      return ChatRoom.onRenderTab node, renderState
     return if node.getParent().getType() == 'border'
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>

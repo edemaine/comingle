@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useRef} from 'react'
-import {Alert, Button, Form, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import React, {useState, useEffect, useLayoutEffect, useRef} from 'react'
+import {Alert, Badge, Button, Form, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faComment} from '@fortawesome/free-solid-svg-icons'
 import {useTracker} from 'meteor/react-meteor-data'
@@ -9,7 +9,7 @@ import {Chat, useChat} from './lib/chat'
 import {getCreator} from './lib/presenceId'
 import {formatDate, formatTime} from './lib/dates'
 
-export ChatRoom = ({channel, audience}) ->
+export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
   loading = useChat channel
   messages = useTracker ->
     Chat.find
@@ -17,16 +17,26 @@ export ChatRoom = ({channel, audience}) ->
     ,
       sort: sent: 1
     .fetch()
-  [body, setBody] = useState ''
-  submit = (e) ->
-    e.preventDefault()
-    return unless body.trim()
-    Meteor.call 'chatSend',
-      channel: channel
-      sender: getCreator()
-      type: 'msg'
-      body: body
-    setBody ''
+  , [channel]
+
+  ## Maintain last seen message and unseen count
+  [seen, setSeen] = useState()
+  useLayoutEffect ->
+    setSeen messages[messages.length-1]?._id if visible
+    undefined
+  , [messages, visible]
+  useLayoutEffect ->
+    if seen?
+      for unseen in [0...messages.length]
+        if messages[messages.length-1-unseen]._id == seen
+          break
+    else
+      unseen = messages.length
+    if unseen != extraData.unseen
+      extraData.unseen = unseen
+      updateTab()
+    undefined
+  , [messages, seen]
 
   ## Keep chat scrolled to bottom unless user modifies scroll position.
   messagesDiv = useRef()
@@ -37,6 +47,18 @@ export ChatRoom = ({channel, audience}) ->
       ## Setting scrollTop to too-large value pushes us to the bottom.
       messagesDiv.current?.scrollTop = messagesDiv.current.scrollHeight
     undefined
+
+  ## Form
+  [body, setBody] = useState ''
+  submit = (e) ->
+    e.preventDefault()
+    return unless body.trim()
+    Meteor.call 'chatSend',
+      channel: channel
+      sender: getCreator()
+      type: 'msg'
+      body: body
+    setBody ''
 
   <div className="chat">
     <div className="messages" ref={messagesDiv}>
@@ -79,3 +101,10 @@ export ChatRoom = ({channel, audience}) ->
       </InputGroup>
     </Form>
   </div>
+
+ChatRoom.onRenderTab = (node, renderState) ->
+  if unseen = node.getExtraData().unseen
+    renderState.content = <>
+      {renderState.content}
+      <Badge variant="danger" className="ml-1">{unseen}</Badge>
+    </>
