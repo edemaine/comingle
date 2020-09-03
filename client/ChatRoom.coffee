@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {Alert, Button, Form, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faComment} from '@fortawesome/free-solid-svg-icons'
@@ -15,7 +15,7 @@ export ChatRoom = ({channel, audience}) ->
     Chat.find
       channel: channel
     ,
-      sort: date: 1
+      sort: sent: 1
     .fetch()
   [body, setBody] = useState ''
   submit = (e) ->
@@ -27,8 +27,19 @@ export ChatRoom = ({channel, audience}) ->
       type: 'msg'
       body: body
     setBody ''
+
+  ## Keep chat scrolled to bottom unless user modifies scroll position.
+  messagesDiv = useRef()
+  if elt = messagesDiv.current
+    atBottom = (elt.scrollHeight - elt.scrollTop - elt.clientHeight <= 3)
+  useEffect ->
+    if atBottom
+      ## Setting scrollTop to too-large value pushes us to the bottom.
+      messagesDiv.current?.scrollTop = messagesDiv.current.scrollHeight
+    undefined
+
   <div className="chat">
-    <div className="messages">
+    <div className="messages" ref={messagesDiv}>
       {for message in messages
         date = formatDate message.sent
         <React.Fragment key={message._id}>
