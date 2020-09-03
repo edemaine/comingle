@@ -174,6 +174,12 @@ export Meeting = ->
       Room &ldquo;{room.title}&rdquo;<br/>
       created by {room.creator?.name ? 'unknown'}<br/>
       on {formatDateTime room.created}
+      {if room.archived
+        <>
+          <br/>archived by {room.archiver?.name ? 'unknown'}
+          <br/>on {formatDateTime room.archived}
+        </>
+      }
     </Tooltip>
   iconFactory = (node) -> # eslint-disable-line react/display-name
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
@@ -204,16 +210,20 @@ export Meeting = ->
     else if node.getComponent() == 'ChatRoom'
       return ChatRoom.onRenderTab node, renderState
     return if node.getParent().getType() == 'border'
+    room = id2room[node.getId()]
+    return unless room
+    className = 'tab-title'
+    className += ' archived' if room.archived
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
-        <span className="tab-title">{renderState.content}</span>
+        <span className={className}>{renderState.content}</span>
       </OverlayTrigger>
     if node.isVisible()  # special buttons for visible tabs
       id = node.getId()
       buttons?.push \
         <div key="link"
          className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
-         aria-label="Save tab URL to clipboard"
+         aria-label="Save room link to clipboard"
          onClick={-> navigator.clipboard.writeText \
            Meteor.absoluteUrl "/m/#{meetingId}##{node.getId()}"}
          onMouseDown={(e) -> e.stopPropagation()}

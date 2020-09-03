@@ -247,9 +247,11 @@ export Room = ({loading, roomId, showArchived}) ->
       return ChatRoom.onRenderTab node, renderState
     tab = id2tab[node.getId()]
     return unless tab
+    className = 'tab-title'
+    className += ' archived' if tab.archived
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
-        <span className="tab-title">{renderState.content}</span>
+        <span className={className}>{renderState.content}</span>
       </OverlayTrigger>
     if node.isVisible()  # special buttons for visible tabs
       buttons = renderState.buttons

@@ -51,6 +51,10 @@ nav
       position: static
       float: right
 
+.tab-title
+  &.archived
+    color: #dc3545  // danger color
+
 .room-info
   color: black
   &:hover
@@ -58,12 +62,14 @@ nav
   &:active
     color: #0069d9
 
-  &.room-info-visible
+  &.presence-visible
     background-color: #b8daff  // list-group-item-primary
-  &.room-info-invisible
+  &.presence-invisible
     background-color: hsl(220,6%,95%)  // list-group-item-secondary, but brighter
-  &.room-info-selected
+  &.selected
     background-color: #b8daff  // list-group-item-primary
+  &.archived
+    color: #dc3545  // danger color
 
   .raise-hand
     float: right

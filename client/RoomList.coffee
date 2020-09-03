@@ -201,8 +201,9 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     clusters = sortNames presence, (p) -> p.name
     clusters = uniqCountNames presence, (p) -> p.name
   roomInfoClass = ''
-  roomInfoClass += " room-info-#{myPresence.type}" if myPresence
-  roomInfoClass += " room-info-selected" if selected
+  roomInfoClass += " presence-#{myPresence.type}" if myPresence
+  roomInfoClass += " selected" if selected
+  roomInfoClass += " archived" if room.archived
   onClick = (force) -> (e) ->
     e.preventDefault()
     e.stopPropagation()
