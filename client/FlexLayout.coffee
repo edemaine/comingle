@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {forwardRef} from 'react'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTimes, faExpandArrowsAlt, faCompressArrowsAlt, faWindowRestore} \
@@ -13,7 +13,7 @@ export defaultGlobal =
 
 titleLimit = 20
 
-export Layout = (props) ->
+export Layout = forwardRef (props, ref) ->
   ## Shorten titles that are longer than titleLimit.
   titleFactory = (node) ->
     title = node.getName()
@@ -36,6 +36,7 @@ export Layout = (props) ->
   <FlexLayout {...props}
    titleFactory={titleFactory}
    onModelChange={onModelChange}
+   ref={ref}
    icons={
      close:
        <OverlayTrigger placement="bottom" overlay={(tipProps) ->

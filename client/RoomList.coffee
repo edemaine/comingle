@@ -194,7 +194,7 @@ RoomList.displayName = 'RoomList'
 
 export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
-  {openRoom} = useContext MeetingContext
+  {openRoom, openRoomWithDragAndDrop} = useContext MeetingContext
   link = useRef()
   if presence?
     myPresence = findMyPresence presence
@@ -237,7 +237,11 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     newRoom = await roomDuplicate room, getCreator()
     openRoom newRoom, false
     selectRoom newRoom, false
-  <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()}
+  onDragStart = (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    openRoomWithDragAndDrop(room._id)
+  <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()} onDragStart={onDragStart}
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
     {if room.raised or myPresence?.type == 'visible'
