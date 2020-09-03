@@ -51,7 +51,16 @@ initModel = ->
       id: 'root'
       type: 'row'
       weight: 100
-      children: []
+      children: [
+        id: 'mainTabset'
+        type: 'tabset'
+        children: [
+          id: 'welcome'
+          type: 'tab'
+          name: 'Welcome'
+          component: 'Welcome'
+        ]
+      ]
   model.setOnAllowDrop (dragNode, dropInfo) ->
     return false if dropInfo.node.getId() == 'roomsTabSet' and dropInfo.location != FlexLayout.DockLocation.RIGHT
     #return false if dropInfo.node.getType() == 'border'
@@ -147,7 +156,8 @@ export Meeting = ->
     updatePresence()
     ## Maintain hash part of URL to point to "current" tab.
     tabset = FlexLayout.getActiveTabset model
-    if tabset and tab = tabset.getSelectedNode()
+    tab = tabset?.getSelectedNode()
+    if tab?.getComponent() == 'Room'
       unless location.hash == "##{tab.getId()}"
         history.replace "/m/#{meetingId}##{tab.getId()}"
       Session.set 'currentRoom', tab.getId()
@@ -155,16 +165,6 @@ export Meeting = ->
       if location.hash
         history.replace "/m/#{meetingId}"
       Session.set 'currentRoom', undefined
-    
-    if model.getRoot().getChildren().every (tabset) -> tabset.getChildren().length == 0
-      welcomeTabJson =
-        id: 'welcome'
-        type: 'tab'
-        name: 'Welcome'
-        component: 'Welcome'
-        enableClose: true
-        enableDrag: true
-      model.doAction FlexLayout.Actions.addNode welcomeTabJson, model.getRoot().getChildren()[0].getId(), FlexLayout.DockLocation.CENTER, -1
   
   factory = (node) -> # eslint-disable-line react/display-name
     switch node.getComponent()

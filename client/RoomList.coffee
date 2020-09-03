@@ -179,7 +179,7 @@ export RoomList = ({loading, model}) ->
           No rooms in this meeting.
         </Alert>
       }
-      <Sublist heading="Rooms You're In:"
+      <Sublist heading="Your Open Rooms:"
        filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Available Rooms:"
        filter={(room) -> not room.archived and
@@ -304,7 +304,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
           <Button variant="warning" onClick={onClick true}>
             <small className="mr-1"><FontAwesomeIcon icon={faDoorOpen}/></small>
             Switch to Room<br/>
-            <small><b>Leaves</b> current room</small>
+            <small><b>Leaves</b> current call</small>
           </Button>
         }
         {if myPresence
@@ -312,7 +312,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
             <small className="mr-1"><FontAwesomeIcon icon={faTimes}/></small>
             Leave Room<br/>
             {if myPresence.type == 'visible'
-              <small><b>Leaves</b> this room</small>
+              <small><b>Leaves</b> current call</small>
             else
               <small>Close background room</small>
             }
