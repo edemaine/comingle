@@ -13,6 +13,7 @@ import {ChatRoom} from './ChatRoom'
 import {RoomList} from './RoomList'
 import {Room} from './Room'
 import {Rooms} from '/lib/rooms'
+import {Welcome} from './Welcome'
 import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
@@ -174,9 +175,7 @@ export Meeting = ->
          visible={node.isVisible()} extraData={node.getExtraData()}
          updateTab={-> FlexLayout.updateNode model, node.getId()}/>
       when 'Welcome'
-        <>
-          Welcome to Comingle!
-        </>
+        <Welcome/>
       when 'Room'
         if node.isVisible()
           <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
