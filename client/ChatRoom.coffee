@@ -21,20 +21,23 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
 
   ## Maintain last seen message and unseen count
   [seen, setSeen] = useState()
+  [loadedSeen, setLoadedSeen] = useState()
   useLayoutEffect ->
     setSeen messages[messages.length-1]?._id if visible
     undefined
   , [messages, visible]
   useLayoutEffect ->
     if seen?
-      for unseen in [0...messages.length]
-        if messages[messages.length-1-unseen]._id == seen
-          break
+      for unseen in [0..messages.length]
+        break if unseen == messages.length or
+          messages[messages.length-1-unseen]._id == seen
     else
       unseen = messages.length
     if unseen != extraData.unseen
       extraData.unseen = unseen
+      extraData.fresh = loadedSeen
       updateTab()
+    setLoadedSeen true unless loading or loadedSeen
     undefined
   , [messages, seen]
 
@@ -104,7 +107,12 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
 
 ChatRoom.onRenderTab = (node, renderState) ->
   if unseen = node.getExtraData().unseen
+    if node.getExtraData().fresh
+      variant = 'danger'
+    else
+      variant = 'secondary'
+    variant
     renderState.content = <>
       {renderState.content}
-      <Badge variant="danger" className="ml-1">{unseen}</Badge>
+      <Badge variant={variant} className="ml-1">{unseen}</Badge>
     </>
