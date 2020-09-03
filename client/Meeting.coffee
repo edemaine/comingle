@@ -43,6 +43,7 @@ initModel = ->
         component: 'ChatRoom'
         enableClose: false
         enableDrag: false
+        enableRenderOnDemand: false
       ]
     ]
     layout:

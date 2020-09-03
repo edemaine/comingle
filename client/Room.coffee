@@ -71,6 +71,7 @@ export Room = ({loading, roomId, showArchived}) ->
           component: 'ChatRoom'
           enableClose: false
           enableDrag: false
+          enableRenderOnDemand: false
         ]
       ]
       layout: layout
