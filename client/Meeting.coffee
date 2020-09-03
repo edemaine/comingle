@@ -103,7 +103,7 @@ export Meeting = ->
   openRoomWithDragAndDrop = (id) ->
     unless model.getNodeById id
       json = makeRoomTabJson id
-      layoutRef.current.addTabWithDragAndDrop "Open #{json.name} (Drag to location)", json, this.onAdded
+      layoutRef.current.addTabWithDragAndDrop "Open #{json.name} (Drag to location)", json
   useEffect ->
     if location.hash and validId id = location.hash[1..]
       openRoom id
