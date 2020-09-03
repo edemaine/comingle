@@ -4,7 +4,7 @@ import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment, faDoorOpen, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faDoorOpen, faEye, faEyeSlash, faQuestion} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import FlexLayout from './FlexLayout'
@@ -13,6 +13,7 @@ import {ChatRoom} from './ChatRoom'
 import {RoomList} from './RoomList'
 import {Room} from './Room'
 import {Rooms} from '/lib/rooms'
+import {Welcome} from './Welcome'
 import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
@@ -50,7 +51,16 @@ initModel = ->
       id: 'root'
       type: 'row'
       weight: 100
-      children: []
+      children: [
+        id: 'mainTabset'
+        type: 'tabset'
+        children: [
+          id: 'welcome'
+          type: 'tab'
+          name: 'Welcome'
+          component: 'Welcome'
+        ]
+      ]
   model.setOnAllowDrop (dragNode, dropInfo) ->
     return false if dropInfo.node.getId() == 'roomsTabSet' and dropInfo.location != FlexLayout.DockLocation.RIGHT
     #return false if dropInfo.node.getType() == 'border'
@@ -146,7 +156,8 @@ export Meeting = ->
     updatePresence()
     ## Maintain hash part of URL to point to "current" tab.
     tabset = FlexLayout.getActiveTabset model
-    if tabset and tab = tabset.getSelectedNode()
+    tab = tabset?.getSelectedNode()
+    if tab?.getComponent() == 'Room'
       unless location.hash == "##{tab.getId()}"
         history.replace "/m/#{meetingId}##{tab.getId()}"
       Session.set 'currentRoom', tab.getId()
@@ -154,6 +165,7 @@ export Meeting = ->
       if location.hash
         history.replace "/m/#{meetingId}"
       Session.set 'currentRoom', undefined
+  
   factory = (node) -> # eslint-disable-line react/display-name
     switch node.getComponent()
       when 'RoomList'
@@ -162,6 +174,8 @@ export Meeting = ->
         <ChatRoom channel={meetingId} audience="everyone"
          visible={node.isVisible()} extraData={node.getExtraData()}
          updateTab={-> FlexLayout.updateNode model, node.getId()}/>
+      when 'Welcome'
+        <Welcome/>
       when 'Room'
         if node.isVisible()
           <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
@@ -185,6 +199,8 @@ export Meeting = ->
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
       {if node.getComponent() == 'ChatRoom'
         <FontAwesomeIcon icon={faComment}/>
+      else if node.getComponent() == 'Welcome'
+        <FontAwesomeIcon icon={faQuestion}/>
       else
         <FontAwesomeIcon icon={faDoorOpen}/>
       }
@@ -209,7 +225,7 @@ export Meeting = ->
         </div>
     else if node.getComponent() == 'ChatRoom'
       return ChatRoom.onRenderTab node, renderState
-    return if node.getParent().getType() == 'border'
+    return if node.getComponent() != 'Room'
     room = id2room[node.getId()]
     return unless room
     className = 'tab-title'

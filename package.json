@@ -1,6 +1,19 @@
 {
   "name": "comingle",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edemaine/comingle.git"
+  },
+  "author": {
+    "name": "Erik Demaine",
+    "email": "edemaine@mit.edu",
+    "url": "http://erikdemaine.org/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/edemaine/comingle/issues"
+  },
+  "homepage": "https://github.com/edemaine/comingle#comingle",
   "scripts": {
     "start": "meteor run",
     "visualize": "meteor --production --extra-packages bundle-visualizer",

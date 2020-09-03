@@ -1,8 +1,9 @@
 # Comingle
 
-**Comingle** is an online meeting tool whose goal is to approximate
-the advantages of in-person meetings.
-To this end, it provides the following key features:
+**Comingle** is an open-source online meeting tool
+whose goal is to approximate the advantages of in-person meetings.
+It **integrates web tools** in an open **multiroom** environment,
+with the following key features:
 
 * Subgroups of people can freely split off into separate discussions, by
   creating and jumping between **rooms** (something like physical tables).
