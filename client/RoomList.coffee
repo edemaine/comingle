@@ -368,22 +368,20 @@ export RoomNew = ({selectRoom}) ->
     if e.key == 'Enter'
       submit e
   <form onSubmit={submit}>
-    <div className="form-group">
-      <input type="text" placeholder="Title" className="form-control"
-       value={title} onChange={(e) -> setTitle e.target.value}
-       onKeyDown={onKeyDown}/>
-      <SplitButton type="submit" className="btn-block" drop="up"
-       title="Create Room" onClick={submit}>
-        <Dropdown.Item onClick={(e) -> submit e, ''}>
-          Empty room
-        </Dropdown.Item>
-        <Dropdown.Item onClick={(e) -> submit e, 'jitsi'}>
-          Jitsi (default)
-        </Dropdown.Item>
-        <Dropdown.Item onClick={(e) -> submit e, 'jitsi+cocreate'}>
-          Jitsi + Cocreate
-        </Dropdown.Item>
-      </SplitButton>
-    </div>
+    <input type="text" placeholder="Title" className="form-control"
+     value={title} onChange={(e) -> setTitle e.target.value}
+     onKeyDown={onKeyDown}/>
+    <SplitButton type="submit" className="btn-block" drop="up"
+     title="Create Room" onClick={submit}>
+      <Dropdown.Item onClick={(e) -> submit e, ''}>
+        Empty room
+      </Dropdown.Item>
+      <Dropdown.Item onClick={(e) -> submit e, 'jitsi'}>
+        Jitsi (default)
+      </Dropdown.Item>
+      <Dropdown.Item onClick={(e) -> submit e, 'jitsi+cocreate'}>
+        Jitsi + Cocreate
+      </Dropdown.Item>
+    </SplitButton>
   </form>
 RoomNew.displayName = 'RoomNew'
