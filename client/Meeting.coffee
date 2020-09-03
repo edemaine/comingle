@@ -95,15 +95,15 @@ export Meeting = ->
   openRoom = useMemo -> (id, focus = true) ->
     tabset = FlexLayout.getActiveTabset model
     unless model.getNodeById id
-      tab = makeRoomTabJson id
-      model.doAction FlexLayout.Actions.addNode tab,
+      model.doAction FlexLayout.Actions.addNode makeRoomTabJson(id),
         tabset.getId(), FlexLayout.DockLocation.CENTER, -1, focus
     else
       FlexLayout.forceSelectTab model, id
   openRoomWithDragAndDrop = (id) ->
     unless model.getNodeById id
       json = makeRoomTabJson id
-      layoutRef.current.addTabWithDragAndDrop "Open #{json.name} (Drag to location)", json
+      layoutRef.current.addTabWithDragAndDrop \
+        "Open #{json.name} (drag to location)", json
   useEffect ->
     if location.hash and validId id = location.hash[1..]
       openRoom id
@@ -288,13 +288,11 @@ export Meeting = ->
           archived={room.archived} onClick={archiveRoom}
           help="Archived rooms can still be viewed and restored from the list at the bottom."
         />
-  <div><MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop}}>
+  <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop}}>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
      onRenderTab={onRenderTab}
      onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
      ref={layoutRef}
      tabPhrase="room"/>
-  </MeetingContext.Provider></div>
+  </MeetingContext.Provider>
 Meeting.displayName = 'Meeting'
-
-console.log FlexLayout.Layout
