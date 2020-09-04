@@ -35,6 +35,11 @@ rules:
     - warn
     - forbid: ['>', '"', '}']
   meteor/no-session: off
+  meteor/audit-argument-checks:
+    - error
+    - checkEquivalents:
+      - checkId
+      - checkMeeting
 settings:
   react:
     version: detect
