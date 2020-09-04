@@ -9,7 +9,7 @@ export Welcome = () =>
     <Card.Body>
       <Card.Title as="h3">Welcome to Comingle!</Card.Title>
       <p>
-        <b>Comingle</b> is an <a href={repository}>open-source</a> online
+        <b>Comingle</b> is an <a href={repository.url}>open-source</a> online
         meeting tool whose goal is to approximate the advantages of
         in-person meetings.
         It integrates web tools in an open multiroom environment.
