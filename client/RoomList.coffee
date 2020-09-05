@@ -103,7 +103,7 @@ export RoomList = ({loading, model}) ->
               {for room in subrooms
                 do (id = room._id) ->
                   <RoomInfo key={room._id} room={room}
-                   presence={presenceByRoom[room._id]}
+                   presence={presenceByRoom[room._id] ? []}
                    selected={selected == room._id}
                    selectRoom={selectRoom}
                    leave={->
@@ -196,14 +196,17 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
   {openRoom, openRoomWithDragAndDrop} = useContext MeetingContext
   link = useRef()
-  if presence?
-    myPresence = findMyPresence presence
-    clusters = sortNames presence, (p) -> p.name
-    clusters = uniqCountNames presence, (p) -> p.name
+  myPresence = findMyPresence presence
+  clusters = sortNames presence, (p) -> p.name
+  clusters = uniqCountNames presence, (p) -> p.name
   roomInfoClass = ''
   roomInfoClass += " presence-#{myPresence.type}" if myPresence
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
+  presenceCount = {}
+  for person in clusters
+    presenceCount[person.item.type] ?= 0
+    presenceCount[person.item.type]++
   onClick = (force) -> (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -241,6 +244,23 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     e.preventDefault()
     e.stopPropagation()
     openRoomWithDragAndDrop(room._id)
+  PresenceList = ({clusters, filter}) ->
+    if filter
+      clusters = clusters?.filter filter
+    if clusters.length
+      <div className="presence">
+        {for person in clusters
+          <span key={person.item.id} className="presence-#{person.item.type}">
+            <FontAwesomeIcon icon={faUser} className="mr-1"/>
+            {person.name}
+            {if person.count > 1
+              <span className="ml-1 badge badge-secondary">{person.count}</span>
+            }
+          </span>
+        }
+      </div>
+    else null
+  PresenceList.displayName = 'PresenceList'
   <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()} onDragStart={onDragStart}
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
@@ -288,20 +308,37 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
         }
       </div>
     }
-    <span className="title">{room.title}</span>
-    {if clusters?.length
-      <div className="presence">
-        {for person in clusters
-          <span key={person.item.id} className="presence-#{person.item.type}">
+    <div className="presence-count">
+      {if presenceCount['visible']
+        <OverlayTrigger placement="top"
+        overlay={
+          <Tooltip>{presenceCount['visible']} {if presenceCount['visible'] == 1 then 'person is' else 'people are'} in this room now</Tooltip>
+        }>
+          <span className='presence-count-visible'>
             <FontAwesomeIcon icon={faUser} className="mr-1"/>
-            {person.name}
-            {if person.count > 1
-              <span className="ml-1 badge badge-secondary">{person.count}</span>
-            }
+            {presenceCount['visible']}
           </span>
-        }
-      </div>
-    }
+        </OverlayTrigger>
+      }
+      {if presenceCount['invisible']
+        <OverlayTrigger placement="top"
+        overlay={
+          <Tooltip>
+            {presenceCount['invisible']} {if presenceCount['invisible'] == 1 then 'person has' else 'people have'} this room opened in the background
+            <PresenceList clusters={clusters} filter={(person) -> person.item.type == 'invisible'}/>
+          </Tooltip>
+        }>
+          <span className='presence-count-invisible'>
+            <FontAwesomeIcon icon={faUser} className="mr-1"/>
+            {presenceCount['invisible']}
+          </span>
+        </OverlayTrigger>
+      }
+    </div>
+    <span className="title">{room.title}</span>
+    <PresenceList clusters={clusters} filter={(person) ->
+      person.item.type == 'visible' # or person.name == myPresence?.name
+    }/>
     {if selected
       <ButtonGroup vertical className="mx-n2 mt-2 d-block">
         {unless myPresence?.type == 'visible'
@@ -338,6 +375,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     }
   </Link>
 RoomInfo.displayName = 'RoomInfo'
+  
 
 export RoomNew = ({selectRoom}) ->
   {meetingId} = useParams()
