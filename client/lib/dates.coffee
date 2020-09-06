@@ -19,13 +19,15 @@ export formatTime = (date) ->
     hour12: false
     timeZoneName: 'short'
 
-export formatTimeDelta = (delta) ->
+export formatTimeDelta = (delta, cap) ->
   delta = Math.round delta / 1000
   return '0' if delta == 0
   out = ''
   if delta < 0
     out += '-'
     delta = -delta
+  if cap and delta >= cap
+    delta = cap
   append = (part) ->
     if out.endsWith ':'
       out += "#{part}".padStart 2, '0'

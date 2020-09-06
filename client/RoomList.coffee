@@ -277,7 +277,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
           recomputeTimer = ->
             delta = timesync.offset + (new Date).getTime() - room.raised
             delta = 0 if delta < 0
-            formatTimeDelta delta
+            formatTimeDelta delta, 60*60
           [timer, setTimer] = useState recomputeTimer
           useInterval ->
             setTimer recomputeTimer()
