@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useContext, useRef, useCallback} from 'react'
+import React, {useState, useMemo, useContext, useRef, useCallback, useEffect} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
 import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
@@ -278,12 +278,21 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
             delta = timesync.offset + (new Date).getTime() - room.raised
             delta = 0 if delta < 0
             formatTimeDelta delta, 60*60
-          [timer, setTimer] = useState recomputeTimer
+          [timer, setTimer] = useState recomputeTimer()
+          [timerHeight, setTimerHeight] = useState 0
+          timerRef = useRef()
           useInterval ->
             setTimer recomputeTimer()
           , 1000
-          <div className="timer">
-            {timer}
+          useEffect ->
+            return unless timerRef.current
+            setTimerHeight(timerRef.current.clientWidth)
+          , [timer]
+
+          <div style={{height: timerHeight}}>
+            <div className="timer" ref={timerRef}>
+              {timer}
+            </div>
           </div>
         }
       </div>
