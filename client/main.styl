@@ -126,12 +126,12 @@ nav
   margin: 1rem
 
 @keyframes pulse
-  0%
+  0%, 100%
     transform: scale(1)
+    filter: drop-shadow(0 0 0px #444)
   50%
     transform: scale(1.2)
-  100%
-    transform: scale(1)
+    filter: drop-shadow(0 0 1px #444)
 
 .chat
   height: 100%
