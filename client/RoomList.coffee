@@ -277,7 +277,10 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
           recomputeTimer = ->
             delta = timesync.offset + (new Date).getTime() - room.raised
             delta = 0 if delta < 0
-            formatTimeDelta delta, 60*60
+            if delta <= 5 * 60*60 * 1000
+              formatTimeDelta delta
+            else
+              '>5hr'
           [timer, setTimer] = useState recomputeTimer()
           [timerHeight, setTimerHeight] = useState 0
           timerRef = useRef()
