@@ -18,10 +18,12 @@ import {MeetingTitle} from './MeetingTitle'
 import {Name} from './Name'
 import {Warnings} from './Warnings'
 import {CardToggle} from './CardToggle'
+import {Highlight} from './Highlight'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {formatTimeDelta, formatDateTime} from './lib/dates'
 import timesync from './lib/timesync'
 import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
+import {useDebounce} from './lib/useDebounce'
 
 findMyPresence = (presence) ->
   presenceId = getPresenceId()
@@ -38,6 +40,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
   [sortKey, setSortKey] = useState 'title'
   [reverse, setReverse] = useState false
   [search, setSearch] = useState ''
+  searchDebounce = useDebounce search, 200
   [selected, setSelected] = useState()
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
   useEffect ->
@@ -90,15 +93,17 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
           block: 'nearest'
       , 0
   , []
-  Sublist = ({heading, filter, startClosed}) ->
+
+  Sublist = ({heading, search, filter, startClosed}) ->
     subrooms = sortedRooms.filter filter
     if search
       pattern = search.toLowerCase()
       match = (x) -> 0 <= x.toLowerCase().indexOf pattern
       subrooms = subrooms.filter (room) ->
-        return true if match room.title
+        include = match room.title
         for presence in presenceByRoom[room._id] ? []
-          return true if match presence.name
+          include or= presence.match = match presence.name
+        include
     return null unless subrooms.length
     <Accordion defaultActiveKey={unless startClosed then "0"}>
       <Card>
@@ -110,7 +115,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
             <ListGroup>
               {for room in subrooms
                 do (id = room._id) ->
-                  <RoomInfo key={room._id} room={room}
+                  <RoomInfo key={room._id} room={room} search={searchDebounce}
                    presence={presenceByRoom[room._id] ? []}
                    selected={selected == room._id}
                    selectRoom={selectRoom}
@@ -124,6 +129,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
       </Card>
     </Accordion>
   Sublist.displayName = 'Sublist'
+
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-grow-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
@@ -187,12 +193,12 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
           No rooms in this meeting.
         </Alert>
       }
-      <Sublist heading="Your Open Rooms:"
+      <Sublist heading="Your Open Rooms:" search={searchDebounce}
        filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
-      <Sublist heading="Available Rooms:"
+      <Sublist heading="Available Rooms:" search={searchDebounce}
        filter={(room) -> not room.archived and
                          not findMyPresence presenceByRoom[room._id]}/>
-      <Sublist heading="Archived Rooms:" startClosed
+      <Sublist heading="Archived Rooms:" startClosed search={searchDebounce}
        filter={(room) -> room.archived and
                          not findMyPresence presenceByRoom[room._id]}/>
     </div>
@@ -225,7 +231,7 @@ RoomList.onRenderTab = (node, renderState) ->
         </Badge>
       </OverlayTrigger>
 
-export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
+export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
   {openRoom, openRoomWithDragAndDrop} = useContext MeetingContext
   link = useRef()
@@ -240,6 +246,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   for person in presence
     presenceCount[person.type] ?= 0
     presenceCount[person.type]++
+
   onClick = (force) -> (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -277,23 +284,23 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     e.preventDefault()
     e.stopPropagation()
     openRoomWithDragAndDrop(room._id)
-  PresenceList = ({clusters, filter}) ->
-    if filter
-      clusters = clusters?.filter filter
-    if clusters.length
-      <div className="presence">
-        {for person in clusters
-          <span key={person.item.id} className="presence-#{person.item.type}">
-            <FontAwesomeIcon icon={faUser}/>
-            {person.name}
-            {if person.count > 1
-              <span className="ml-1 badge badge-secondary">{person.count}</span>
-            }
-          </span>
-        }
-      </div>
-    else null
+
+  PresenceList = ({clusters, filter, search}) ->
+    return null unless clusters?.length
+    clusters = clusters.filter filter if filter
+    <div className="presence">
+      {for person in clusters
+        <span key={person.item.id} className="presence-#{person.item.type}">
+          <FontAwesomeIcon icon={faUser}/>
+          <Highlight search={search} text={person.name}/>
+          {if person.count > 1
+            <span className="ml-1 badge badge-secondary">{person.count}</span>
+          }
+        </span>
+      }
+    </div>
   PresenceList.displayName = 'PresenceList'
+
   <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()} onDragStart={onDragStart}
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
@@ -361,9 +368,9 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
         }
       </div>
     }
-    <span className="title">{room.title}</span>
-    <PresenceList clusters={clusters} filter={(person) ->
-      person.item.type == 'visible' # or person.name == myPresence?.name
+    <Highlight className="title" text={room.title} search={search}/>
+    <PresenceList clusters={clusters} search={search} filter={(person) ->
+      person.item.type == 'visible' or person.item.match # or person.name == myPresence?.name
     }/>
     {if selected
       <ButtonGroup vertical className="mx-n2 mt-2 d-block">
