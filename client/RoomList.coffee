@@ -125,7 +125,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
     </Accordion>
   Sublist.displayName = 'Sublist'
   <div className="d-flex flex-column h-100">
-    <div className="RoomList flex-shrink-1 overflow-auto pb-2" ref={roomList}>
+    <div className="RoomList flex-grow-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
       <Warnings/>
       <MeetingTitle/>
