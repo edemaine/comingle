@@ -116,8 +116,11 @@ nav
     > span
       display: inline-block
       margin-right: 1rem
-    > .presence-invisible
-      color: rgba(0,0,0,0.333333333) // #aaa
+      &.presence-invisible
+        color: rgba(0,0,0,0.333333333) // #aaa
+      > svg
+        font-size: 0.77em
+        margin-right: 0.25rem
 
 .welcome-page
   margin: 1rem

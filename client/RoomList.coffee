@@ -251,7 +251,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
       <div className="presence">
         {for person in clusters
           <span key={person.item.id} className="presence-#{person.item.type}">
-            <FontAwesomeIcon icon={faUser} className="mr-1"/>
+            <FontAwesomeIcon icon={faUser}/>
             {person.name}
             {if person.count > 1
               <span className="ml-1 badge badge-secondary">{person.count}</span>
