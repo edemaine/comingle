@@ -204,9 +204,9 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
   presenceCount = {}
-  for person in clusters
-    presenceCount[person.item.type] ?= 0
-    presenceCount[person.item.type]++
+  for person in presence
+    presenceCount[person.type] ?= 0
+    presenceCount[person.type]++
   onClick = (force) -> (e) ->
     e.preventDefault()
     e.stopPropagation()
