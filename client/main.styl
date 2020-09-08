@@ -73,6 +73,7 @@ nav
 
   .raise-hand
     float: right
+    clear: right
     margin-right: -0.75rem
     z-index: 1
     opacity: 0.1
@@ -96,14 +97,14 @@ nav
 
   .presence-count
     float: right
-    font-size: 75%
+    clear: right
+    margin-right: -0.75rem
     display: flex
-    flex-direction: column
-    > span
-      margin-right: 0.25rem
-    > .presence-count-invisible
-      opacity: (1/3)
-      // color: rgba(0,0,0,1/3) // #aaa
+    flex-direction: row
+    justify-content: flex-end
+    font-size: 75%
+    > .presence-invisible
+      opacity: 0.666666666
 
   .presence
     font-size: 75%

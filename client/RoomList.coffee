@@ -1,7 +1,7 @@
 import React, {useState, useMemo, useContext, useRef, useCallback, useEffect} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
-import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Alert, Badge, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -264,6 +264,31 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()} onDragStart={onDragStart}
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
+    <div className="presence-count">
+      {for kind in [
+         type: 'invisible'
+         variant: 'secondary'
+         singular: 'person has this room open in the background:'
+         plural: 'people have this room open in the background:'
+       ,
+         type: 'visible'
+         variant: 'primary'
+         singular: 'person is in this room:'
+         plural: 'people are in this room:'
+       ]
+         continue unless presenceCount[kind.type]
+         <OverlayTrigger key={kind.type} placement="top"
+          overlay={do (kind) -> (props) ->
+            <Tooltip {...props}>
+              {presenceCount[kind.type]} {if presenceCount[kind.type] == 1 then kind.singular else kind.plural}
+              <PresenceList clusters={clusters}
+               filter={(person) -> person.item.type == kind.type}/>
+            </Tooltip>
+          }>
+           <Badge variant={kind.variant} className="presence-#{kind.type}">{presenceCount[kind.type]}</Badge>
+         </OverlayTrigger>
+      }
+    </div>
     {if room.raised or myPresence?.type == 'visible'
       if room.raised
         label = 'Lower Hand'
@@ -321,33 +346,6 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
         }
       </div>
     }
-    <div className="presence-count">
-      {if presenceCount['visible']
-        <OverlayTrigger placement="top"
-        overlay={
-          <Tooltip>{presenceCount['visible']} {if presenceCount['visible'] == 1 then 'person is' else 'people are'} in this room now</Tooltip>
-        }>
-          <span className='presence-count-visible'>
-            <FontAwesomeIcon icon={faUser} className="mr-1"/>
-            {presenceCount['visible']}
-          </span>
-        </OverlayTrigger>
-      }
-      {if presenceCount['invisible']
-        <OverlayTrigger placement="top"
-        overlay={
-          <Tooltip>
-            {presenceCount['invisible']} {if presenceCount['invisible'] == 1 then 'person has' else 'people have'} this room opened in the background
-            <PresenceList clusters={clusters} filter={(person) -> person.item.type == 'invisible'}/>
-          </Tooltip>
-        }>
-          <span className='presence-count-invisible'>
-            <FontAwesomeIcon icon={faUser} className="mr-1"/>
-            {presenceCount['invisible']}
-          </span>
-        </OverlayTrigger>
-      }
-    </div>
     <span className="title">{room.title}</span>
     <PresenceList clusters={clusters} filter={(person) ->
       person.item.type == 'visible' # or person.name == myPresence?.name
