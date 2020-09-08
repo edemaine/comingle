@@ -8,6 +8,7 @@ import {Loading} from './Loading'
 import {Chat, useChat} from './lib/chat'
 import {getCreator} from './lib/presenceId'
 import {formatDate, formatTime} from './lib/dates'
+import {useLocalStorage} from './lib/useLocalStorage'
 
 export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
   loading = useChat channel
@@ -20,7 +21,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
   , [channel]
 
   ## Maintain last seen message and unseen count
-  [seen, setSeen] = useState()
+  [seen, setSeen] = useLocalStorage "chatSeen-#{channel}", null, true
   [loadedSeen, setLoadedSeen] = useState()
   useLayoutEffect ->
     setSeen messages[messages.length-1]?._id if visible
