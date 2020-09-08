@@ -1,5 +1,7 @@
-import React from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
+import {Session} from 'meteor/session'
+import useEventListener from '@use-it/event-listener'
 
 import {Tabs} from '/lib/tabs'
 
@@ -23,5 +25,24 @@ export allow = allowList.join ';'
 export TabIFrame = ({tabId}) ->
   tab = useTracker -> Tabs.findOne tabId
   return null unless tab
-  <iframe src={tab.url} allow={allow}/>
+  ref = useRef()
+
+  ## Send name to tab if it speaks coop protocol
+  name = useTracker -> Session.get 'name'
+  [coop, setCoop] = useState 0
+  useEventListener 'message', (e) ->
+    return unless e.source == ref.current.contentWindow
+    return unless e.data?.coop
+    setCoop coop + 1  # force update
+  useEffect ->
+    return unless ref.current
+    return unless coop
+    ref.current.contentWindow.postMessage
+      coop: 1
+      user: fullName: name
+    , '*'
+  , [ref, name, coop]
+
+  <iframe ref={ref} src={tab.url} allow={allow}/>
+
 TabIFrame.displayName = 'TabIFrame'
