@@ -111,16 +111,17 @@ nav
         font-size: 0.77em
         margin-right: 0.07em
 
-  .presence
-    font-size: 75%
-    > span
-      display: inline-block
-      margin-right: 1rem
-      &.presence-invisible
-        color: rgba(0,0,0,0.333333333) // #aaa
-      > svg
-        font-size: 0.77em
-        margin-right: 0.25rem
+.presence
+  font-size: 75%
+  > span
+    display: inline-block
+    margin-right: 1rem
+    &.presence-invisible
+      //- color: rgba(0,0,0,0.333333333) // #aaa
+      opacity: 0.666666666
+    > svg
+      font-size: 0.77em
+      margin-right: 0.25rem
 
 .welcome-page
   margin: 1rem

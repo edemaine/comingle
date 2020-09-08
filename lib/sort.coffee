@@ -37,16 +37,18 @@ export sortNames = (items, item2name = (x) -> x) ->
     else
       0
 
-export uniqCountNames = (items, item2name = (x) -> x) ->
+export uniqCountNames = (items, item2name = ((x) -> x), distinguisher) ->
   out = []
   for item in items
     name = item2name item
-    if name == last
+    distinct = distinguisher? item
+    if name == lastName and distinct == lastDistinct
       out[out.length-1].count++
     else
       out.push
         item: item
         name: name
         count: 1
-      last = name
+      lastName = name
+      lastDistinct = distinct
   out
