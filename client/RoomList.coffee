@@ -1,7 +1,7 @@
 import React, {useState, useMemo, useContext, useRef, useCallback, useEffect} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
-import {Accordion, Alert, Badge, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -390,7 +390,6 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     }
   </Link>
 RoomInfo.displayName = 'RoomInfo'
-  
 
 export RoomNew = ({selectRoom}) ->
   {meetingId} = useParams()
