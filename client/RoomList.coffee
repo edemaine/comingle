@@ -268,24 +268,28 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
       {for kind in [
          type: 'invisible'
          variant: 'secondary'
-         singular: 'person has this room open in the background:'
-         plural: 'people have this room open in the background:'
+         singular: 'person has this room open in the background'
+         plural: 'people have this room open in the background'
        ,
          type: 'visible'
          variant: 'primary'
-         singular: 'person is in this room:'
-         plural: 'people are in this room:'
+         singular: 'person is in this room'
+         plural: 'people are in this room'
        ]
          continue unless presenceCount[kind.type]
          <OverlayTrigger key={kind.type} placement="top"
           overlay={do (kind) -> (props) ->
             <Tooltip {...props}>
-              {presenceCount[kind.type]} {if presenceCount[kind.type] == 1 then kind.singular else kind.plural}
+              {presenceCount[kind.type]} {if presenceCount[kind.type] == 1 then kind.singular else kind.plural}:
               <PresenceList clusters={clusters}
                filter={(person) -> person.item.type == kind.type}/>
             </Tooltip>
           }>
-           <Badge variant={kind.variant} className="presence-#{kind.type}">{presenceCount[kind.type]}</Badge>
+           <span className="presence-#{kind.type}"
+            aria-label="#{presenceCount[kind.type]} #{if presenceCount[kind.type] == 1 then kind.singular else kind.plural}">
+             <FontAwesomeIcon icon={faUser}/>
+             {presenceCount[kind.type]}
+           </span>
          </OverlayTrigger>
       }
     </div>
