@@ -223,7 +223,7 @@ RoomList.onRenderTab = (node, renderState) ->
       <OverlayTrigger key="handCount" placement="right" overlay={(props) ->
         <Tooltip {...props}>{help}</Tooltip>
       }>
-        <Badge variant="danger" className="ml-1" onClick={showHand}
+        <Badge variant="danger" className="ml-1 hand-count" onClick={showHand}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
           <FontAwesomeIcon aria-label={help} icon={faHandPaper} className="mr-1"/>
