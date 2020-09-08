@@ -281,7 +281,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
               formatTimeDelta delta
             else
               '>5hr'
-          [timer, setTimer] = useState recomputeTimer()
+          [timer, setTimer] = useState recomputeTimer
           [timerHeight, setTimerHeight] = useState 0
           timerRef = useRef()
           useInterval ->
