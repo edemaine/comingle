@@ -203,11 +203,23 @@ RoomList.displayName = 'RoomList'
 RoomList.onRenderTab = (node, renderState) ->
   if raisedCount = node.getExtraData().raisedCount
     help = "#{raisedCount} raised hand#{if raisedCount > 1 then 's' else ''}"
+    hand = null
+    showHand = (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      hands = (elt for elt in document.querySelectorAll '.RoomList .raise-hand.active')
+      return unless hands.length
+      index = hands.indexOf hand
+      hand = hands[(index + 1) % hands.length]
+      hand.scrollIntoView
+        behavior: 'smooth'
     renderState.buttons.push \
       <OverlayTrigger key="handCount" placement="right" overlay={(props) ->
         <Tooltip {...props}>{help}</Tooltip>
       }>
-        <Badge variant="danger" className="ml-1">
+        <Badge variant="danger" className="ml-1" onClick={showHand}
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
           <FontAwesomeIcon aria-label={help} icon={faHandPaper} className="mr-1"/>
           {raisedCount}
         </Badge>
