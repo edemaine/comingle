@@ -246,6 +246,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
    data-room={room._id}>
     {if room.raised or myPresence?.type == 'visible'
       if room.raised
+        label = 'Lower Hand'
         help =
           <>
             {if myPresence?.type == 'visible'
@@ -255,6 +256,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
             on {formatDateTime room.raised}
           </>
       else
+        label = 'Raise Hand'
         help = <b>Raise Hand</b>
       toggleHand = (e) ->
         e.preventDefault()
@@ -265,12 +267,11 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
           id: room._id
           raised: not room.raised
           updator: getCreator()
-      <div className="raise-hand #{if room.raised then 'active' else ''}"
-       aria-label={help}>
+      <div className="raise-hand #{if room.raised then 'active' else ''}">
         <OverlayTrigger placement="top" overlay={(props) ->
           <Tooltip {...props}>{help}</Tooltip>
         }>
-          <FontAwesomeIcon aria-label={help} icon={faHandPaper}
+          <FontAwesomeIcon aria-label={label} icon={faHandPaper}
            onClick={toggleHand}/>
         </OverlayTrigger>
         {if room.raised and typeof room.raised != 'boolean'
