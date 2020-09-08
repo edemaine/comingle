@@ -103,7 +103,7 @@ export RoomList = ({loading, model}) ->
               {for room in subrooms
                 do (id = room._id) ->
                   <RoomInfo key={room._id} room={room}
-                   presence={presenceByRoom[room._id]}
+                   presence={presenceByRoom[room._id] ? []}
                    selected={selected == room._id}
                    selectRoom={selectRoom}
                    leave={->
@@ -196,14 +196,17 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
   {openRoom, openRoomWithDragAndDrop} = useContext MeetingContext
   link = useRef()
-  if presence?
-    myPresence = findMyPresence presence
-    clusters = sortNames presence, (p) -> p.name
-    clusters = uniqCountNames presence, (p) -> p.name
+  myPresence = findMyPresence presence
+  clusters = sortNames presence, (p) -> p.name
+  clusters = uniqCountNames presence, (p) -> p.name
   roomInfoClass = ''
   roomInfoClass += " presence-#{myPresence.type}" if myPresence
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
+  presenceCount = {}
+  for person in presence
+    presenceCount[person.type] ?= 0
+    presenceCount[person.type]++
   onClick = (force) -> (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -241,9 +244,55 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     e.preventDefault()
     e.stopPropagation()
     openRoomWithDragAndDrop(room._id)
+  PresenceList = ({clusters, filter}) ->
+    if filter
+      clusters = clusters?.filter filter
+    if clusters.length
+      <div className="presence">
+        {for person in clusters
+          <span key={person.item.id} className="presence-#{person.item.type}">
+            <FontAwesomeIcon icon={faUser}/>
+            {person.name}
+            {if person.count > 1
+              <span className="ml-1 badge badge-secondary">{person.count}</span>
+            }
+          </span>
+        }
+      </div>
+    else null
+  PresenceList.displayName = 'PresenceList'
   <Link ref={link} to="/m/#{meetingId}##{room._id}" onClick={onClick()} onDragStart={onDragStart}
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
+    <div className="presence-count">
+      {for kind in [
+         type: 'invisible'
+         variant: 'secondary'
+         singular: 'person has this room open in the background'
+         plural: 'people have this room open in the background'
+       ,
+         type: 'visible'
+         variant: 'primary'
+         singular: 'person is in this room'
+         plural: 'people are in this room'
+       ]
+         continue unless presenceCount[kind.type]
+         <OverlayTrigger key={kind.type} placement="top"
+          overlay={do (kind) -> (props) ->
+            <Tooltip {...props}>
+              {presenceCount[kind.type]} {if presenceCount[kind.type] == 1 then kind.singular else kind.plural}:
+              <PresenceList clusters={clusters}
+               filter={(person) -> person.item.type == kind.type}/>
+            </Tooltip>
+          }>
+           <span className="presence-#{kind.type}"
+            aria-label="#{presenceCount[kind.type]} #{if presenceCount[kind.type] == 1 then kind.singular else kind.plural}">
+             <FontAwesomeIcon icon={faUser}/>
+             {presenceCount[kind.type]}
+           </span>
+         </OverlayTrigger>
+      }
+    </div>
     {if room.raised or myPresence?.type == 'visible'
       if room.raised
         label = 'Lower Hand'
@@ -302,19 +351,9 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
       </div>
     }
     <span className="title">{room.title}</span>
-    {if clusters?.length
-      <div className="presence">
-        {for person in clusters
-          <span key={person.item.id} className="presence-#{person.item.type}">
-            <FontAwesomeIcon icon={faUser} className="mr-1"/>
-            {person.name}
-            {if person.count > 1
-              <span className="ml-1 badge badge-secondary">{person.count}</span>
-            }
-          </span>
-        }
-      </div>
-    }
+    <PresenceList clusters={clusters} filter={(person) ->
+      person.item.type == 'visible' # or person.name == myPresence?.name
+    }/>
     {if selected
       <ButtonGroup vertical className="mx-n2 mt-2 d-block">
         {unless myPresence?.type == 'visible'

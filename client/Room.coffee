@@ -8,7 +8,7 @@ import {faComment, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/f
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 
 import {Rooms, roomTabs} from '/lib/rooms'
-import {Tabs, tabTypes} from '/lib/tabs'
+import {tabTypes} from '/lib/tabs'
 import {getCreator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
