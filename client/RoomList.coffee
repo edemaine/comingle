@@ -324,29 +324,7 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
            onClick={toggleHand}/>
         </OverlayTrigger>
         {if room.raised and typeof room.raised != 'boolean'
-          recomputeTimer = ->
-            delta = timesync.offset + (new Date).getTime() - room.raised
-            delta = 0 if delta < 0
-            if delta <= 5 * 60*60 * 1000
-              formatTimeDelta delta
-            else
-              '>5hr'
-          [timer, setTimer] = useState recomputeTimer
-          [timerHeight, setTimerHeight] = useState 0
-          timerRef = useRef()
-          useInterval ->
-            setTimer recomputeTimer()
-          , 1000
-          useEffect ->
-            return unless timerRef.current
-            setTimerHeight(timerRef.current.clientWidth)
-          , [timer]
-
-          <div style={{height: timerHeight}}>
-            <div className="timer" ref={timerRef}>
-              {timer}
-            </div>
-          </div>
+          <RaisedTimer raised={room.raised}/>
         }
       </div>
     }
@@ -390,6 +368,31 @@ export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
     }
   </Link>
 RoomInfo.displayName = 'RoomInfo'
+
+RaisedTimer = ({raised}) ->
+  recomputeTimer = ->
+    delta = timesync.offset + (new Date).getTime() - raised
+    delta = 0 if delta < 0
+    if delta <= 5 * 60*60 * 1000
+      formatTimeDelta delta
+    else
+      '>5hr'
+  [timer, setTimer] = useState recomputeTimer
+  [timerHeight, setTimerHeight] = useState 0
+  timerRef = useRef()
+  useInterval ->
+    setTimer recomputeTimer()
+  , 1000
+  useEffect ->
+    return unless timerRef.current
+    setTimerHeight(timerRef.current.clientWidth)
+  , [timer]
+
+  <div style={{height: timerHeight}}>
+    <div className="timer" ref={timerRef}>
+      {timer}
+    </div>
+  </div>
 
 export RoomNew = ({selectRoom}) ->
   {meetingId} = useParams()
