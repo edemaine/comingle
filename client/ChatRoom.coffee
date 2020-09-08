@@ -111,7 +111,6 @@ ChatRoom.onRenderTab = (node, renderState) ->
       variant = 'danger'
     else
       variant = 'secondary'
-    variant
     renderState.content = <>
       {renderState.content}
       <Badge variant={variant} className="ml-1">{unseen}</Badge>

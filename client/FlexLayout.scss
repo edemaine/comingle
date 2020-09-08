@@ -29,6 +29,10 @@ $font-size: 12px;
   padding-right: 0.5ex;
 }
 
+.flexlayout__border_button_trailing {
+  margin-left: 0.25rem  // smaller than default 8px
+}
+
 // Color top-level splitters (separating rooms) differently
 $roomColor_base: hsl(195, 10%, 95%);
 $roomColor_1: scale_color($roomColor_base, $lightness:-3%);

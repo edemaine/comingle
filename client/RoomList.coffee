@@ -1,7 +1,7 @@
 import React, {useState, useMemo, useContext, useRef, useCallback, useEffect} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
-import {Accordion, Alert, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Accordion, Alert, Badge, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -33,13 +33,21 @@ sortKeys =
   participants: 'Participant count'
   raised: 'Raised hand timer'
 
-export RoomList = ({loading, model}) ->
+export RoomList = ({loading, model, extraData, updateTab}) ->
   {meetingId} = useParams()
   [sortKey, setSortKey] = useState 'title'
   [reverse, setReverse] = useState false
   [search, setSearch] = useState ''
   [selected, setSelected] = useState()
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
+  useEffect ->
+    raisedCount = 0
+    for room in rooms
+      raisedCount++ if room.raised
+    if raisedCount != extraData.raisedCount
+      extraData.raisedCount = raisedCount
+      updateTab()
+  , [rooms]
   presences = useTracker -> Presence.find(meeting: meetingId).fetch()
   presenceByRoom = useMemo ->
     byRoom = {}
@@ -191,6 +199,19 @@ export RoomList = ({loading, model}) ->
     <RoomNew selectRoom={selectRoom}/>
   </div>
 RoomList.displayName = 'RoomList'
+
+RoomList.onRenderTab = (node, renderState) ->
+  if raisedCount = node.getExtraData().raisedCount
+    help = "#{raisedCount} raised hand#{if raisedCount > 1 then 's' else ''}"
+    renderState.buttons.push \
+      <OverlayTrigger key="handCount" placement="right" overlay={(props) ->
+        <Tooltip {...props}>{help}</Tooltip>
+      }>
+        <Badge variant="danger" className="ml-1">
+          <FontAwesomeIcon aria-label={help} icon={faHandPaper} className="mr-1"/>
+          {raisedCount}
+        </Badge>
+      </OverlayTrigger>
 
 export RoomInfo = ({room, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()

@@ -173,13 +173,15 @@ export Meeting = ->
       Session.set 'currentRoom', undefined
   
   factory = (node) -> # eslint-disable-line react/display-name
+    updateTab = -> FlexLayout.updateNode model, node.getId()
     switch node.getComponent()
       when 'RoomList'
-        <RoomList loading={loading} model={model}/>
+        <RoomList loading={loading} model={model}
+         extraData={node.getExtraData()} updateTab={updateTab}/>
       when 'ChatRoom'
         <ChatRoom channel={meetingId} audience="everyone"
-         visible={node.isVisible()} extraData={node.getExtraData()}
-         updateTab={-> FlexLayout.updateNode model, node.getId()}/>
+         visible={node.isVisible()}
+         extraData={node.getExtraData()} updateTab={updateTab}/>
       when 'Welcome'
         <Welcome/>
       when 'Room'
@@ -218,17 +220,18 @@ export Meeting = ->
       buttons?.push \
         <div key="link"
          className="flexlayout__#{type}_button_trailing"
-         aria-label="Save meeting link to clipboard"
+         aria-label="Copy meeting link to clipboard"
          onClick={-> navigator.clipboard.writeText \
            Meteor.absoluteUrl "/m/#{meetingId}"}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
-          <OverlayTrigger placement="bottom" overlay={(props) ->
-            <Tooltip {...props}>Save meeting link to clipboard</Tooltip>
+          <OverlayTrigger placement="right" overlay={(props) ->
+            <Tooltip {...props}>Copy meeting link to clipboard</Tooltip>
           }>
             <FontAwesomeIcon icon={clipboardLink}/>
           </OverlayTrigger>
         </div>
+      return RoomList.onRenderTab node, renderState
     else if node.getComponent() == 'ChatRoom'
       return ChatRoom.onRenderTab node, renderState
     return if node.getComponent() != 'Room'
@@ -245,13 +248,13 @@ export Meeting = ->
       buttons?.push \
         <div key="link"
          className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
-         aria-label="Save room link to clipboard"
+         aria-label="Copy room link to clipboard"
          onClick={-> navigator.clipboard.writeText \
            Meteor.absoluteUrl "/m/#{meetingId}##{node.getId()}"}
          onMouseDown={(e) -> e.stopPropagation()}
          onTouchStart={(e) -> e.stopPropagation()}>
           <OverlayTrigger placement="bottom" overlay={(props) ->
-            <Tooltip {...props}>Save room link to clipboard</Tooltip>
+            <Tooltip {...props}>Copy room link to clipboard</Tooltip>
           }>
             <FontAwesomeIcon icon={clipboardLink}/>
           </OverlayTrigger>
