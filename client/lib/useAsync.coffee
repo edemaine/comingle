@@ -1,8 +1,8 @@
-import {useState, useEffect} from 'react'
+import {useState, useLayoutEffect} from 'react'
 
 export useAsync = (asyncFunc) ->
   [value, setValue] = useState()
-  useEffect ->
+  useLayoutEffect ->
     setValue undefined
     asyncFunc()
     .then (response) ->

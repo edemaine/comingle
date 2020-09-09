@@ -5,6 +5,7 @@ import {faComment} from '@fortawesome/free-solid-svg-icons'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {Loading} from './Loading'
+import {Markdown} from './lib/Markdown'
 import {Chat, useChat} from './lib/chat'
 import {getCreator} from './lib/presenceId'
 import {formatDate, formatTime} from './lib/dates'
@@ -64,6 +65,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
       body: body
     setBody ''
 
+  return null unless visible
   <div className="chat">
     <div className="messages" ref={messagesDiv}>
       {for message in messages
@@ -80,7 +82,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
               <span className="sender">{message.sender.name or '(anonymous)'}</span>
               <span className="sent">{formatTime message.sent}</span>
             </div>
-            <div className="body">{message.body}</div>
+            <Markdown className="body" body={message.body}/>
           </div>
         </React.Fragment>
       }
