@@ -23,8 +23,8 @@ Meteor.methods
       connections[@connection.id] = presence.id
       presence.updated = new Date
     Presence.update
-      id: presence.id
       meeting: presence.meeting
+      id: presence.id
     ,
       $set:
         name: presence.name
