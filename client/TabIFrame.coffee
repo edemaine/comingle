@@ -41,6 +41,7 @@ export TabIFrame = ({tabId}) ->
       coop: 1
       user: fullName: name
     , '*'
+    undefined
   , [ref, name, coop]
 
   <iframe ref={ref} src={tab.url} allow={allow}/>

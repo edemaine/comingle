@@ -9,10 +9,12 @@ import {useDebounce} from './lib/useDebounce'
 export Name = ->
   [name, setName] = useLocalStorage 'name', '', true
   nameDebounce = useDebounce name, 500
+
   useEffect ->
     Session.set 'name', nameDebounce
     undefined
   , [nameDebounce]
+
   <Accordion defaultActiveKey="0">
     <Card>
       <CardToggle eventKey="0">
@@ -21,6 +23,7 @@ export Name = ->
       <Accordion.Collapse eventKey="0">
         <Card.Body>
           <Form.Control type="text" placeholder="FirstName LastName"
+           className="name #{if nameDebounce.trim() then '' else 'is-invalid'}"
            value={name} onChange={(e) -> setName e.target.value}/>
         </Card.Body>
       </Accordion.Collapse>
