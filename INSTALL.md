@@ -36,6 +36,15 @@ Installation instructions:
 6. `mup deploy` each time you want to deploy code to server
    (initially and after each `git pull`)
 
+## Configuration
+
+[`Config.coffee`](Config.coffee) stores a few configuration options defining
+Comingle's behavior:
+
+* `newMeetingRooms` specifies rooms (including titles and templates)
+  to automatically create in any newly created meeting.
+* `defaultServers` specifies the default servers for Cocreate and Jitsi.
+
 ## Zoom Support
 
 To use the [Zoom Web Client SDK](https://github.com/zoom/sample-app-web),

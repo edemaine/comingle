@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useReducer, useRef, useMemo} from 'react'
+import React, {useEffect, useReducer, useRef, useMemo} from 'react'
 import {useParams, useLocation, useHistory} from 'react-router-dom'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
@@ -70,7 +70,7 @@ initModel = ->
 
 export Meeting = ->
   {meetingId} = useParams()
-  [model, setModel] = useState initModel
+  model = useMemo initModel, []
   location = useLocation()
   history = useHistory()
   {loading, rooms} = useTracker ->

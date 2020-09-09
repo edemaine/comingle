@@ -1,11 +1,5 @@
 import React from 'react'
 
-LinkToFrontPage = (props) ->
-  <a href={Meteor.absoluteUrl()} target="_blank" {...props}> {### eslint-disable-line react/jsx-no-target-blank ###}
-    {props.children}
-  </a>
-LinkToFrontPage.displayName = 'LinkToFrontPage'
-
 export Header = ->
   <nav>
     <LinkToFrontPage className="flex-shrink-1" style={maxWidth:"35px"}>
@@ -16,3 +10,9 @@ export Header = ->
     </LinkToFrontPage>
   </nav>
 Header.displayName = 'Header'
+
+export LinkToFrontPage = (props) ->
+  <a href={Meteor.absoluteUrl()} target="_blank" {...props}> {### eslint-disable-line react/jsx-no-target-blank ###}
+    {props.children}
+  </a>
+LinkToFrontPage.displayName = 'LinkToFrontPage'

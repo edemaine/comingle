@@ -1,6 +1,6 @@
 ## Comingle Server Configuration Settings
 
-export default Settings =
+export Config =
 
   ## When creating a new meeting, create rooms with the specified
   ## title and template.  Template can be '' (blank), 'cocreate', 'jitsi',

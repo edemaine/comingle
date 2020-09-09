@@ -5,7 +5,7 @@ import {Random} from 'meteor/random'
 import {validId, creatorPattern} from './id'
 import {checkMeeting} from './meetings'
 import {checkRoom} from './rooms'
-import Settings from '../settings.coffee'
+import {Config} from '/Config'
 
 export Tabs = new Mongo.Collection 'tabs'
 
@@ -36,7 +36,7 @@ export tabTypes =
     category: 'Whiteboard'
     instance: 'board'
     createNew: ->
-      server = Settings.defaultServers.cocreate ?
+      server = Config.defaultServers.cocreate ?
                'https://cocreate.csail.mit.edu'
       url = "#{trimURL server}/api/roomNew?grid=1"
       response = await fetch url
@@ -51,7 +51,7 @@ export tabTypes =
     onePerRoom: true
     keepVisible: true
     createNew: ->
-      server = Settings.defaultServers.jitsi ? 'https://meet.jit.si'
+      server = Config.defaultServers.jitsi ? 'https://meet.jit.si'
       "#{trimURL server}/comingle/#{Random.id()}"
   youtube:
     title: 'YouTube'
@@ -125,7 +125,7 @@ export mangleTab = (tab, dropManualTitle) ->
 
   ## Force type if we recognize default servers
   for service in ['cocreate', 'jitsi']
-    server = Settings.defaultServers[service]
+    server = Config.defaultServers[service]
     continue unless server?
     if tab.url.startsWith server
       tab.type = service

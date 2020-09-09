@@ -137,10 +137,10 @@ export Room = ({loading, roomId, showArchived}) ->
             if not tabsetUsed.current[tabset]? or
                tabsetUsed.current[tabset] < tabsetUsed.current[oldest]
               oldest = tabset
-        location = [oldest, FlexLayout.DockLocation.CENTER, -1]
+        [oldest, FlexLayout.DockLocation.CENTER, -1]
       else
         ## Otherwise, add to the left/top of first tabset.
-        location = [tabsets[0].getId(), direction(tabsets[0], false), -1]
+        [tabsets[0].getId(), direction(tabsets[0], false), -1]
   ## Synchronize model with room
   useEffect ->
     return unless model?

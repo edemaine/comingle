@@ -37,6 +37,7 @@ rules:
   react/no-unescaped-entities:
     - warn
     - forbid: ['>', '"', '}']
+  react/prop-types: off
   meteor/no-session: off
   meteor/audit-argument-checks:
     - error

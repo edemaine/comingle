@@ -3,7 +3,7 @@ import {check, Match} from 'meteor/check'
 
 import {validId, creatorPattern} from './id'
 import {roomWithTemplate} from './rooms'
-import Settings from '../settings.coffee'
+import {Config} from '/Config'
 
 export Meetings = new Mongo.Collection 'meetings'
 
@@ -22,7 +22,7 @@ Meteor.methods
       meeting.created = new Date
     meetingId = Meetings.insert meeting
     unless @isSimulation
-      for room in Settings.newMeetingRooms ? []
+      for room in Config.newMeetingRooms ? []
         roomWithTemplate Object.assign
           meeting: meetingId
           creator: meeting.creator

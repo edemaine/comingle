@@ -94,7 +94,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
       , 0
   , []
 
-  Sublist = ({heading, search, filter, startClosed}) ->
+  Sublist = ({heading, search, filter, startClosed}) -> # eslint-disable-line react/display-name
     subrooms = sortedRooms.filter filter
     if search
       pattern = search.toLowerCase()
@@ -285,7 +285,7 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
     e.stopPropagation()
     openRoomWithDragAndDrop(room._id)
 
-  PresenceList = ({clusters, filter, search}) ->
+  PresenceList = ({clusters, filter, search}) -> # eslint-disable-line react/display-name
     return null unless clusters?.length
     clusters = clusters.filter filter if filter
     <div className="presence">
@@ -318,7 +318,7 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
        ]
          continue unless presenceCount[kind.type]
          <OverlayTrigger key={kind.type} placement="top"
-          overlay={do (kind) -> (props) ->
+          overlay={do (kind) -> (props) -> # eslint-disable-line react/display-name
             <Tooltip {...props}>
               {presenceCount[kind.type]} {if presenceCount[kind.type] == 1 then kind.singular else kind.plural}:
               <PresenceList clusters={clusters}
@@ -409,7 +409,7 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
   </Link>
 RoomInfo.displayName = 'RoomInfo'
 
-RaisedTimer = ({raised}) ->
+export RaisedTimer = ({raised}) ->
   recomputeTimer = ->
     delta = timesync.offset + (new Date).getTime() - raised
     delta = 0 if delta < 0
@@ -433,6 +433,7 @@ RaisedTimer = ({raised}) ->
       {timer}
     </div>
   </div>
+RaisedTimer.displayName = 'RaisedTimer'
 
 export RoomNew = ({selectRoom}) ->
   {meetingId} = useParams()
