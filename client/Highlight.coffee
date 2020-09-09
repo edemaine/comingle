@@ -2,10 +2,7 @@ import React from 'react'
 
 import {escapeHTML, escapeRegExp} from './lib/escape'
 
-export Highlight = (props) ->
-  {search, text} = props
-  delete props.search
-  delete props.text
+export Highlight = ({search, text, ...props}) ->
   unless search
     return <span {...props}>{text}</span>
   text = escapeHTML text
