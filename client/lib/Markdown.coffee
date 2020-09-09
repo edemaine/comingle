@@ -1,18 +1,20 @@
-import React, {useLayoutEffect, useMemo} from 'react'
+import React, {useMemo, useState} from 'react'
 
 import {useAsync} from './useAsync'
 
-markdown = null  # eventually set to a MarkdownIt instance
+globalMarkdown = null  # eventually set to a MarkdownIt instance
 
 export Markdown = ({body, ...props}) ->
-  MarkdownIt = useAsync -> (await import('markdown-it')).default
+  [markdown, setMarkdown] = useState globalMarkdown
+  unless markdown?
+    import('markdown-it').then ({default: MarkdownIt}) ->
+      setMarkdown globalMarkdown = new MarkdownIt
+        linkify: true
+        typographer: true
   html = useMemo ->
-    return unless MarkdownIt?
-    markdown ?= new MarkdownIt
-      linkify: true
-      typographer: true
+    return unless markdown?
     markdown.renderInline body
-  , [MarkdownIt]
+  , [markdown]
   if html?
     <div {...props} dangerouslySetInnerHTML={__html: html}/>
   else
