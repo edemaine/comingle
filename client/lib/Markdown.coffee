@@ -1,20 +1,27 @@
-import React, {useMemo, useState} from 'react'
+import React, {useMemo} from 'react'
+import {useTracker} from 'meteor/react-meteor-data'
+import {Session} from 'meteor/session'
 
-import {useAsync} from './useAsync'
-
-globalMarkdown = null  # eventually set to a MarkdownIt instance
+globalMarkdown = null  # eventually set to MarkdownIt instance
 
 export Markdown = ({body, ...props}) ->
-  [markdown, setMarkdown] = useState globalMarkdown
-  unless markdown?
-    import('markdown-it').then ({default: MarkdownIt}) ->
-      setMarkdown globalMarkdown = new MarkdownIt
-        linkify: true
-        typographer: true
+  markdown = useTracker ->
+    return globalMarkdown if globalMarkdown?
+    unless Session.get 'markdownLoading'
+      Session.set 'markdownLoading', true
+      import('markdown-it').then ({default: MarkdownIt}) ->
+        globalMarkdown = new MarkdownIt
+          linkify: true
+          typographer: true
+        Session.set 'markdownLoading', false  # triggers reading globalMarkdown
+    undefined
+  , []
+
   html = useMemo ->
     return unless markdown?
     markdown.renderInline body
   , [markdown]
+
   if html?
     <div {...props} dangerouslySetInnerHTML={__html: html}/>
   else
