@@ -25,6 +25,7 @@ import timesync from './lib/timesync'
 import {useDebounce} from './lib/useDebounce'
 import {Meetings} from '/lib/meetings'
 import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
+import {Config} from '/Config'
 
 findMyPresence = (presence) ->
   presenceId = getPresenceId()
@@ -36,7 +37,7 @@ sortKeys =
   participants: 'Participant count'
   raised: 'Raised hand timer'
 
-defaultSort =
+defaultSort = Config.defaultSort ?
   key: 'title'
   reverse: false
 

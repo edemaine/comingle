@@ -19,3 +19,8 @@ export Config =
   defaultServers:
     cocreate: 'https://cocreate.csail.mit.edu'
     jitsi: 'https://meet.jit.si'
+
+  ## Default sort key for all meetings
+  defaultSort:
+    key: 'title'  # see client/RoomList.coffee for other options
+    reverse: false
