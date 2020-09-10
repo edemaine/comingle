@@ -22,8 +22,9 @@ import {Highlight} from './Highlight'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {formatTimeDelta, formatDateTime} from './lib/dates'
 import timesync from './lib/timesync'
-import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 import {useDebounce} from './lib/useDebounce'
+import {Meetings} from '/lib/meetings'
+import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 
 findMyPresence = (presence) ->
   presenceId = getPresenceId()
@@ -35,10 +36,17 @@ sortKeys =
   participants: 'Participant count'
   raised: 'Raised hand timer'
 
+defaultSort =
+  key: 'title'
+  reverse: false
+
 export RoomList = ({loading, model, extraData, updateTab}) ->
   {meetingId} = useParams()
-  [sortKey, setSortKey] = useState 'title'
-  [reverse, setReverse] = useState false
+  [sortKey, setSortKey] = useState null  # null means "use default"
+  [reverse, setReverse] = useState null  # null means "use default"
+  meeting = useTracker -> Meetings.findOne meetingId
+  sortKey ?= meeting?.defaultSort?.key ? defaultSort.key
+  reverse ?= meeting?.defaultSort?.reverse ? defaultSort.reverse
   [search, setSearch] = useState ''
   searchDebounce = useDebounce search, 200
   [selected, setSelected] = useState()
