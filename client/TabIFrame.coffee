@@ -34,6 +34,7 @@ export TabIFrame = ({tabId}) ->
     return unless e.source == ref.current.contentWindow
     return unless e.data?.coop
     setCoop coop + 1  # force update
+  , ref.current
   useEffect ->
     return unless ref.current
     return unless coop
