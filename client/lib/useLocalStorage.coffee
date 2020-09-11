@@ -18,8 +18,11 @@ export useLocalStorage = (key, initialValue, sync, noUpdate) ->
       # Get from local storage by key
       item = window.localStorage.getItem key
       # Parse stored json or if none return initialValue
-      if item?
-        JSON.parse item
+      if item? and item != 'undefined'
+        try
+          JSON.parse item
+        catch
+          initial()
       else
         initial()
     catch error
