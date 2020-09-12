@@ -29,8 +29,7 @@ export Layout = forwardRef (props, ref) ->
       model.doAction Actions.updateModelAttributes
         tabSetEnableMaximize: enableMaximize
     if tabsets.length == 1 and tabsets[0].isMaximized()
-      model.doAction Actions.updateNodeAttributes tabsets[0].getId(),
-        maximized: false
+      model.doAction Actions.maximizeToggle tabsets[0].getId()
     props.onModelChange? model
   onModelChange props.model  # initialize
   <FlexLayout {...props}
