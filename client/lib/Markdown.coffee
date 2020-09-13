@@ -39,6 +39,8 @@ export Markdown = ({body, ...props}) ->
   html = useMemo ->
     return unless markdown?
     markdown.renderInline body
+    ## Make all links open in separate window, without referrer/opener
+    .replace /<a href\b/g, '<a target="_blank" rel="noreferrer" href'
   , [markdown, texLoaded]
 
   if html?
