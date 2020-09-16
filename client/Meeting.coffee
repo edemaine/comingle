@@ -59,6 +59,7 @@ initModel = ->
           type: 'tab'
           name: 'Welcome'
           component: 'Welcome'
+          enableRename: false
         ]
       ]
   model.setOnAllowDrop (dragNode, dropInfo) ->
