@@ -47,6 +47,9 @@ export useLocalStorage = (key, initialValue, sync, noUpdate) ->
   if sync
     useEventListener 'storage', (e) ->
       if e.key == key
-        setStoredValue JSON.parse e.newValue
+        try
+          setStoredValue JSON.parse e.newValue
+        catch error
+          console.warn error
 
   [storedValue, setValue]
