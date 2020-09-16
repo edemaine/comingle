@@ -3,7 +3,8 @@ import {Session} from 'meteor/session'
 
 ## Modeled after Cocreate's remoteId mechanism
 
-presenceId = Random.id()
+unless presenceId = window?.sessionStorage?.getItem? 'presenceId'
+  window?.sessionStorage?.setItem? 'presenceId', presenceId = Random.id()
 export getPresenceId = -> presenceId
 
 ### Persistent version, which causes trouble with multiple windows:
