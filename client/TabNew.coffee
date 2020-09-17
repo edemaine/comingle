@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react'
-import {Form} from 'react-bootstrap'
+import {Alert, Form} from 'react-bootstrap'
 
 import {validURL, tabTypes, categories, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
@@ -31,6 +31,7 @@ do -> # avoid namespace pollution
 export TabNew = ({node, meetingId, roomId,
                   replaceTabNew, existingTabTypes}) ->
   [url, setUrl] = useState ''
+  [mixed, setMixed] = useState false
   [title, setTitle] = useState ''
   [category, setCategory] = useState 'Web'
   [type, setType] = useState 'iframe'
@@ -64,6 +65,7 @@ export TabNew = ({node, meetingId, roomId,
     setTitle tab.title if tab.title != title
     setType tab.type if tab.type != type
     setManualTitle tab.manualTitle if tab.manualTitle != manualTitle
+    setMixed window.location.protocol == 'https:' and /^http:\/\//i.test tab.url
     if submit
       setSubmit false
       setTimeout (-> submitButton.current?.click()), 0
@@ -187,6 +189,11 @@ export TabNew = ({node, meetingId, roomId,
                value={url} required
                onChange={(e) -> setUrl e.target.value}/>
             </div>
+            {if mixed
+              <Alert variant="warning">
+                You cannot use a website with insecure <code>http</code> protocol (because Comingle uses secure <code>https</code> protocol).
+              </Alert>
+            }
             <div className="form-group">
               <label>Tab title (can be renamed later)</label>
               <input type="text" placeholder="Cool Site" className="form-control"
