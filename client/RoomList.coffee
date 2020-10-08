@@ -50,6 +50,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
   reverse ?= meeting?.defaultSort?.reverse ? defaultSort.reverse
   [search, setSearch] = useState ''
   searchDebounce = useDebounce search, 200
+  [nonempty, setNonempty] = useState false
   [selected, setSelected] = useState()
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
   useEffect ->
@@ -156,8 +157,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
                 <FontAwesomeIcon icon={faTimesCircle} className="search-icon"
                  onClick={(e) -> e.stopPropagation(); setSearch ''}/>
                 <Form.Control type="text" value={search}
-                 onChange={(e) -> setSearch e.target.value}>
-                </Form.Control>
+                 onChange={(e) -> setSearch e.target.value}/>
                 <ButtonGroup size="sm" className="sorting w-100 text-center">
                   <DropdownButton title="Sort By" variant="light">
                     {for key, phrase of sortKeys
@@ -189,6 +189,11 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
                     </Button>
                   </OverlayTrigger>
                 </ButtonGroup>
+                <Form.Group controlId="nonempty">
+                  <Form.Check label="Only nonempty rooms"
+                   className="mx-1 mt-1 mb-n1 text-center" checked={nonempty}
+                   onChange={(e) -> setNonempty e.target.checked}/>
+                </Form.Group>
               </Card.Body>
             </Accordion.Collapse>
           </Card>
@@ -206,9 +211,11 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
        filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Available Rooms:" search={searchDebounce}
        filter={(room) -> not room.archived and
+                         (not nonempty or presenceByRoom[room._id] or selected == room._id) and
                          not findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Archived Rooms:" startClosed search={searchDebounce}
        filter={(room) -> room.archived and
+                         (not nonempty or presenceByRoom[room._id] or selected == room._id) and
                          not findMyPresence presenceByRoom[room._id]}/>
     </div>
     <RoomNew selectRoom={selectRoom}/>
