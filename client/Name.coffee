@@ -15,18 +15,14 @@ export Name = ->
     undefined
   , [nameDebounce]
 
-  <Accordion defaultActiveKey="0">
-    <Card>
-      <CardToggle eventKey="0">
-        Your Name:
-      </CardToggle>
-      <Accordion.Collapse eventKey="0">
-        <Card.Body>
-          <Form.Control type="text" placeholder="FirstName LastName"
-           className="name #{if nameDebounce.trim() then '' else 'is-invalid'}"
-           value={name} onChange={(e) -> setName e.target.value}/>
-        </Card.Body>
-      </Accordion.Collapse>
-    </Card>
-  </Accordion>
+  <Card>
+    <Card.Header className="tight">
+      Your Name:
+    </Card.Header>
+    <Card.Body>
+      <Form.Control type="text" placeholder="FirstName LastName"
+       className="name #{if nameDebounce.trim() then '' else 'is-invalid'}"
+       value={name} onChange={(e) -> setName e.target.value}/>
+    </Card.Body>
+  </Card>
 Name.displayName = 'Name'

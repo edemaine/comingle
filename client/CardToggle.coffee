@@ -7,7 +7,7 @@ export CardToggle = ({children, eventKey}) ->
   eventKey ?= 0
   currentEventKey = useContext AccordionContext
   onClick = useAccordionToggle eventKey
-  <Card.Header onClick={onClick}>
+  <Card.Header onClick={onClick} className="toggle">
     {children}
     {if eventKey == currentEventKey
       <FontAwesomeIcon icon={faChevronCircleUp} className="float-right"/>

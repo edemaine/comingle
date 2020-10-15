@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {useParams} from 'react-router-dom'
-import {Form} from 'react-bootstrap'
+import {Card, Form} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {Meetings} from '/lib/meetings'
@@ -25,24 +25,17 @@ export MeetingTitle = ->
           updator: getCreator()
       setChanged false
   , [changedDebounce]
-  ###
-  <Accordion defaultActiveKey="0">
-    <Card>
-      <CardToggle eventKey="0">
-        Meeting Title:
-      </CardToggle>
-      <Accordion.Collapse eventKey="0">
-        <Card.Body>
-  ###
-  <Form.Control type="text" placeholder="Meeting Title"
-   value={title} onChange={(e) ->
-     setTitle e.target.value
-     setChanged e.target.value
-  }/>
-  ###
-        </Card.Body>
-      </Accordion.Collapse>
-    </Card>
-  </Accordion>
-  ###
+
+  <Card>
+    <Card.Header className="tight">
+      Meeting Title:
+    </Card.Header>
+    <Card.Body>
+      <Form.Control type="text" placeholder="Comingle Meeting"
+       value={title} onChange={(e) ->
+         setTitle e.target.value
+         setChanged e.target.value
+      }/>
+    </Card.Body>
+  </Card>
 MeetingTitle.displayName = 'MeetingTitle'
