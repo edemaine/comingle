@@ -2,6 +2,7 @@ import React, {useState, useMemo, useContext, useRef, useCallback, useEffect} fr
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
 import {Accordion, Alert, Badge, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
+import SelectableContext from 'react-bootstrap/SelectableContext'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -110,6 +111,9 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
       , 0
   , []
 
+  # SelectableContext below is workaround until release of:
+  # https://github.com/react-bootstrap/react-bootstrap/pull/5201
+
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-grow-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
@@ -123,6 +127,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
               Room Search:
             </CardToggle>
             <Accordion.Collapse eventKey="0">
+             <SelectableContext.Provider value={null}>
               <Card.Body>
                 <FontAwesomeIcon icon={faTimesCircle} className="search-icon"
                  onClick={(e) -> e.stopPropagation(); setSearch ''}/>
@@ -165,6 +170,7 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
                    onChange={(e) -> setNonempty e.target.checked}/>
                 </Form.Group>
               </Card.Body>
+             </SelectableContext.Provider>
             </Accordion.Collapse>
           </Card>
         </Accordion>
