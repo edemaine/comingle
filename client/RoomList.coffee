@@ -74,6 +74,12 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
             id: presence.id
     byRoom
   , [presences]
+  hasVisible = (room) ->
+    presences = presenceByRoom[room._id ? room]
+    return false unless presences?
+    for presence in presences
+      return true if presence.type == 'visible'
+    false
   sorters =
     title: titleKey
     created: (room) -> room.created
@@ -211,11 +217,11 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
        filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Available Rooms:" search={searchDebounce}
        filter={(room) -> not room.archived and
-                         (not nonempty or presenceByRoom[room._id] or selected == room._id) and
+                         (not nonempty or hasVisible(room) or selected == room._id) and
                          not findMyPresence presenceByRoom[room._id]}/>
       <Sublist heading="Archived Rooms:" startClosed search={searchDebounce}
        filter={(room) -> room.archived and
-                         (not nonempty or presenceByRoom[room._id] or selected == room._id) and
+                         (not nonempty or hasVisible(room) or selected == room._id) and
                          not findMyPresence presenceByRoom[room._id]}/>
     </div>
     <RoomNew selectRoom={selectRoom}/>
