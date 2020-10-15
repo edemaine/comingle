@@ -1,8 +1,7 @@
 import React, {useEffect} from 'react'
-import {Accordion, Card, Form} from 'react-bootstrap'
+import {Card, Form} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 
-import {CardToggle} from './CardToggle'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 

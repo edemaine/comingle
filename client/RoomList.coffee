@@ -110,42 +110,6 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
       , 0
   , []
 
-  Sublist = ({heading, search, filter, startClosed}) -> # eslint-disable-line react/display-name
-    subrooms = sortedRooms.filter filter
-    if search
-      pattern = search.toLowerCase()
-      match = (x) -> 0 <= x.toLowerCase().indexOf pattern
-      subrooms = subrooms.filter (room) ->
-        include = match room.title
-        for presence in presenceByRoom[room._id] ? []
-          include or= presence.match = match presence.name
-        include
-    return null unless subrooms.length
-    <Accordion defaultActiveKey={unless startClosed then "0"}>
-      <Card>
-        <CardToggle eventKey="0">
-          {heading}
-        </CardToggle>
-        <Accordion.Collapse eventKey="0">
-          <Card.Body>
-            <ListGroup>
-              {for room in subrooms
-                do (id = room._id) ->
-                  <RoomInfo key={room._id} room={room} search={searchDebounce}
-                   presence={presenceByRoom[room._id] ? []}
-                   selected={selected == room._id}
-                   selectRoom={selectRoom}
-                   leave={->
-                     model.doAction FlexLayout.Actions.deleteTab id}
-                  />
-              }
-            </ListGroup>
-          </Card.Body>
-        </Accordion.Collapse>
-      </Card>
-    </Accordion>
-  Sublist.displayName = 'Sublist'
-
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-grow-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
@@ -213,13 +177,16 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
           No rooms in this meeting.
         </Alert>
       }
-      <Sublist heading="Your Open Rooms:" search={searchDebounce}
+      <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+       heading="Your Open Rooms:" search={searchDebounce}
        filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
-      <Sublist heading="Available Rooms:" search={searchDebounce}
+      <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+       heading="Available Rooms:" search={searchDebounce}
        filter={(room) -> not room.archived and
                          (not nonempty or hasVisible(room) or selected == room._id) and
                          not findMyPresence presenceByRoom[room._id]}/>
-      <Sublist heading="Archived Rooms:" startClosed search={searchDebounce}
+      <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+       heading="Archived Rooms:" startClosed search={searchDebounce}
        filter={(room) -> room.archived and
                          (not nonempty or hasVisible(room) or selected == room._id) and
                          not findMyPresence presenceByRoom[room._id]}/>
@@ -227,6 +194,45 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
     <RoomNew selectRoom={selectRoom}/>
   </div>
 RoomList.displayName = 'RoomList'
+
+Sublist = ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, search, filter, startClosed}) -> # eslint-disable-line react/display-name
+  subrooms = useMemo ->
+    matching = sortedRooms.filter filter
+    if search
+      pattern = search.toLowerCase()
+      match = (x) -> 0 <= x.toLowerCase().indexOf pattern
+      matching = matching.filter (room) ->
+        include = match room.title
+        for presence in presenceByRoom[room._id] ? []
+          include or= presence.match = match presence.name
+        include
+    matching
+  , [sortedRooms, filter, search, (if search then presenceByRoom)]
+  return null unless subrooms.length
+  <Accordion defaultActiveKey={unless startClosed then '0'}>
+    <Card>
+      <CardToggle eventKey="0">
+        {heading}
+      </CardToggle>
+      <Accordion.Collapse eventKey="0">
+        <Card.Body>
+          <ListGroup>
+            {for room in subrooms
+              do (id = room._id) ->
+                <RoomInfo key={room._id} room={room} search={search}
+                 presence={presenceByRoom[room._id] ? []}
+                 selected={selected == room._id}
+                 selectRoom={selectRoom}
+                 leave={->
+                   model.doAction FlexLayout.Actions.deleteTab id}
+                />
+            }
+          </ListGroup>
+        </Card.Body>
+      </Accordion.Collapse>
+    </Card>
+  </Accordion>
+Sublist.displayName = 'Sublist'
 
 RoomList.onRenderTab = (node, renderState) ->
   if raisedCount = node.getExtraData().raisedCount
