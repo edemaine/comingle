@@ -16,13 +16,13 @@ export Welcome = () =>
       </p>
       <h5>Getting Started:</h5>
       <ul>
-        <li>First, <b>enter your name</b> (first and last) at the top of the left panel.</li>
+        <li>First, <b>enter your name</b> (first and last) in the left panel (second text box).</li>
         <li><b>Your open rooms</b> will appear as tabs near the top of your screen.</li>
         <li>To <b>join a room</b>, click on a room (such as &ldquo;Main Room&rdquo;) in the room list on the left.</li>
         <li>When you click a second room, you'll have two choices:
           <ul>
             <li> &ldquo;<b>Switch to Room</b>&rdquo; (shortcut: hold <kbd>Shift</kbd> while clicking) opens the room as a new tab and immediately switches to it.  Note that this will <b>disconnect</b> you from any current Comingle video call.</li>
-            <li> &ldquo;<b>Open in Background</b>&rdquo; (shortcut: hold <kbd>{Ctrl}</kbd> while clicking) opens the room as a new tab, but you stay in your current room.  You can switch to it later by clicking on the tab.</li>
+            <li> &ldquo;<b>Open in Background</b>&rdquo; (shortcut: hold <kbd>{Ctrl}</kbd> while clicking) opens the room as a new tab, but you stay in your current room.  This feature can be useful to indicate interest in a room before switching.  You can switch to it later by clicking on the tab.</li>
           </ul>
         </li>
         <li>Each room contains one or more <b>tabs</b>: video call, whiteboard, etc.
