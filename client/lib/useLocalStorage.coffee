@@ -5,30 +5,8 @@ import {useState} from 'react'
 import useEventListener from '@use-it/event-listener'
 
 export useLocalStorage = (key, initialValue, sync, noUpdate) ->
-  # Support raw initial value or function generating that value
-  initial = ->
-    if typeof initialValue == 'function'
-      initialValue()
-    else
-      initialValue
-
   # Pass initial state function to useState so logic is only executed once
-  [storedValue, setStoredValue] = useState ->
-    try
-      # Get from local storage by key
-      item = window.localStorage.getItem key
-      # Parse stored json or if none return initialValue
-      if item? and item != 'undefined'
-        try
-          JSON.parse item
-        catch
-          initial()
-      else
-        initial()
-    catch error
-      # If error also return initialValue
-      console.warn error
-      initial()
+  [storedValue, setStoredValue] = useState -> getLocalStorage key, initialValue
 
   # Return a wrapped version of useState's setter function that
   # persists the new value to localStorage.
@@ -55,3 +33,27 @@ export useLocalStorage = (key, initialValue, sync, noUpdate) ->
           console.warn error
 
   [storedValue, setValue]
+
+export getLocalStorage = (key, initialValue) ->
+  try
+    # Get from local storage by key
+    item = window.localStorage.getItem key
+    # Parse stored json or if none return initialValue
+    if item? and item != 'undefined'
+      try
+        JSON.parse item
+      catch
+        initial initialValue
+    else
+      initial initialValue
+  catch error
+    # If error also return initialValue
+    console.warn error
+    initial initialValue
+
+# Support raw initial value or function generating that value
+initial = (initialValue) ->
+  if typeof initialValue == 'function'
+    initialValue()
+  else
+    initialValue

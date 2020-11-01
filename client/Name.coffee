@@ -1,16 +1,16 @@
-import React, {useEffect} from 'react'
+import React, {useLayoutEffect} from 'react'
 import {Card, Form} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 
-import {useLocalStorage} from './lib/useLocalStorage'
+import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
 export Name = ->
   [name, setName] = useLocalStorage 'name', '', true
   nameDebounce = useDebounce name, 500
 
-  useEffect ->
+  useLayoutEffect ->
     Session.set 'name', nameDebounce
     undefined
   , [nameDebounce]
@@ -28,7 +28,7 @@ export Name = ->
 Name.displayName = 'Name'
 
 export useName = ->
-  useTracker -> Session.get 'name'
+  useTracker -> getName()
 
 export getName = ->
-  Session.get 'name'
+  Session.get('name') ? getLocalStorage 'name', ''
