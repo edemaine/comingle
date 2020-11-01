@@ -36,6 +36,8 @@ export useLocalStorage = (key, initialValue, sync, noUpdate) ->
     try
       # Allow value to be a function so we have same API as useState
       value = value storedValue if value instanceof Function
+      # Easy case: no change
+      return if value == storedValue
       # Save state
       setStoredValue value unless noUpdate
       # Save to local storage
