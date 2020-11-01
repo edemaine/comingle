@@ -4,7 +4,7 @@ import {Card} from 'react-bootstrap'
 import {Ctrl} from './lib/keys'
 import {homepage, repository} from '/package.json'
 
-export Welcome = () =>
+export Welcome = ->
   <Card>
     <Card.Body>
       <Card.Title as="h3">Welcome to Comingle!</Card.Title>

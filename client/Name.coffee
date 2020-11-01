@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react'
 import {Card, Form} from 'react-bootstrap'
 import {Session} from 'meteor/session'
+import {useTracker} from 'meteor/react-meteor-data'
 
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
@@ -25,3 +26,9 @@ export Name = ->
     </Card.Body>
   </Card>
 Name.displayName = 'Name'
+
+export useName = ->
+  useTracker -> Session.get 'name'
+
+export getName = ->
+  Session.get 'name'

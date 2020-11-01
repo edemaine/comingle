@@ -14,6 +14,7 @@ import {RoomList} from './RoomList'
 import {Room} from './Room'
 import {Rooms} from '/lib/rooms'
 import {Welcome} from './Welcome'
+import {useName} from './Name'
 import {Presence} from '/lib/presence'
 import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
@@ -119,7 +120,7 @@ export Meeting = ->
       state
   , {})
   presenceId = getPresenceId()
-  name = useTracker -> Session.get 'name'
+  name = useName()
   updatePresence = ->
     return unless name?  # wait for tracker to load name
     presence =

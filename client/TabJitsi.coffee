@@ -2,6 +2,7 @@ import React from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {allow} from './TabIFrame'
+import {getName} from './Name'
 import {Tabs} from '/lib/tabs'
 
 export TabJitsi = ({tabId, room}) ->
@@ -20,7 +21,7 @@ export TabJitsi = ({tabId, room}) ->
   url += "#" + (
     for key, value of {
       jitsi_meet_external_api_id: 0
-      'userInfo.displayName': Session.get 'name'
+      'userInfo.displayName': getName()
       ###
       Config as defined in
       https://github.com/jitsi/jitsi-meet/blob/master/config.js

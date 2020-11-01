@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
-import {Session} from 'meteor/session'
 import useEventListener from '@use-it/event-listener'
 
+import {useName} from './Name'
 import {Tabs} from '/lib/tabs'
 
 ###
@@ -28,7 +28,7 @@ export TabIFrame = ({tabId}) ->
   ref = useRef()
 
   ## Send name to tab if it speaks coop protocol
-  name = useTracker -> Session.get 'name'
+  name = useName()
   [coop, setCoop] = useState 0
   useEventListener 'message', (e) ->
     return unless e.source == ref.current.contentWindow
