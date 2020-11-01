@@ -3,9 +3,17 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 
 import {FrontPage} from './FrontPage'
 import {Meeting} from './Meeting'
+import {useDark} from './Settings'
 import {Redirect} from './lib/Redirect'
 
 export App = ->
+  <>
+    <DarkClass/>
+    <AppRouter/>
+  </>
+App.displayName = 'App'
+
+export AppRouter = ->
   <Router>
     <Switch>
       <Route path="/m/:meetingId">
@@ -20,4 +28,13 @@ export App = ->
       </Route>
     </Switch>
   </Router>
-App.displayName = 'App'
+AppRouter.displayName = 'AppRouter'
+
+export DarkClass = ->
+  dark = useDark()
+  if dark
+    document.body.classList.add 'dark'
+  else
+    document.body.classList.remove 'dark'
+  null
+DarkClass.displayName = 'DarkClass'

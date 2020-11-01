@@ -1,7 +1,42 @@
 $font-size: 12px;
-@import "{}/node_modules/flexlayout-react/style/light.scss";
+
+// LIGHT MODE
+
+:root {
+  $color_base: hsl(195, 10%, 95%);  // room-level color
+  @import "{}/node_modules/flexlayout-react/style/light.scss";
+  --flexlayout-color-2: #{$color_2};
+  .flexlayout__splitter { // Flipped from regular approach: dark to light
+    background-color: $color_6;
+    &:hover { background-color: $color_4; }
+    &_drag { background-color: $color_3; }
+  }
+}
+
+.flexlayout__layout .flexlayout__layout {
+  $color_base: hsl(50, 10%, 95%);  // tab-level color
+  @import "{}/node_modules/flexlayout-react/style/light.scss";
+}
+
+// DARK MODE
+
+.dark {
+  $color_base: hsl(195, 10%, 5%);  // top-level color
+  @import "{}/node_modules/flexlayout-react/style/dark.scss";
+  --flexlayout-color-2: #{$color_2};
+  .flexlayout__splitter { // Flipped from regular approach: dark to light
+    background-color: $color_6;
+    &:hover { background-color: $color_4; }
+    &_drag { background-color: $color_3; }
+  }
+}
+
+.dark .flexlayout__layout .flexlayout__layout {
+  @import "{}/node_modules/flexlayout-react/style/dark.scss";
+}
 
 // Override button placement
+
 .flexlayout__tab_button { padding: 2px 6px; }
 .flexlayout__tab_button_content { padding-right: 2px; }
 .flexlayout__tab_button_trailing { margin-left: 4px;
@@ -9,6 +44,9 @@ $font-size: 12px;
   .fa-clipboard-link { font-size: 120%; margin-top: -3.5px }
 }
 .flexlayout__tab_button_overflow { padding-left: 4px; }
+
+.flexlayout__tab_toolbar button { color: black; }
+.dark .flexlayout__tab_toolbar button { color: white; }
 
 .flexlayout__tab_toolbar_button-fa {
   background: transparent;
@@ -21,7 +59,7 @@ $font-size: 12px;
 
 .flexlayout__tab_button_trailing:active { color: #555 }
 .flexlayout__tab_button_trailing {
-  a, a:visited, a:hover { color: inherit }
+  a, a:visited, a:hover { color: inherit !important }
   a { padding-right: 0 }
 }
 
@@ -31,63 +69,4 @@ $font-size: 12px;
 
 .flexlayout__border_button_trailing {
   margin-left: 0.25rem  // smaller than default 8px
-}
-
-// Color top-level splitters (separating rooms) differently
-$roomColor_base: hsl(195, 10%, 95%);
-$roomColor_1: scale_color($roomColor_base, $lightness:-3%);
-$roomColor_2: scale_color($roomColor_base, $lightness:-10%);
-$roomColor_3: scale_color($roomColor_base, $lightness:-15%);
-$roomColor_4: scale_color($roomColor_base, $lightness:-20%);
-$roomColor_5: scale_color($roomColor_base, $lightness:-25%);
-$roomColor_6: scale_color($roomColor_base, $lightness:-30%);
-#react-root > .flexlayout__layout {
-  > .flexlayout__splitter {
-    /* Regular approach: light to dark
-    background-color: $roomColor_2;
-    &:hover { background-color: $roomColor_4; }
-    &_drag { background-color: $roomColor_5; }
-    */
-    // Flipped from regular approach: dark to light
-    background-color: $roomColor_6;
-    &:hover { background-color: $roomColor_4; }
-    &_drag { background-color: $roomColor_3; }
-  }
-  > .flexlayout__drag_rect {
-    background-color: $roomColor_1;
-    border-color: $roomColor_4;
-  }
-  > .flexlayout__tabset {
-    background-color: $roomColor_1;
-    > .flexlayout__tabset_header_outer {
-      background-color: $roomColor_1;
-      .flexlayout__tab_button {
-        .flexlayout__tab_button_textbox {
-          background-color: $roomColor_3;
-        }
-        &--selected, &:hover {
-          background-color: $roomColor_3;
-        }
-        &_textbox {
-          background-color: $roomColor_3;
-        }
-      }
-    }
-    > .flexlayout__tabset-selected {
-      background-image: linear-gradient($color_background, $roomColor_4);
-    }
-    > .flexlayout__tabset-maximized {
-      background-image: linear-gradient($roomColor_6, $roomColor_2);
-    }
-  }
-  > .flexlayout__border_left {
-    background-color: $roomColor_2;
-    border-right: $roomColor_3;
-    .flexlayout__border_button {
-      background-color: $roomColor_3;
-      &--selected, &:hover {
-        background-color: $roomColor_3;
-      }
-    }
-  }
 }

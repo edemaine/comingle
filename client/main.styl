@@ -18,13 +18,13 @@ nav
   display: flex
   justify-content: center
   align-items: center
-  background-color: #d6dcde  // .flexlayout__border_left
+  background-color: var(--flexlayout-color-2)  // .flexlayout__border_left
   padding: 3px 0
-  a, a:visited { color: inherit }
+  a, a:visited { color: inherit !important }
 
 .RoomList
   .card
-    overflow: visible  // allow timer to spill out of card
+    overflow: visible !important  // allow timer and Sort By to spill out of card
   .card-header
     padding: 0.25rem // 0.75rem
     text-align: center
@@ -56,7 +56,7 @@ nav
 
 .tab-title
   &.archived
-    color: #dc3545  // danger color
+    color: var(--danger)  // danger color
 
 .room-info
   color: black
@@ -65,14 +65,18 @@ nav
   &:active
     color: #0069d9
 
-  &.presence-visible
-    background-color: #b8daff  // list-group-item-primary
+  &.presence-visible, &.selected
+    background-color: var(--list-group-item-primary-bg)
+    &:hover, &:focus
+      background-color: var(--list-group-item-primary-bg-1)
   &.presence-invisible
-    background-color: hsl(220,6%,95%)  // list-group-item-secondary, but brighter
-  &.selected
-    background-color: #b8daff  // list-group-item-primary
+    background-color: var(--list-group-item-secondary-bg)
+    &:hover, &:focus
+      background-color: var(--list-group-item-secondary-bg-1)
   &.archived
-    color: #dc3545  // danger color
+    &, &:hover, &:focus
+      .title
+        color: var(--danger)
 
   .raise-hand
     float: right
@@ -110,6 +114,9 @@ nav
       margin-left: 0.2rem
       &.presence-invisible
         color: rgba(0,0,0,0.333333333) // #aaa
+        /.dark &
+          color: rgba(255,255,255,0.333333333)
+        // opacity: 0.666666666
       > svg
         font-size: 0.77em
         margin-right: 0.07em
@@ -120,7 +127,7 @@ nav
     display: inline-block
     margin-right: 1rem
     &.presence-invisible
-      //- color: rgba(0,0,0,0.333333333) // #aaa
+      // color: rgba(0,0,0,0.333333333) // #aaa
       opacity: 0.666666666
     > svg
       font-size: 0.77em
@@ -155,7 +162,7 @@ nav
     // https://stackoverflow.com/a/14731123/7797661
     overflow: hidden
     &:before, &:after
-      background-color: black
+      background-color: var(--black)
       content: ""
       display: inline-block
       height: 1px
@@ -179,7 +186,7 @@ nav
       flex-grow: 1
       text-align: right
       margin-left: 1rem
-      color: #666
+      color: var(--gray-600)
   .body
     overflow-wrap: anywhere
 

@@ -1,3 +1,255 @@
 $code-color: #17a2b8; // $cyan
 
-@import "{}/node_modules/bootstrap/scss/bootstrap.scss";
+// Full import:
+//@import "{}/node_modules/bootstrap/scss/bootstrap.scss";
+
+// Required
+@import "{}/node_modules/bootstrap/scss/functions";
+@import "{}/node_modules/bootstrap/scss/variables";
+@import "{}/node_modules/bootstrap/scss/mixins";
+
+// Optional
+//@import "{}/node_modules/bootstrap/scss/root";
+@import "{}/node_modules/bootstrap/scss/reboot";
+@import "{}/node_modules/bootstrap/scss/type";
+//@import "{}/node_modules/bootstrap/scss/images";
+@import "{}/node_modules/bootstrap/scss/code";
+//@import "{}/node_modules/bootstrap/scss/grid";
+//@import "{}/node_modules/bootstrap/scss/tables";
+@import "{}/node_modules/bootstrap/scss/forms";
+@import "{}/node_modules/bootstrap/scss/buttons";
+@import "{}/node_modules/bootstrap/scss/transitions";
+@import "{}/node_modules/bootstrap/scss/dropdown";
+@import "{}/node_modules/bootstrap/scss/button-group";
+@import "{}/node_modules/bootstrap/scss/input-group";
+@import "{}/node_modules/bootstrap/scss/custom-forms";
+@import "{}/node_modules/bootstrap/scss/nav";
+@import "{}/node_modules/bootstrap/scss/navbar";
+@import "{}/node_modules/bootstrap/scss/card";
+//UNUSED: @import "{}/node_modules/bootstrap/scss/breadcrumb";
+//UNUSED: @import "{}/node_modules/bootstrap/scss/pagination";
+@import "{}/node_modules/bootstrap/scss/badge";
+@import "{}/node_modules/bootstrap/scss/jumbotron";
+@import "{}/node_modules/bootstrap/scss/alert";
+//UNUSED: @import "{}/node_modules/bootstrap/scss/progress";
+@import "{}/node_modules/bootstrap/scss/media";
+@import "{}/node_modules/bootstrap/scss/list-group";
+@import "{}/node_modules/bootstrap/scss/close";
+//UNUSED: @import "{}/node_modules/bootstrap/scss/toasts";
+//UNUSED: @import "{}/node_modules/bootstrap/scss/modal";
+@import "{}/node_modules/bootstrap/scss/tooltip";
+//UNUSED: @import "{}/node_modules/bootstrap/scss/popover";
+//UNUSED: @import "{}/node_modules/bootstrap/scss/carousel";
+@import "{}/node_modules/bootstrap/scss/spinners";
+@import "{}/node_modules/bootstrap/scss/utilities";
+@import "{}/node_modules/bootstrap/scss/print";
+
+@mixin vars($sign: 1) {
+  @each $color, $value in $theme-colors {
+    --#{$color}: #{$value};
+  }
+  --list-group-item-primary-bg: #{theme-color-level('primary', -9 * $sign)};
+  --list-group-item-secondary-bg: #{theme-color-level('secondary', -9 * $sign)};
+  --list-group-item-primary-bg-1: #{theme-color-level('primary', -8 * $sign)};
+  --list-group-item-secondary-bg-1: #{theme-color-level('secondary', -8 * $sign)};
+}
+
+:root {
+  @include vars;
+  --black: #{black};
+  --gray-600: #{$gray-600};
+}
+
+// DARK MODE
+
+/*
+// Colors based on Cyborg theme, distributed under MIT License.
+// https://raw.githubusercontent.com/thomaspark/bootswatch/v4/dist/cyborg/_variables.scss
+
+$blue:   #1c89ff; // #2a9fd6;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink:   #e83e8c;
+$red:    #c00;
+$orange: #fd7e14;
+$yellow: #f80;
+$green:  #77b300;
+$teal:   #20c997;
+$cyan:   #93c;
+$colors: ();
+
+$primary:   $blue;
+$secondary: $gray-600;
+$success:   $green;
+$info:      $cyan;
+$warning:   $yellow;
+$danger:    $red;
+*/
+$light:     $gray-900;
+$dark:      $gray-400;
+$theme-colors: ();
+
+$yiq-contrasted-threshold: 175;
+
+$body-bg:    $black; // #060606
+$body-color: $white; // $gray-400
+$link-color: lighten($primary, 25%); // $primary
+$link-hover-color: lighten($link-color, 15%);
+
+$table-color:             $white;
+$table-accent-bg:         rgba($white, .05);
+$table-hover-bg:          rgba($white, .075);
+$table-border-color:      $gray-700;
+$table-dark-border-color: $gray-500;
+$table-dark-color:        darken($gray-500, 7.5%);
+
+$input-bg:                       $black;
+$input-disabled-bg:              $gray-800;
+$input-color:                    $gray-300;
+$input-border-color:             $gray-600;
+$input-focus-bg:                 $input-bg;
+$input-focus-border-color:       darken($component-active-bg, 25%);
+$input-focus-color:              $input-color;
+$input-placeholder-color:        darken($gray-500, 5%);
+$input-plaintext-color:          $body-color;
+$input-group-addon-color:        $white;
+$input-group-addon-bg:           $gray-700;
+$input-group-addon-border-color: transparent;
+
+$component-active-color: $white;
+$component-active-bg:    $primary;
+
+$dropdown-bg:                $gray-700;
+$dropdown-divider-bg:        $gray-800;
+$dropdown-link-color:        $white;
+$dropdown-link-hover-color:  $white;
+$dropdown-link-hover-bg:     $primary;
+$dropdown-link-active-color: $component-active-color;
+$dropdown-link-active-bg:    $component-active-bg;
+
+$nav-tabs-border-color:             $table-border-color;
+$nav-tabs-link-hover-border-color:  $nav-tabs-border-color;
+$nav-tabs-link-active-color:        $white;
+$nav-tabs-link-active-bg:           $nav-tabs-border-color;
+$nav-tabs-link-active-border-color: $nav-tabs-border-color;
+
+$navbar-dark-hover-color:   $white;
+$navbar-light-hover-color:  $gray-800;
+$navbar-light-active-color: $gray-800;
+
+$pagination-color:                 $white;
+$pagination-bg:                    $gray-700;
+$pagination-border-color:          transparent;
+$pagination-hover-color:           $white;
+$pagination-hover-bg:              $primary;
+$pagination-hover-border-color:    $pagination-border-color;
+$pagination-disabled-bg:           $pagination-bg;
+$pagination-disabled-border-color: $pagination-border-color;
+
+$jumbotron-bg: $gray-800;
+
+$card-border-color: rgba($white, .125);
+$card-cap-bg:       rgba($white, .08);
+$card-bg:           $black; // $gray-700
+
+$tooltip-bg: $gray-700;
+$tooltip-opacity: .99;
+
+$popover-bg: $gray-700;
+
+$toast-color:                   $white;
+$toast-background-color:        $gray-800;
+$toast-border-color:            $gray-700;
+$toast-header-color:            $body-color;
+$toast-header-background-color: $toast-background-color;
+$toast-header-border-color:     $toast-border-color;
+
+$modal-content-bg:          $gray-800;
+$modal-header-border-color: $gray-700;
+
+$progress-bg:        $gray-700;
+
+$list-group-bg:                  $black;
+$list-group-border-color:        rgba($white, .125);
+$list-group-hover-bg:            $gray-900;
+$list-group-active-color:        $component-active-color;
+$list-group-active-bg:           $component-active-bg;
+$list-group-active-border-color: $list-group-active-bg;
+$list-group-disabled-color:      $gray-400;
+$list-group-disabled-bg:         $list-group-bg;
+$list-group-action-color:        $gray-300;
+$list-group-action-hover-color:  $list-group-action-color;
+$list-group-action-active-color: $body-color;
+$list-group-action-active-bg:    $primary;
+
+$breadcrumb-active-color: $gray-700;
+
+$close-color:       $white;
+$close-text-shadow: none;
+
+$pre-color: inherit;
+
+@import "{}/node_modules/bootstrap/scss/variables";
+
+.dark {
+  // New --variables
+  @include vars(-1);
+  --black: #{white};
+  --gray-600: #{$gray-400};
+
+  // Flip meaning of "level"
+  @function theme-color-level($color-name: "primary", $level: 0) {
+    $level: -$level;
+    $color: theme-color($color-name);
+    $color-base: if($level > 0, $black, $white);
+    $level: abs($level);
+    @return mix($color-base, $color, $level * $theme-color-interval);
+  }
+
+  // html/body rules from _reboot.scss
+  -webkit-tap-highlight-color: rgba($black, 0); // 5
+  color: $body-color;
+  text-align: left; // 3
+  background-color: $body-bg; // 2
+
+  // other rules from _reboot.scss
+  a {
+    color: $link-color;
+    @include hover() {
+      color: $link-hover-color;
+    }
+  }
+  caption { color: $table-caption-color; }
+
+  @import "{}/node_modules/bootstrap/scss/type";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/images";
+  @import "{}/node_modules/bootstrap/scss/code";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/grid";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/tables";
+  @import "{}/node_modules/bootstrap/scss/forms";
+  @import "{}/node_modules/bootstrap/scss/buttons";
+  //NO COLOR: @import "{}/node_modules/bootstrap/scss/transitions";
+  @import "{}/node_modules/bootstrap/scss/dropdown";
+  @import "{}/node_modules/bootstrap/scss/button-group";
+  @import "{}/node_modules/bootstrap/scss/input-group";
+  @import "{}/node_modules/bootstrap/scss/custom-forms";
+  @import "{}/node_modules/bootstrap/scss/nav";
+  @import "{}/node_modules/bootstrap/scss/navbar";
+  @import "{}/node_modules/bootstrap/scss/card";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/breadcrumb";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/pagination";
+  @import "{}/node_modules/bootstrap/scss/badge";
+  @import "{}/node_modules/bootstrap/scss/jumbotron";
+  @import "{}/node_modules/bootstrap/scss/alert";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/progress";
+  //NO COLOR: @import "{}/node_modules/bootstrap/scss/media";
+  @import "{}/node_modules/bootstrap/scss/list-group";
+  @import "{}/node_modules/bootstrap/scss/close";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/toasts";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/modal";
+  @import "{}/node_modules/bootstrap/scss/tooltip";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/popover";
+  //UNUSED: @import "{}/node_modules/bootstrap/scss/carousel";
+  //NO COLOR: @import "{}/node_modules/bootstrap/scss/spinners";
+  //NO COLOR: @import "{}/node_modules/bootstrap/scss/utilities";
+}

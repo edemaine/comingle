@@ -4,7 +4,7 @@ import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment, faDoorOpen, faEye, faEyeSlash, faQuestion} from '@fortawesome/free-solid-svg-icons'
+import {faCog, faComment, faDoorOpen, faEye, faEyeSlash, faQuestion} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import FlexLayout from './FlexLayout'
@@ -12,10 +12,11 @@ import {ArchiveButton} from './ArchiveButton'
 import {ChatRoom} from './ChatRoom'
 import {RoomList} from './RoomList'
 import {Room} from './Room'
-import {Rooms} from '/lib/rooms'
+import {Settings} from './Settings'
 import {Welcome} from './Welcome'
 import {useName} from './Name'
 import {Presence} from '/lib/presence'
+import {Rooms} from '/lib/rooms'
 import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {useIdMap} from './lib/useIdMap'
@@ -46,6 +47,13 @@ initModel = ->
         enableClose: false
         enableDrag: false
         enableRenderOnDemand: false
+      ,
+        id: 'settings'
+        type: 'tab'
+        name: "Settings"
+        component: 'Settings'
+        enableClose: false
+        enableDrag: false
       ]
     ]
     layout:
@@ -184,6 +192,8 @@ export Meeting = ->
         <ChatRoom channel={meetingId} audience="everyone"
          visible={node.isVisible()}
          extraData={node.getExtraData()} updateTab={updateTab}/>
+      when 'Settings'
+        <Settings/>
       when 'Welcome'
         <Welcome/>
       when 'Room'
@@ -209,6 +219,8 @@ export Meeting = ->
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
       {if node.getComponent() == 'ChatRoom'
         <FontAwesomeIcon icon={faComment}/>
+      else if node.getComponent() == 'Settings'
+        <FontAwesomeIcon icon={faCog}/>
       else if node.getComponent() == 'Welcome'
         <FontAwesomeIcon icon={faQuestion}/>
       else
