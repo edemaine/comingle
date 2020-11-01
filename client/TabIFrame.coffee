@@ -3,6 +3,7 @@ import {useTracker} from 'meteor/react-meteor-data'
 import useEventListener from '@use-it/event-listener'
 
 import {useName} from './Name'
+import {useDark} from './Settings'
 import {Tabs} from '/lib/tabs'
 
 ###
@@ -29,6 +30,7 @@ export TabIFrame = ({tabId}) ->
 
   ## Send name to tab if it speaks coop protocol
   name = useName()
+  dark = useDark()
   [coop, setCoop] = useState 0
   useEventListener 'message', (e) ->
     return unless e.source == ref.current.contentWindow
@@ -40,9 +42,10 @@ export TabIFrame = ({tabId}) ->
     ref.current.contentWindow.postMessage
       coop: 1
       user: fullName: name
+      theme: dark: dark
     , '*'
     undefined
-  , [ref, name, coop]
+  , [ref, name, dark, coop]
 
   <iframe ref={ref} src={tab.url} allow={allow}/>
 
