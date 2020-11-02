@@ -28,7 +28,7 @@ export Name = ->
 Name.displayName = 'Name'
 
 export useName = ->
-  [name, setName] = useLocalStorage 'name', '', true
+  [name] = useLocalStorage 'name', '', true
   useTracker -> Session.get('name') ? name
 
 export getName = ->

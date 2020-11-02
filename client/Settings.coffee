@@ -28,7 +28,7 @@ export Dark = ->
 Dark.displayName = 'Dark'
 
 export useDark = ->
-  [dark, setDark] = useLocalStorage 'dark', preferDark, true
+  [dark] = useLocalStorage 'dark', preferDark, true
   useTracker -> Session.get('dark') ? dark
 
 export getDark = ->
