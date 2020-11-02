@@ -4,6 +4,7 @@ import {Button, ButtonGroup, Jumbotron} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGithub} from '@fortawesome/free-brands-svg-icons'
 
+import {Dark} from './Settings'
 import {getCreator} from './lib/presenceId'
 import {bugs, homepage, repository} from '/package.json'
 
@@ -31,16 +32,21 @@ export FrontPage = ->
         Create New Meeting
       </Button>
     </p>
-    <ButtonGroup>
-      <Button variant="info" as="a" href={homepage}>
-        Documentation
-      </Button>
-      <Button variant="dark" as="a" href={repository.url}>
-        Source Code on Github <FontAwesomeIcon icon={faGithub}/>
-      </Button>
-      <Button variant="danger" as="a" href={bugs.url}>
-        Report Bugs or Request Features
-      </Button>
-    </ButtonGroup>
+    <p>
+      <ButtonGroup>
+        <Button variant="info" as="a" href={homepage}>
+          Documentation
+        </Button>
+        <Button variant="dark" as="a" href={repository.url}>
+          Source Code on Github <FontAwesomeIcon icon={faGithub}/>
+        </Button>
+        <Button variant="danger" as="a" href={bugs.url}>
+          Report Bugs or Request Features
+        </Button>
+      </ButtonGroup>
+    </p>
+    <p>
+      <Dark/>
+    </p>
   </Jumbotron>
 FrontPage.displayName = 'FrontPage'
