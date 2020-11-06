@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react'
-import {Alert, Form} from 'react-bootstrap'
+import {Alert, Button, Card, Form, Nav} from 'react-bootstrap'
 
 import {validURL, tabTypes, categories, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
@@ -97,15 +97,15 @@ export TabNew = ({node, meetingId, roomId,
     , true
     id = Meteor.apply 'tabNew', [tab], returnStubValue: true
     replaceTabNew {id, node}
-  <div className="card">
-    <div className="card-body">
-      <h3 className="card-title">Add Shared Tab to Room</h3>
-      <p className="card-text">
+  <Card>
+    <Card.Body>
+      <Card.Title as="h3">Add Shared Tab to Room</Card.Title>
+      <Card.Text as="p">
         Create/embed a widget for everyone in this room to use.
-      </p>
-      <div className="card form-group">
-        <div className="card-header">
-          <ul className="nav nav-tabs card-header-tabs" role="tablist">
+      </Card.Text>
+      <Card className="form-group">
+        <Card.Header>
+          <Nav variant="tabs">
             {for categoryName, categoryTabTypes of tabTypesByCategory
               selected = (category == categoryName)
               <li key={categoryName} className="nav-item" role="presentation">
@@ -116,11 +116,11 @@ export TabNew = ({node, meetingId, roomId,
                 </a>
               </li>
             }
-          </ul>
-        </div>
+          </Nav>
+        </Card.Header>
         {if (tabType for tabType of tabTypesByCategory[category]).length > 1
-          <div className="card-header">
-            <ul className="nav nav-tabs card-header-tabs" role="tablist">
+          <Card.Header>
+            <Nav variant="tabs">
               {for tabType, tabData of tabTypesByCategory[category]
                 selected = (type == tabType)
                 disabled = tabData.onePerRoom and existingTabTypes[tabType]
@@ -132,23 +132,23 @@ export TabNew = ({node, meetingId, roomId,
                   </a>
                 </li>
               }
-            </ul>
-          </div>
+            </Nav>
+          </Card.Header>
         }
-        <div className="card-body">
-          <form className="newTab" onSubmit={onSubmit}>
+        <Card.Body>
+          <Form className="newTab" onSubmit={onSubmit}>
             {if categories[category]?.onePerRoom and
                 (tabType for tabType of tabTypesByCategory[category] \
                  when existingTabTypes[tabType]).length
-              <div className="alert alert-warning">
+              <Alert variant="warning">
                 WARNING: This room already has a {category} tab. Do you really want another?
-              </div>
+              </Alert>
             }
             {tabTypePage[type].topDescription}
             {if tabTypes[type].onePerRoom and existingTabTypes[type]
-              <div className="alert alert-warning">
+              <Alert variant="warning">
                 WARNING: This room already has a {tabTypes[type].longTitle ? tabTypes[type].title} tab. Do you really want another?
-              </div>
+              </Alert>
             }
             {if tabTypes[type].createNew
               onClick = ->
@@ -157,12 +157,12 @@ export TabNew = ({node, meetingId, roomId,
                 setUrl url
                 setSubmit true
               <>
-                <div className="form-group">
-                  <button className="btn btn-primary btn-lg btn-block"
+                <Form.Group>
+                  <Button variant="primary" size="lg" block
                    type="button" onClick={onClick}>
                     New {tabTypes[type].longTitle ? tabTypes[type].title} {capitalize tabTypes[type].instance}
-                  </button>
-                </div>
+                  </Button>
+                </Form.Group>
                 <p>Or paste the URL for an existing {tabTypes[type].instance}:</p>
               </>
             }
@@ -183,30 +183,30 @@ export TabNew = ({node, meetingId, roomId,
               </>
             }
             {tabTypePage[type].bottomDescription}
-            <div className="form-group">
+            <Form.Group>
               <label>URL</label>
               <input type="url" placeholder="https://..." className="form-control"
                value={url} required
                onChange={(e) -> setUrl e.target.value}/>
-            </div>
+            </Form.Group>
             {if mixed
               <Alert variant="warning">
                 You cannot use a website with insecure <code>http</code> protocol (because Comingle uses secure <code>https</code> protocol).
               </Alert>
             }
-            <div className="form-group">
+            <Form.Group>
               <label>Tab title (can be renamed later)</label>
               <input type="text" placeholder="Cool Site" className="form-control"
                value={title} required pattern=".*\S.*"
                onChange={(e) -> setTitle e.target.value; setManualTitle true}/>
-            </div>
-            <button ref={submitButton} type="submit"
-             className="btn btn-primary btn-lg btn-block mb-1">
+            </Form.Group>
+            <Button ref={submitButton} type="submit"
+             variant="primary" size="lg" block className="mb-1">
               Embed This URL
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Card.Body>
+  </Card>
 TabNew.displayName = 'TabNew'
