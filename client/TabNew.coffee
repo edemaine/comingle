@@ -159,7 +159,7 @@ export TabNew = ({node, meetingId, roomId,
               <>
                 <div className="form-group">
                   <button className="btn btn-primary btn-lg btn-block"
-                   onClick={onClick}>
+                   type="button" onClick={onClick}>
                     New {tabTypes[type].longTitle ? tabTypes[type].title} {capitalize tabTypes[type].instance}
                   </button>
                 </div>
