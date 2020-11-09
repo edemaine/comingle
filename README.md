@@ -15,6 +15,7 @@ with the following key features:
   or key web pages being discussed.
   * Anyone joining late instantly has access to this state,
     enabling them to catch up without others telling them what tools to open.
+  * You can return to a room days or weeks later and pick up where you left off.
 * Comingle can be the **glue** that binds together all of the disparate
   web apps you want to use in your meeting
   (even for small meetings with a single room).
@@ -35,7 +36,13 @@ with the following key features:
   * Any `<iframe>`-compatible web tool
 * Each user can decide the best **layout** for their screen of each room's
   tools, by dragging tabs to be side-by-side or stacked atop each other.
-* Direct support for persistent **chat** at the meeting and room level.
+* Persistent **chat** provided at the meeting and room level.
+  * Chat messages can include Markdown formatting and LaTeX math
+    (via [KaTeX](https://katex.org)).
+* **Dark mode** for light-sensitive users, automatically affecting
+  Jitsi, Cocreate, and Coauthor tabs.
+* **Coop** protocol automatically passes user's name and dark-mode preference
+  to supported apps (Cocreate and Coauthor).
 * Instantly create a new meeting and share the URL to meet with others.
   **No accounts required**.
 * **Free/open source** ([MIT license](LICENSE))
