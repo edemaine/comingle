@@ -5,7 +5,7 @@ import {render} from 'react-dom'
 import {App} from './App'
 import '/lib/main'
 import './lib/timesync'
-import './FlexLayout.scss'
+import './FlexLayout.sass'
 import './bootstrap.scss'
 
 Meteor.startup ->
