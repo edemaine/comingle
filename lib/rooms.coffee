@@ -46,6 +46,25 @@ Meteor.methods
         set.raiser = set.updator
     Rooms.update diff.id,
       $set: set
+  roomWithTabs: (room) ->
+    tabs = room.tabs ? {}
+    delete room.tabs
+    roomId = Meteor.call 'roomNew', room
+    for title, tab of tabs when title and tab.type
+      if tab.url
+        url = tab.url
+      else
+        url = tabTypes[tab.type].createNew()
+        url = await url if url.then?
+      await meteorCallPromise 'tabNew', mangleTab(
+        meeting: room.meeting
+        room: roomId
+        type: tab.type
+        title: title
+        url: url
+        creator: room.creator
+      , true)
+    roomId
 
 export roomWithTemplate = (room) ->
   template = room.template ? ''
