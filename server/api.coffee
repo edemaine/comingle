@@ -7,20 +7,24 @@ apiMethods =
 
   '/list': (options) ->
     try
+      meeting = options.get 'meeting'
+      if not meeting
+        throw ("Must specify meeting ID")
       colltype = options.get 'type'
       switch colltype
-        when 'meetings' then coll = Meetings
+        # when 'meetings' then coll = Meetings
         when 'rooms' then coll = Rooms
         when 'tabs' then coll = Tabs
+        else throw ("Invalid collection type: " + colltype)
       status: 200
       json:
         ok: true
-        data: coll.find().fetch()
+        data: coll.find({'meeting': meeting}).fetch()
     catch e
       status: 500
       json:
         ok: false
-        error: "Error listing #{colltype}: #{e}"
+        error: e
 
   '/addRoom': (options, req) ->
     try
