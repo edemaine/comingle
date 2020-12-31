@@ -22,25 +22,6 @@ apiMethods =
         ok: false
         error: "Error listing #{colltype}: #{e}"
 
-  '/delete': (options) ->
-    try
-      colltype = options.get 'type'
-      id = options.get 'id'
-      switch colltype
-        when 'meeting' then coll = Meetings; Rooms.remove {'meeting': id}; Tabs.remove {'meeting': id}
-        when 'room' then coll = Rooms; Tabs.remove {'room': id}
-        when 'tab' then coll = Tabs
-      coll.remove id
-      status: 200
-      json:
-        ok: true
-        data: coll.find().fetch()
-    catch e
-      status: 500
-      json:
-        ok: false
-        error: "Error listing #{colltype}: #{e}"
-
   '/addRoom': (options, req) ->
     try
       room = req.body
