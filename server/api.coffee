@@ -26,6 +26,25 @@ apiMethods =
         ok: false
         error: e
 
+  '/archiveRoom': (options) ->
+    try
+      room = options.get 'room'
+      if not room
+        throw ("Must specify room ID")
+      result = Meteor.call 'roomEdit',
+        id: room
+        archived: Boolean JSON.parse options.get 'archive'
+        updator: { name: "Web API", presenceId: "none" }
+      status: 200
+      json:
+        ok: true
+        data: Rooms.find({'_id': room}).fetch()
+    catch e
+      status: 500
+      json:
+        ok: false
+        error: e
+
   '/addRoom': (options, req) ->
     try
       room = req.body
