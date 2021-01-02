@@ -54,6 +54,9 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
   [nonempty, setNonempty] = useState false
   [selected, setSelected] = useState()
   rooms = useTracker -> Rooms.find(meeting: meetingId).fetch()
+  tags = (item.tags?.hall for item in rooms when item.tags?.hall?).filter( (value, index, array) ->
+    array.indexOf(value, index + 1) < 0
+  )
   useEffect ->
     raisedCount = 0
     for room in rooms
@@ -189,8 +192,19 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Available Rooms:" search={searchDebounce}
        filter={(room) -> not room.archived and
+                         not room.tags?.hall? and
                          (not nonempty or hasVisible(room) or selected == room._id) and
                          not findMyPresence presenceByRoom[room._id]}/>
+      {for tag in tags ? []
+        filt = (t) -> 
+          (room) -> not room.archived and
+                    (room.tags?.hall == t) and
+                    (not nonempty or hasVisible(room) or selected == room._id) and
+                    not findMyPresence presenceByRoom[room._id]
+        <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+        heading={tag} key={tag} search={searchDebounce}
+        filter={filt(tag)}/>
+      }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Archived Rooms:" startClosed search={searchDebounce}
        filter={(room) -> room.archived and

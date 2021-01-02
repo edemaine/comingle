@@ -20,6 +20,7 @@ Meteor.methods
       meeting: String
       title: String
       creator: creatorPattern
+      tags: Match.Optional Object
     unless @isSimulation
       room.created = new Date
     checkMeeting room.meeting
