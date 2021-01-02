@@ -25,9 +25,9 @@ export Config =
     key: 'title'  # see client/RoomList.coffee for other options
     reverse: false
 
-  hideWarnings: true
-  hideHeader: true
-  hideOpenRooms: true
-  defaultSwitchRoom: true
-  singleRoom: true
-  preferCompact: true
+  hideWarnings: false
+  hideHeader: false
+  hideOpenRooms: false
+  defaultSwitchRoom: false
+  singleRoom: false
+  preferCompact: false
