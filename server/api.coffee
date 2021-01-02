@@ -13,9 +13,8 @@ apiMethods =
       colltype = options.get 'type'
       switch colltype
         # when 'meetings' then coll = Meetings
-        when 'rooms' then coll = Rooms
         when 'tabs' then coll = Tabs
-        else throw ("Invalid collection type: " + colltype)
+        else coll = Rooms
       status: 200
       json:
         ok: true
