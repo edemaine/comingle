@@ -189,19 +189,21 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
           No rooms in this meeting.
         </Alert>
       }
-      <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
-       heading="Your Open Rooms:" search={searchDebounce}
-       filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
+      {if not Config.hideOpenRooms
+          <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+           heading="Your Open Rooms:" search={searchDebounce}
+           filter={(room) -> findMyPresence presenceByRoom[room._id]}/>
+      }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Available Rooms:" search={searchDebounce}
        filter={(room) -> not room.archived and
                          (not nonempty or hasVisible(room) or selected == room._id) and
-                         not findMyPresence presenceByRoom[room._id]}/>
+                         (Config.hideOpenRooms or not findMyPresence presenceByRoom[room._id])}/>
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Archived Rooms:" startClosed search={searchDebounce}
        filter={(room) -> room.archived and
                          (not nonempty or hasVisible(room) or selected == room._id) and
-                         not findMyPresence presenceByRoom[room._id]}/>
+                         (Config.hideOpenRooms or not findMyPresence presenceByRoom[room._id])}/>
     </div>
     <RoomNew selectRoom={selectRoom}/>
   </div>
