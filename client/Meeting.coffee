@@ -301,10 +301,11 @@ export Meeting = ->
           archived: not room.archived
           updator: getCreator()
       if room = id2room[id]
-        buttons?.push <ArchiveButton key="archive" type={type} noun="room"
-          archived={room.archived} onClick={archiveRoom}
-          help="Archived rooms can still be viewed and restored from the list at the bottom."
-        />
+        if not room.tags?.protected
+          buttons?.push <ArchiveButton key="archive" type={type} noun="room"
+            archived={room.archived} onClick={archiveRoom}
+            help="Archived rooms can still be viewed and restored from the list at the bottom."
+          />
   <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop}}>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
      onRenderTab={onRenderTab}
