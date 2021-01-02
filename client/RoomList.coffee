@@ -6,7 +6,7 @@ import SelectableContext from 'react-bootstrap/SelectableContext'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen, faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
+import {faThumbtack, faDoorOpen, faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
 import {faClone} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
@@ -96,8 +96,11 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
         -raised.getTime()
       else
         -Infinity
+  pinnedSort = (sorter) ->
+     (room) -> 
+        (room.tags?.pinned or "_") + sorter(room)
   sortedRooms = useMemo ->
-    sorted = sortByKey rooms[..], sorters[sortKey]
+    sorted = sortByKey rooms[..], pinnedSort(sorters[sortKey])
     sorted.reverse() if reverse
     sorted
   , [rooms, sortKey, reverse, if sortKey == 'participants' then presenceByRoom]
@@ -415,6 +418,9 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
           <RaisedTimer raised={room.raised}/>
         }
       </div>
+    }
+    {if room.tags?.pinned?
+        <small> <FontAwesomeIcon icon={faThumbtack}/> </small>
     }
     <Highlight className="title" text={room.title} search={search}/>
     <PresenceList clusters={clusters} search={search} filter={(person) ->
