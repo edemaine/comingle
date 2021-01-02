@@ -237,8 +237,8 @@ Sublist = ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, s
                  presence={presenceByRoom[room._id] ? []}
                  selected={selected == room._id}
                  selectRoom={selectRoom}
-                 leave={->
-                   model.doAction FlexLayout.Actions.deleteTab id}
+                 leave={(toleave = id) ->
+                   model.doAction FlexLayout.Actions.deleteTab toleave}
                 />
             }
           </ListGroup>
@@ -314,6 +314,8 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
       selectRoom null
     ## Otherwise open room with focus 
     else
+      if Config.singleRoom
+          leave(currentRoom)
       openRoom room._id, true
       selectRoom null
   onLeave = (e) ->
@@ -438,7 +440,7 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
               <small>Close background room</small>
             }
           </Button>
-        else
+        else if not Config.singleRoom
           <Button variant="secondary" onClick={onClick false} className="px-1">
             Join in Background<br/>
             <small><b>Stays</b> in current room</small>

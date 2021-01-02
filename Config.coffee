@@ -29,3 +29,4 @@ export Config =
   hideHeader: true
   hideOpenRooms: true
   defaultSwitchRoom: true
+  singleRoom: true
