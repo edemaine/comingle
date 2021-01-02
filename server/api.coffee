@@ -1,24 +1,24 @@
 import bodyParser from 'body-parser';
 import {Meetings} from '/lib/meetings'
-import {Rooms, roomWithTemplate, roomWithTabs} from '/lib/rooms'
+import {Rooms, roomWithTemplate, roomWithTabs, taggedRooms} from '/lib/rooms'
 import {Tabs} from '/lib/tabs'
 
 apiMethods =
 
-  '/list': (options) ->
+  '/list': (options, req) ->
     try
-      meeting = options.get 'meeting'
+      meeting = req.body?.meeting ? options.get 'meeting'
       if not meeting
         throw ("Must specify meeting ID")
-      colltype = options.get 'type'
+      colltype = req.body?.type ? options.get 'type'
       switch colltype
         # when 'meetings' then coll = Meetings
-        when 'tabs' then coll = Tabs
-        else coll = Rooms
+        when 'tabs' then coll = Tabs.find({'meeting': meeting}).fetch()
+        else coll = taggedRooms meeting, req.body?.tags
       status: 200
       json:
         ok: true
-        data: coll.find({'meeting': meeting}).fetch()
+        data: coll
     catch e
       status: 500
       json:

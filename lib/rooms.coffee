@@ -123,3 +123,14 @@ export roomDuplicate = (room, creator) ->
       url: url
       creator: creator
   newRoom
+
+export taggedRooms = (meetingId, tags) ->
+  meeting = checkMeeting meetingId
+  Rooms.find(meeting: meetingId).fetch().filter (room) ->
+    match = true
+    for key, value of tags ? []
+      if value?
+        match &= room.tags?[key] == value
+      else
+        match &= not room.tags?[key]?
+    match
