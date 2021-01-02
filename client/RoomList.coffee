@@ -293,24 +293,29 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
     e.preventDefault()
     e.stopPropagation()
     currentRoom = Session.get 'currentRoom'
-    ## Open room with focus in the following cases:
-    ##   * We're not in any rooms
-    ##   * Shift-click => force open as foreground tab
-    ##   * We clicked on the Switch button (force == true)
-    if not currentRoom? or e.shiftKey or force == true
-      openRoom room._id, true
-      selectRoom null
+    ## Toggle whether this room is selected if:
+    ##   * We are in this room, or
+    ##   * We are in any other room and force is neither true nor false and 
+    ##     * Config.defaultSwitchRoom is true and Shift is pressed 
+    ##     * Config.defaultSwitchRoom is not true and no modifiers are pressed 
+    if ((currentRoom == room._id) or 
+        (currentRoom? and force != true and force != false and 
+            ((Config.defaultSwitchRoom and e.shiftKey) or 
+            not (Config.defaultSwitchRoom or e.shiftKey or e.ctrlKey or e.metaKey))))
+      if selected
+          selectRoom null 
+      else 
+          selectRoom room._id
     ## Open room as background tab (without focusing) in the following cases:
     ##   * Ctrl/Command-click => force open as background tab
     ##   * We clicked on the Join In Background button (force == false)
     else if e.ctrlKey or e.metaKey or force == false
       openRoom room._id, false
       selectRoom null
-    ## Otherwise, toggle whether this room is selected.
-    else if selected
-      selectRoom null
+    ## Otherwise open room with focus 
     else
-      selectRoom room._id
+      openRoom room._id, true
+      selectRoom null
   onLeave = (e) ->
     e.preventDefault()
     e.stopPropagation()

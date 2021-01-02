@@ -28,3 +28,4 @@ export Config =
   hideWarnings: true
   hideHeader: true
   hideOpenRooms: true
+  defaultSwitchRoom: true
