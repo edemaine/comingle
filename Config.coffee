@@ -24,3 +24,6 @@ export Config =
   defaultSort:
     key: 'title'  # see client/RoomList.coffee for other options
     reverse: false
+
+  hideWarnings: true
+  hideHeader: true

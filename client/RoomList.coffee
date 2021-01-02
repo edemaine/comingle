@@ -116,9 +116,15 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
 
   <div className="d-flex flex-column h-100">
     <div className="RoomList flex-grow-1 overflow-auto pb-2" ref={roomList}>
-      <Header/>
-      <Warnings/>
-      <MeetingTitle/>
+      {if not Config.hideHeader
+          <Header/>
+      }
+      {if not Config.hideWarnings
+          <Warnings/>
+      }
+      {if not Config.hideHeader
+          <MeetingTitle/>
+      }
       <Name/>
       {if rooms.length > 0
         <Accordion>
