@@ -30,3 +30,4 @@ export Config =
   hideOpenRooms: true
   defaultSwitchRoom: true
   singleRoom: true
+  preferCompact: true

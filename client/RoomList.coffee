@@ -27,6 +27,7 @@ import {useDebounce} from './lib/useDebounce'
 import {Meetings} from '/lib/meetings'
 import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 import {Config} from '/Config'
+import {getCompact} from './Settings'
 
 findMyPresence = (presence) ->
   presenceId = getPresenceId()
@@ -284,6 +285,7 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
   roomInfoClass += " presence-#{myPresence.type}" if myPresence
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
+  roomInfoClass += " compact" if getCompact()
   presenceCount = {}
   for person in presence
     presenceCount[person.type] ?= 0

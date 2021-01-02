@@ -2,6 +2,7 @@ import React, {useLayoutEffect} from 'react'
 import {Card, Form} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
+import {Config} from '/Config'
 
 import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
 
@@ -11,6 +12,7 @@ export Settings = ->
       <Card.Title as="h3">Settings</Card.Title>
       <Form>
         <Dark/>
+        <Compact/>
       </Form>
     </Card.Body>
   </Card>
@@ -36,3 +38,24 @@ export getDark = ->
 
 preferDark = ->
   window.matchMedia('(prefers-color-scheme: dark)').matches
+
+export Compact = ->
+  [compact, setCompact] = useLocalStorage 'compact', preferCompact, true
+  useLayoutEffect ->
+    Session.set 'compact', compact
+    undefined
+  , [compact]
+
+  <Form.Switch id="compact" label="Compact Mode" checked={compact}
+   onChange={(e) -> setCompact e.target.checked}/>
+Compact.displayName = 'Compact'
+
+export useCompact = ->
+  [compact] = useLocalStorage 'compact', preferCompact, true
+  useTracker -> Session.get('compact') ? compact
+
+export getCompact = ->
+  Session.get('compact') ? getLocalStorage 'compact', preferCompact
+
+preferCompact = ->
+  Config.preferCompact
