@@ -25,38 +25,38 @@ apiMethods =
         ok: false
         error: e
 
-  '/archiveRoom': (options) ->
+  '/editRoom': (options, req) ->
     try
-      room = options.get 'room'
-      if not room
-        throw ("Must specify room ID")
-      result = Meteor.call 'roomEdit',
-        id: room
-        archived: Boolean JSON.parse options.get 'archive'
-        updator: { name: "Web API", presenceId: "none" }
-      status: 200
-      json:
-        ok: true
-        data: Rooms.find({'_id': room}).fetch()
-    catch e
-      status: 500
-      json:
-        ok: false
-        error: e
+      room = req.body?.room ? options.get 'room'
+      meeting = req.body?.meeting ? options.get 'meeting'
+      tags = req.body?.tags
 
-  '/raiseHand': (options) ->
-    try
-      room = options.get 'room'
-      if not room
-        throw ("Must specify room ID")
-      result = Meteor.call 'roomEdit',
-        id: room
-        raised: Boolean JSON.parse options.get 'raise'
-        updator: { name: "Web API", presenceId: "none" }
+      if (meeting and tags)
+        roomlist = taggedRooms meeting, tags
+      else if room 
+        roomlist = Rooms.find({'_id': room}).fetch()
+      else 
+        throw ("Must specify either room ID or meeting ID and tags to filter")
+      idlist = (room._id for room in roomlist)
+
+      checkflag = (optname, setname) ->
+        getvar = options.get optname
+        reqvar = req.body?[optname]
+        if not getvar? and not reqvar?
+          return null
+        [setname] : reqvar or Boolean JSON.parse getvar
+
+      for id in idlist
+        diff = 
+          id: id
+          updator: { name: "Web API", presenceId: "none" } 
+        diff = {...diff, ...checkflag('archive', 'archived'), ...checkflag('raise', 'raised')}
+        Meteor.call 'roomEdit', diff
+
       status: 200
       json:
         ok: true
-        data: Rooms.find({'_id': room}).fetch()
+        data: idlist
     catch e
       status: 500
       json:
