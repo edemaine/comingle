@@ -96,6 +96,8 @@ export roomTabs = (roomId, showArchived) ->
 export roomDuplicate = (room, creator) ->
   tabs = roomTabs room, false
   room = checkRoom room unless room._id?
+  tags = room.tags
+  delete tags?.protected
   ## Name room with existing title followed by an unused number like (2).
   i = 2
   base = room.title
@@ -110,6 +112,7 @@ export roomDuplicate = (room, creator) ->
     meeting: room.meeting
     title: title
     creator: creator
+    tags: tags ? {}
   ## Duplicate tabs, calling createNew method if desired to avoid e.g.
   ## identical Cocreate boards or identical Jitsi meeting rooms.
   for tab in tabs
