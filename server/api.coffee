@@ -50,6 +50,7 @@ apiMethods =
         diff = 
           id: id
           updator: { name: "Web API", presenceId: "none" } 
+          tags: req.body?.settags ? {}
         diff = {...diff, ...checkflag('archive', 'archived'), ...checkflag('raise', 'raised')}
         Meteor.call 'roomEdit', diff
 

@@ -31,11 +31,14 @@ Meteor.methods
       title: Match.Optional String
       raised: Match.Optional Boolean
       archived: Match.Optional Boolean
+      tags: Match.Optional Object
       updator: creatorPattern
     room = checkRoom diff.id
     set = {}
-    for key, value of diff when key != 'id'
+    for key, value of diff when key != 'id' and key != 'tags'
       set[key] = value unless room[key] == value
+    for key, value of diff.tags ? {}
+      set["tags."+key] = value
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
       set.updated = new Date
