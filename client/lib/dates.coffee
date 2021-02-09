@@ -31,10 +31,11 @@ export formatTimeDelta = (delta) ->
       out += "#{part}".padStart 2, '0'
     else
       out += "#{part}"
+  remainder = delta
   for epoch in [24*60*60, 60*60, 60]
     if delta > epoch
-      append Math.floor delta / epoch
+      append Math.floor remainder / epoch
       out += ':'
-      delta %= epoch
-  append delta
+      remainder %= epoch
+  append remainder
   out
