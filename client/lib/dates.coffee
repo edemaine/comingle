@@ -21,21 +21,24 @@ export formatTime = (date) ->
 
 export formatTimeDelta = (delta) ->
   delta = Math.round delta / 1000
-  return '0' if delta == 0
+  #return '0' if delta == 0
   out = ''
   if delta < 0
     out += '-'
     delta = -delta
+  ###
   append = (part) ->
     if out.endsWith ':'
       out += "#{part}".padStart 2, '0'
     else
       out += "#{part}"
   remainder = delta
-  for epoch in [60] #[24*60*60, 60*60, 60]
+  for epoch in [24*60*60, 60*60, 60]
     if delta > epoch
       append Math.floor remainder / epoch
       out += ':'
       remainder %= epoch
   append remainder
   out
+  ###
+  out + "#{Math.floor delta / 60}:#{"#{delta % 60}".padStart 2, '0'}"
