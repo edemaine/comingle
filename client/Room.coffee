@@ -249,6 +249,8 @@ export Room = ({loading, roomId, onClose}) ->
           <br/>on {formatDateTime tab.archived}
         </i>
       }
+      <br/>
+      <small>(Double click to rename.)</small>
     </Tooltip>
   onRenderTab = (node, renderState) ->
     return if node.getComponent() == 'TabNew'
@@ -491,6 +493,8 @@ export RoomTitle = ({room, roomId}) ->
             <br/>on {formatDateTime room.archived}
           </>
         }
+        <br/>
+        <small>(Double click to rename.)</small>
       </Tooltip>
     }>
       {({ref, ...triggerHandler}) ->
