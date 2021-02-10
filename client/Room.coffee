@@ -463,7 +463,7 @@ export RoomTitle = ({room, roomId}) ->
     undefined
   , [editing]
 
-  onKeyPress = (e) ->
+  onKeyDown = (e) ->
     switch e.key
       when 'Escape'
         e.preventDefault()
@@ -505,6 +505,6 @@ export RoomTitle = ({room, roomId}) ->
       }
     </OverlayTrigger>
   else
-    <input className={className} ref={inputRef} onKeyPress={onKeyPress}/>
+    <input className={className} ref={inputRef} onKeyDown={onKeyDown}/>
 
 RoomTitle.displayName = 'RoomTitle'
