@@ -40,6 +40,7 @@ sortKeys =
   title: 'Title'
   created: 'Creation time'
   participants: 'Participant count'
+  starred: 'Star count'
   raised: 'Raised hand timer'
 
 defaultSort = Config.defaultSort ?
@@ -96,6 +97,8 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
     created: (room) -> room.created
     participants: (room) ->
       titleKey "#{presenceByRoom[room._id]?.joined?.length ? 0}.#{room.title}"
+    starred: (room) ->
+      titleKey "#{presenceByRoom[room._id]?.starred?.length ? 0}.#{room.title}"
     raised: (room) ->
       if raised = room.raised
         ## room.raised will briefly be true instead of a time
@@ -107,7 +110,8 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
     sorted = sortByKey rooms[..], sorters[sortKey]
     sorted.reverse() if reverse
     sorted
-  , [rooms, sortKey, reverse, if sortKey == 'participants' then presenceByRoom]
+  , [rooms, sortKey, reverse,
+     (presenceByRoom if sortKey in ['participants', 'starred'])]
   roomList = useRef()
   selectRoom = useCallback (id, scroll) ->
     setSelected id
