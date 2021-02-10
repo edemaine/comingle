@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer, useRef, useMemo} from 'react'
+import React, {useCallback, useEffect, useReducer, useRef, useMemo} from 'react'
 import {useParams, useLocation, useHistory} from 'react-router-dom'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
@@ -20,6 +20,7 @@ import {Rooms} from '/lib/rooms'
 import {validId} from '/lib/id'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {useIdMap} from './lib/useIdMap'
+import {useLocalStorage} from './lib/useLocalStorage'
 import {formatDateTime} from './lib/dates'
 
 export MeetingContext = React.createContext {}
@@ -102,13 +103,19 @@ export Meeting = ->
     name: Rooms.findOne(id)?.title ? id
     component: 'Room'
     config: showArchived: false
-  openRoom = useMemo -> (id, focus = true) ->
-    tabset = FlexLayout.getActiveTabset model
+  openRoom = useCallback (id, background) ->
+    ## Replaces current open room, unless `background` tells us to open it
+    ## as an additional room in the background
     unless model.getNodeById id
+      tabset = FlexLayout.getActiveTabset model
+      oldRoom = tabset.getSelectedNode()
       model.doAction FlexLayout.Actions.addNode makeRoomTabJson(id),
-        tabset.getId(), FlexLayout.DockLocation.CENTER, -1, focus
+        tabset.getId(), FlexLayout.DockLocation.CENTER, -1, not background
+      if oldRoom? and not background
+        model.doAction FlexLayout.Actions.deleteTab oldRoom.getId()
     else
       FlexLayout.forceSelectTab model, id
+  , [model]
   openRoomWithDragAndDrop = (id) ->
     unless model.getNodeById id
       json = makeRoomTabJson id
@@ -129,6 +136,7 @@ export Meeting = ->
   , {})
   presenceId = getPresenceId()
   name = useName()
+  [starred, setStarred] = useLocalStorage "starred-#{meetingId}", [], true
   updatePresence = ->
     return unless name?  # wait for tracker to load name
     presence =
@@ -136,27 +144,26 @@ export Meeting = ->
       meeting: meetingId
       name: name
       rooms:
-        visible: []
-        invisible: []
+        joined: []
+        starred: starred
     model.visitNodes (node) ->
       if node.getType() == 'tab' and node.getComponent() == 'Room'
-        if node.isVisible()
-          presence.rooms.visible.push node.getId()
-        else
-          presence.rooms.invisible.push node.getId()
+        presence.rooms.joined.push node.getId()
     current = Presence.findOne
       id: presenceId
       meeting: meetingId
     unless current? and current.name == presence.name and
-           current?.rooms?.visible?.toString?() ==
-           presence.rooms.visible.toString() and
-           current?.rooms?.invisible?.toString?() ==
-           presence.rooms.invisible.toString()
+           current?.rooms?.joined?.toString?() ==
+           presence.rooms.joined.toString() and
+           current?.rooms?.starred?.toString?() ==
+           presence.rooms.starred.toString()
       Meteor.call 'presenceUpdate', presence
-  ## Send presence when name changes or when we reconnect to server
-  ## (so server may have deleted our presence information).
-  useEffect updatePresence, [name]
-  useTracker -> updatePresence() if Meteor.status().connected
+  ## Send presence when name changes, when list of starred rooms changes, or
+  ## when we reconnect to server (so server may have deleted our presence).
+  useEffect updatePresence, [name, starred.join '\t']
+  useTracker ->
+    updatePresence() if Meteor.status().connected
+  , []
   onAction = (action) ->
     switch action.type
       when FlexLayout.Actions.RENAME_TAB
@@ -197,10 +204,7 @@ export Meeting = ->
       when 'Welcome'
         <Welcome/>
       when 'Room'
-        if node.isVisible()
-          <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
-        else
-          null  # don't render hidden rooms, in particular to cancel all calls
+        <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
   tooltip = (node) -> (props) -> # eslint-disable-line react/display-name
     room = id2room[node.getId()]
     return <span/> unless room
@@ -305,7 +309,7 @@ export Meeting = ->
           archived={room.archived} onClick={archiveRoom}
           help="Archived rooms can still be viewed and restored from the list at the bottom."
         />
-  <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop}}>
+  <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop, starred, setStarred}}>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
      onRenderTab={onRenderTab}
      onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}

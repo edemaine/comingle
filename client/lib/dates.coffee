@@ -32,7 +32,7 @@ export formatTimeDelta = (delta) ->
     else
       out += "#{part}"
   remainder = delta
-  for epoch in [24*60*60, 60*60, 60]
+  for epoch in [60] #[24*60*60, 60*60, 60]
     if delta > epoch
       append Math.floor remainder / epoch
       out += ':'

@@ -24,7 +24,9 @@ allowList = [
 export allow = allowList.join ';'
 
 export TabIFrame = ({tabId}) ->
-  tab = useTracker -> Tabs.findOne tabId
+  tab = useTracker ->
+    Tabs.findOne tabId
+  , [tabId]
   return null unless tab
   ref = useRef()
 

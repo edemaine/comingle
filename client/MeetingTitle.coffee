@@ -9,7 +9,9 @@ import {useDebounce} from './lib/useDebounce'
 
 export MeetingTitle = ->
   {meetingId} = useParams()
-  meeting = useTracker -> Meetings.findOne meetingId
+  meeting = useTracker ->
+    Meetings.findOne meetingId
+  , [meetingId]
   [title, setTitle] = useState (meeting?.title ? '')
   [changed, setChanged] = useState false
   useEffect ->

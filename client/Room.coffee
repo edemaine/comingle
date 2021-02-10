@@ -46,11 +46,15 @@ export Room = ({loading, roomId, showArchived}) ->
   [tabNews, replaceTabNew] = useReducer(
     (state, {id, node}) -> state[id] = node; state
   , {})
-  {loading, room, tabs} = useTracker ->
+  {subLoading, room, tabs} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
-    loading: loading or not sub.ready()
+    subLoading: not sub.ready()
     room: Rooms.findOne roomId
-    tabs: roomTabs roomId, showArchived
+  , [roomId]
+  loading or= subLoading
+  tabs = useTracker ->
+    roomTabs roomId, showArchived
+  , [roomId, showArchived]
   id2tab = useIdMap tabs
   existingTabTypes = useIdMap tabs, 'type'
   tabsetUsed = useRef {}

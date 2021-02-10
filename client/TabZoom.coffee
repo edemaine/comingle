@@ -16,7 +16,9 @@ base64 = (str) ->
     String.fromCharCode "0x#{hex}"
 
 export TabZoom = ({tabId}) ->
-  tab = useTracker -> Tabs.findOne tabId
+  tab = useTracker ->
+    Tabs.findOne tabId
+  , [tabId]
   return null unless tab
   match = zoomRegExp.exec tab.url
   unless match

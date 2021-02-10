@@ -29,7 +29,10 @@ Dark.displayName = 'Dark'
 
 export useDark = ->
   [dark] = useLocalStorage 'dark', preferDark, true
-  useTracker -> Session.get('dark') ? dark
+  trackedDark = useTracker ->
+    Session.get 'dark'
+  , []
+  trackedDark ? dark
 
 export getDark = ->
   Session.get('dark') ? getLocalStorage 'dark', preferDark

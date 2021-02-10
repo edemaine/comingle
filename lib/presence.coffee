@@ -16,8 +16,8 @@ Meteor.methods
       meeting: Match.Where validId
       name: String
       rooms:
-        visible: [Match.Where validId]
-        invisible: [Match.Where validId]
+        joined: [Match.Where validId]
+        starred: [Match.Where validId]
     unless @isSimulation
       checkMeeting presence.meeting
       connections[@connection.id] = presence.id
