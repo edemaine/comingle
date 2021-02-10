@@ -5,13 +5,13 @@ import {faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
 
 import {capitalize} from './lib/capitalize'
 
-export ArchiveButton = ({type, noun, archived, help, onClick}) ->
+export ArchiveButton = ({className, noun, archived, help, onClick}) ->
   buttonRef = useRef()
   [click, setClick] = useState false
   [hover, setHover] = useState false
   verb = if archived then 'Restore' else 'Archive'
   noun = capitalize noun
-  <div className="flexlayout__#{type}_button_trailing"
+  <div className={className}
    aria-label="#{verb} #{noun} for Everyone"
    onClick={-> setClick not click}
    onMouseEnter={-> setHover true}

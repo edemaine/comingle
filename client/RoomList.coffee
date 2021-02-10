@@ -322,11 +322,10 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
     currentRoom = Session.get 'currentRoom'
     ## Open room with focus in the following cases:
     ##   * We're not in any rooms
-    ##   * Shift-click => force open as foreground tab
-    ##   * Ctrl-click => force open as background tab
+    ##   * Shift/Ctrl/Meta-click => force open
     ##   * We clicked on the Switch button (force == true)
-    if not currentRoom? or e.shiftKey or e.ctrlKey or force == true
-      openRoom room._id, e.ctrlKey
+    if not currentRoom? or e.shiftKey or e.ctrlKey or e.metaKey or force == true
+      openRoom room._id
       selectRoom null
     ## Otherwise, toggle whether this room is selected.
     else if selected
@@ -417,7 +416,7 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
         </div>
       </OverlayTrigger>
     }
-    <Highlight className="title" text={room.title} search={search}/>
+    <Highlight className="room-title" text={room.title} search={search}/>
     <PresenceList presenceClusters={
       if search  # show matching starred people too
         (presenceClusters.joined ? []).concat (person \
@@ -528,7 +527,6 @@ export RoomNew = ({selectRoom}) ->
   submit = (e, template) ->
     e.preventDefault?()
     return unless title.trim().length
-    {shiftKey, ctrlKey, metaKey} = e
     room =
       meeting: meetingId
       title: title.trim()
@@ -536,11 +534,8 @@ export RoomNew = ({selectRoom}) ->
       template: template ? 'jitsi'
     setTitle ''
     roomId = await roomWithTemplate room
-    if shiftKey
-      openRoom roomId, true
-      selectRoom null
-    else if ctrlKey or metaKey
-      openRoom roomId, false
+    if e.shiftKey or e.ctrlKey or e.metaKey
+      openRoom roomId
       selectRoom null
     else
       selectRoom roomId, true

@@ -61,7 +61,7 @@ nav
       position: static
       float: right
 
-.tab-title
+.room-title, .tab-title
   &.archived
     color: var(--danger-fg)  // danger color
 
@@ -78,13 +78,17 @@ nav
     &:hover, &:focus
       background-color: var(--list-group-item-secondary-bg-1)
   */
-  &.presence-joined, &.selected
+  &.presence-joined
     background-color: var(--list-group-item-primary-bg)
     &:hover, &:focus
       background-color: var(--list-group-item-primary-bg-1)
+  &.selected
+    background-color: var(--list-group-item-secondary-bg)
+    &:hover, &:focus
+      background-color: var(--list-group-item-secondary-bg-1)
   &.archived
     &, &:hover, &:focus
-      .title
+      .room-title
         color: var(--danger-fg)
 
   .raise-hand
@@ -160,6 +164,49 @@ nav
   50%
     transform: scale(1.2)
     filter: drop-shadow(0 0 1px #444)
+
+.Room
+  display: flex
+  flex-direction: column
+  width: 100%
+  height: 100%
+  .header
+    padding: 0.25rem 0.5rem
+    background: linear-gradient(#fff, #bcc5c8)
+    /.dark &
+      background: linear-gradient(#000, #374043)
+    display: flex
+    flex-direction: row
+    align-items: center
+    .room-title
+      flex-grow: 1
+    div.room-title
+      cursor: pointer
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
+    input.room-title
+      border: none
+      padding: 0
+      color: green  // like FlexLayout
+      background: #fff
+      /.dark &
+        color: lightgreen
+        background: #000
+  .container
+    position: relative
+    flex-grow: 1
+
+.flexlayout__tab_button_trailing, .icon-button
+  cursor: pointer
+  &:hover
+    color: #333
+    /.dark &
+      color: #ccc
+  &:active
+    color: #555
+    /.dark &
+      color: #aaa
 
 .chat
   height: 100%

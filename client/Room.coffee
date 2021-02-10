@@ -1,11 +1,13 @@
-import React, {useState, useEffect, useReducer, useRef} from 'react'
+import React, {useCallback, useEffect, useReducer, useRef, useState} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
+import useEventListener from '@use-it/event-listener'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faDoorOpen, faEye, faEyeSlash, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
+import {clipboardLink} from './icons/clipboardLink'
 
 import {Rooms, roomTabs} from '/lib/rooms'
 import {tabTypes} from '/lib/tabs'
@@ -13,13 +15,13 @@ import {getCreator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
 import {formatDateTime} from './lib/dates'
+import {ArchiveButton} from './ArchiveButton'
 import {Loading} from './Loading'
 import {ChatRoom} from './ChatRoom'
 import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
 import {TabZoom} from './TabZoom'
-import {ArchiveButton} from './ArchiveButton'
 
 tabTitle = (tab) ->
   tab.title or 'Untitled'
@@ -40,7 +42,7 @@ tabIcon = (tab) -> # eslint-disable-line react/display-name
     else
       null
 
-export Room = ({loading, roomId, showArchived}) ->
+export Room = ({loading, roomId, onClose}) ->
   {meetingId} = useParams()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(
@@ -52,12 +54,14 @@ export Room = ({loading, roomId, showArchived}) ->
     room: Rooms.findOne roomId
   , [roomId]
   loading or= subLoading
+  [showArchived, setShowArchived] = useState false
   tabs = useTracker ->
     roomTabs roomId, showArchived
   , [roomId, showArchived]
   id2tab = useIdMap tabs
   existingTabTypes = useIdMap tabs, 'type'
   tabsetUsed = useRef {}
+
   ## Initialize model according to saved layout
   [model, setModel] = useState()
   useEffect ->
@@ -80,6 +84,7 @@ export Room = ({loading, roomId, showArchived}) ->
       ]
       layout: layout
   , [loading]
+
   ## Automatic tab layout algorithm.
   direction = (tabset, keepVisible) ->
     rect = tabset.getRect()
@@ -145,6 +150,7 @@ export Room = ({loading, roomId, showArchived}) ->
       else
         ## Otherwise, add to the left/top of first tabset.
         [tabsets[0].getId(), direction(tabsets[0], false), -1]
+
   ## Synchronize model with room
   useEffect ->
     return unless model?
@@ -189,8 +195,7 @@ export Room = ({loading, roomId, showArchived}) ->
     undefined
   , [model, tabs]
   ## End of hooks
-  if loading or not model?  # Post-loading, useEffect needs a tick to set model
-    return <Loading/>
+
   tabNew = (parent) ->
     return unless model?
     ## Add TabNew to the clicked tabset, unless it has a keepVisible tab
@@ -316,7 +321,8 @@ export Room = ({loading, roomId, showArchived}) ->
           id: tab._id
           archived: not tab.archived
           updator: getCreator()
-      buttons?.push <ArchiveButton key="archive" type={type} noun="tab"
+      buttons?.push <ArchiveButton key="archive" noun="tab"
+        className="flexlayout__tab_button_trailing"
         archived={tab.archived} onClick={archiveTab}
         help="Archived tabs can still be restored using the room's eye icon."
       />
@@ -354,7 +360,147 @@ export Room = ({loading, roomId, showArchived}) ->
     ## Track when each tabset was active.
     if tabset = model.getActiveTabset()
       tabsetUsed.current[tabset.getId()] = (new Date).getTime()
-  <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-   onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
-   onAction={onAction} onModelChange={onModelChange} tabPhrase="tab"/>
+
+  ## Room button actions
+  roomLink = ->
+    navigator.clipboard.writeText \
+      Meteor.absoluteUrl "/m/#{meetingId}##{roomId}"
+  archiveRoom = ->
+    return unless room?
+    Meteor.call 'roomEdit',
+      id: room._id
+      archived: not room.archived
+      updator: getCreator()
+
+  leaveRoom = (position) -> # eslint-disable-line react/display-name
+    <OverlayTrigger placement="bottom" overlay={(props) ->
+      <Tooltip {...props}>
+        Leave this room
+        <br/>
+        <small>and any embedded calls</small>
+      </Tooltip>
+    }>
+      <div className="flexlayout__tab_button_#{position}"
+        onClick={onClose}>
+        <FontAwesomeIcon icon={faDoorOpen}/>
+      </div>
+    </OverlayTrigger>
+
+  <div className="Room">
+    <div className="header">
+      {leaveRoom 'leading icon-button'}
+      <RoomTitle room={room} roomId={roomId}/>
+      <OverlayTrigger placement="bottom" overlay={(props) ->
+        <Tooltip {...props}>Copy room link to clipboard</Tooltip>
+      }>
+        <div aria-label="Copy room link to clipboard" onClick={roomLink}
+         className="flexlayout__tab_button_trailing">
+          <FontAwesomeIcon icon={clipboardLink}/>
+        </div>
+      </OverlayTrigger>
+      {
+        label = "#{if showArchived then "Hide" else "Show"} Archived Tabs"
+        <OverlayTrigger placement="bottom" overlay={(props) ->
+          <Tooltip {...props}>
+            {label}<br/>
+            <small>Currently {unless showArchived then <b>not</b>} showing archived tabs.</small>
+          </Tooltip>
+        }>
+          <div aria-label={label} onClick={-> setShowArchived not showArchived}
+           className="flexlayout__tab_button_trailing">
+            <FontAwesomeIcon icon={if showArchived then faEye else faEyeSlash}/>
+          </div>
+        </OverlayTrigger>
+      }
+      <ArchiveButton type="tab" noun="room"
+       className="flexlayout__tab_button_trailing"
+       archived={room?.archived} onClick={archiveRoom}
+       help="Archived rooms can still be viewed and restored from the list at the bottom."/>
+      {leaveRoom 'trailing'}
+    </div>
+    <div className="container">
+      {if loading or not model?  ### Post-loading, useEffect needs a tick to set model ###
+        <Loading/>
+      else
+        <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
+        onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
+        onAction={onAction} onModelChange={onModelChange} tabPhrase="tab"/>
+      }
+    </div>
+  </div>
+
 Room.displayName = 'Room'
+
+export setRoomTitle = (roomId, title) ->
+  ## Sanitize room title and push to other users
+  title = title.trim()
+  return unless title  # prevent empty title
+  Meteor.call 'roomEdit',
+    id: roomId
+    title: title
+    updator: getCreator()
+
+export RoomTitle = ({room, roomId}) ->
+  [editing, setEditing] = useState false
+  inputRef = useRef()
+  ## Stop editing when clicking anywhere else (like FlexLayout)
+  clickOutside = useCallback (e) ->
+    setEditing false unless e.target == inputRef.current
+  , []
+  useEventListener 'click', clickOutside
+  useEventListener 'touchstart', clickOutside
+  ## Keep <input> value synchronized with room title (when other user changes)
+  useEffect ->
+    return unless editing and room?
+    inputRef.current.value = room.title
+  , [editing, room?.title]
+  ## Focus on <input> when start editing (like FlexLayout)
+  useEffect ->
+    return unless editing
+    inputRef.current.select()
+    undefined
+  , [editing]
+
+  onKeyPress = (e) ->
+    switch e.key
+      when 'Escape'
+        e.preventDefault()
+        setEditing false
+      when 'Enter'
+        e.preventDefault()
+        setRoomTitle roomId, inputRef.current.value
+        setEditing false
+
+  className = 'room-title'
+  className += ' archived' if room?.archived
+
+  unless room?
+    <div className={className}>
+      <span>{roomId}</span>
+    </div>
+  else unless editing
+    <OverlayTrigger placement="bottom" overlay={(props) ->
+      return <div/> unless room?
+      <Tooltip {...props}>
+        Room &ldquo;{room.title}&rdquo;<br/>
+        created by {room.creator?.name ? 'unknown'}<br/>
+        on {formatDateTime room.created}
+        {if room.archived
+          <>
+            <br/>archived by {room.archiver?.name ? 'unknown'}
+            <br/>on {formatDateTime room.archived}
+          </>
+        }
+      </Tooltip>
+    }>
+      {({ref, ...triggerHandler}) ->
+        <div className={className} {...triggerHandler}
+         onDoubleClick={-> setEditing true}>
+          <span ref={ref}>{room?.title ? roomId}</span>
+        </div>
+      }
+    </OverlayTrigger>
+  else
+    <input className={className} ref={inputRef} onKeyPress={onKeyPress}/>
+
+RoomTitle.displayName = 'RoomTitle'

@@ -1,34 +1,40 @@
-import React, {useCallback, useEffect, useReducer, useRef, useMemo} from 'react'
+import React, {useCallback, useEffect, useRef, useMemo} from 'react'
 import {useParams, useLocation, useHistory} from 'react-router-dom'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCog, faComment, faDoorOpen, faEye, faEyeSlash, faQuestion} from '@fortawesome/free-solid-svg-icons'
+import {faCog, faComment, faDoorOpen, faQuestion} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import FlexLayout from './FlexLayout'
-import {ArchiveButton} from './ArchiveButton'
 import {ChatRoom} from './ChatRoom'
 import {RoomList} from './RoomList'
-import {Room} from './Room'
+import {Room, setRoomTitle} from './Room'
 import {Settings} from './Settings'
 import {Welcome} from './Welcome'
 import {useName} from './Name'
 import {Presence} from '/lib/presence'
 import {Rooms} from '/lib/rooms'
 import {validId} from '/lib/id'
-import {getPresenceId, getCreator} from './lib/presenceId'
-import {useIdMap} from './lib/useIdMap'
+import {getPresenceId} from './lib/presenceId'
+#import {useIdMap} from './lib/useIdMap'
 import {useLocalStorage} from './lib/useLocalStorage'
-import {formatDateTime} from './lib/dates'
 
 export MeetingContext = React.createContext {}
+
+welcomeTab =
+  id: 'welcome'
+  type: 'tab'
+  name: 'Welcome'
+  component: 'Welcome'
+  enableRename: false
 
 initModel = ->
   model = FlexLayout.Model.fromJson
     global: Object.assign {}, FlexLayout.defaultGlobal,
       borderEnableDrop: false
+      tabSetEnableTabStrip: false
     borders: [
       type: 'border'
       location: 'left'
@@ -64,13 +70,7 @@ initModel = ->
       children: [
         id: 'mainTabset'
         type: 'tabset'
-        children: [
-          id: 'welcome'
-          type: 'tab'
-          name: 'Welcome'
-          component: 'Welcome'
-          enableRename: false
-        ]
+        children: [welcomeTab]
       ]
   model.setOnAllowDrop (dragNode, dropInfo) ->
     return false if dropInfo.node.getId() == 'roomsTabSet' and dropInfo.location != FlexLayout.DockLocation.RIGHT
@@ -88,7 +88,7 @@ export Meeting = ->
     sub = Meteor.subscribe 'meeting', meetingId
     loading: not sub.ready()
     rooms: Rooms.find().fetch()
-  id2room = useIdMap rooms
+  #id2room = useIdMap rooms
   layoutRef = useRef null
   useEffect ->
     for room in rooms
@@ -102,17 +102,14 @@ export Meeting = ->
     type: 'tab'
     name: Rooms.findOne(id)?.title ? id
     component: 'Room'
-    config: showArchived: false
-  openRoom = useCallback (id, background) ->
-    ## Replaces current open room, unless `background` tells us to open it
-    ## as an additional room in the background
+  openRoom = useCallback (id) ->
+    ## Replaces current open room
     unless model.getNodeById id
       tabset = FlexLayout.getActiveTabset model
       oldRoom = tabset.getSelectedNode()
       model.doAction FlexLayout.Actions.addNode makeRoomTabJson(id),
-        tabset.getId(), FlexLayout.DockLocation.CENTER, -1, not background
-      if oldRoom? and not background
-        model.doAction FlexLayout.Actions.deleteTab oldRoom.getId()
+        tabset.getId(), FlexLayout.DockLocation.CENTER, -1
+      model.doAction FlexLayout.Actions.deleteTab oldRoom.getId() if oldRoom?
     else
       FlexLayout.forceSelectTab model, id
   , [model]
@@ -126,14 +123,6 @@ export Meeting = ->
       openRoom id
     undefined
   , [location.hash]
-  [showArchived, setShowArchived] = useReducer(
-    (state, {id, value}) ->
-      if model.getNodeById id
-        model.doAction FlexLayout.Actions.updateNodeAttributes id,
-          config: showArchived: value
-      state[id] = value
-      state
-  , {})
   presenceId = getPresenceId()
   name = useName()
   [starred, setStarred] = useLocalStorage "starred-#{meetingId}", [], true
@@ -167,18 +156,16 @@ export Meeting = ->
   onAction = (action) ->
     switch action.type
       when FlexLayout.Actions.RENAME_TAB
-        ## Sanitize room title and push to other users
-        action.data.text = action.data.text.trim()
-        return unless action.data.text  # prevent empty title
-        Meteor.call 'roomEdit',
-          id: action.data.node
-          title: action.data.text
-          updator: getCreator()
+        setRoomTitle action.data.node, action.data.text
     action
   onModelChange = ->
     updatePresence()
-    ## Maintain hash part of URL to point to "current" tab.
+    ## Reopen Welcome screen if not in a room
     tabset = FlexLayout.getActiveTabset model
+    if tabset? and not tabset.getChildren().length
+      model.doAction FlexLayout.Actions.addNode welcomeTab, tabset.getId(),
+        FlexLayout.DockLocation.CENTER, -1
+    ## Maintain hash part of URL to point to "current" tab.
     tab = tabset?.getSelectedNode()
     if tab?.getComponent() == 'Room'
       unless location.hash == "##{tab.getId()}"
@@ -204,33 +191,18 @@ export Meeting = ->
       when 'Welcome'
         <Welcome/>
       when 'Room'
-        <Room loading={loading} roomId={node.getId()} {...node.getConfig()}/>
-  tooltip = (node) -> (props) -> # eslint-disable-line react/display-name
-    room = id2room[node.getId()]
-    return <span/> unless room
-    <Tooltip {...props}>
-      Room &ldquo;{room.title}&rdquo;<br/>
-      created by {room.creator?.name ? 'unknown'}<br/>
-      on {formatDateTime room.created}
-      {if room.archived
-        <>
-          <br/>archived by {room.archiver?.name ? 'unknown'}
-          <br/>on {formatDateTime room.archived}
-        </>
-      }
-    </Tooltip>
+        <Room loading={loading} roomId={node.getId()}
+         onClose={-> model.doAction FlexLayout.Actions.deleteTab node.getId()}
+         {...node.getConfig()}/>
   iconFactory = (node) -> # eslint-disable-line react/display-name
-    <OverlayTrigger placement="bottom" overlay={tooltip node}>
-      {if node.getComponent() == 'ChatRoom'
-        <FontAwesomeIcon icon={faComment}/>
-      else if node.getComponent() == 'Settings'
-        <FontAwesomeIcon icon={faCog}/>
-      else if node.getComponent() == 'Welcome'
-        <FontAwesomeIcon icon={faQuestion}/>
-      else
-        <FontAwesomeIcon icon={faDoorOpen}/>
-      }
-    </OverlayTrigger>
+    if node.getComponent() == 'ChatRoom'
+      <FontAwesomeIcon icon={faComment}/>
+    else if node.getComponent() == 'Settings'
+      <FontAwesomeIcon icon={faCog}/>
+    else if node.getComponent() == 'Welcome'
+      <FontAwesomeIcon icon={faQuestion}/>
+    else
+      <FontAwesomeIcon icon={faDoorOpen}/>
   onRenderTab = (node, renderState) ->
     type = if node.getParent().getType() == 'border' then 'border' else 'tab'
     buttons = renderState.buttons
@@ -252,63 +224,7 @@ export Meeting = ->
       return RoomList.onRenderTab node, renderState
     else if node.getComponent() == 'ChatRoom'
       return ChatRoom.onRenderTab node, renderState
-    return if node.getComponent() != 'Room'
-    room = id2room[node.getId()]
-    return unless room
-    className = 'tab-title'
-    className += ' archived' if room.archived
-    renderState.content =
-      <OverlayTrigger placement="bottom" overlay={tooltip node}>
-        <span className={className}>{renderState.content}</span>
-      </OverlayTrigger>
-    if node.isVisible()  # special buttons for visible tabs
-      id = node.getId()
-      buttons?.push \
-        <div key="link"
-         className="flexlayout__#{type}_button_trailing flexlayout__tab_button_link"
-         aria-label="Copy room link to clipboard"
-         onClick={-> navigator.clipboard.writeText \
-           Meteor.absoluteUrl "/m/#{meetingId}##{node.getId()}"}
-         onMouseDown={(e) -> e.stopPropagation()}
-         onTouchStart={(e) -> e.stopPropagation()}>
-          <OverlayTrigger placement="bottom" overlay={(props) ->
-            <Tooltip {...props}>Copy room link to clipboard</Tooltip>
-          }>
-            <FontAwesomeIcon icon={clipboardLink}/>
-          </OverlayTrigger>
-        </div>
-      showArchived = node.getConfig()?.showArchived
-      label =
-        if showArchived
-          "Hide Archived Tabs"
-        else
-          "Show Archived Tabs"
-      buttons?.push \
-        <div key="archived"
-         className="flexlayout__#{type}_button_trailing"
-         aria-label={label}
-         onClick={-> setShowArchived {id, value: not showArchived}}
-         onMouseDown={(e) -> e.stopPropagation()}
-         onTouchStart={(e) -> e.stopPropagation()}>
-          <OverlayTrigger placement="bottom" overlay={(props) ->
-            <Tooltip {...props}>
-              {label}<br/>
-              <small>Currently {unless showArchived then <b>not</b>} showing archived tabs.</small>
-            </Tooltip>
-          }>
-            <FontAwesomeIcon icon={if showArchived then faEye else faEyeSlash}/>
-          </OverlayTrigger>
-        </div>
-      archiveRoom = ->
-        Meteor.call 'roomEdit',
-          id: room._id
-          archived: not room.archived
-          updator: getCreator()
-      if room = id2room[id]
-        buttons?.push <ArchiveButton key="archive" type={type} noun="room"
-          archived={room.archived} onClick={archiveRoom}
-          help="Archived rooms can still be viewed and restored from the list at the bottom."
-        />
+
   <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop, starred, setStarred}}>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
      onRenderTab={onRenderTab}
@@ -316,4 +232,5 @@ export Meeting = ->
      ref={layoutRef}
      tabPhrase="room"/>
   </MeetingContext.Provider>
+
 Meeting.displayName = 'Meeting'
