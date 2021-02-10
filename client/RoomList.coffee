@@ -124,6 +124,10 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
           block: 'nearest'
       , 0
   , []
+  {setStarred} = useContext MeetingContext
+  clearStars = useCallback ->
+    setStarred []
+  , [setStarred]
 
   # SelectableContext below is workaround until release of:
   # https://github.com/react-bootstrap/react-bootstrap/pull/5201
@@ -199,7 +203,19 @@ export RoomList = ({loading, model, extraData, updateTab}) ->
       }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Your Starred Rooms:" startClosed search={searchDebounce}
-       filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}/>
+       filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}>
+        <OverlayTrigger placement="top" overlay={(props) ->
+          <Tooltip {...props}>
+            Unstar all rooms
+          </Tooltip>
+        }>
+          <div className="text-center">
+            <Button size="sm" variant="outline-warning" onClick={clearStars}>
+              Clear Stars
+            </Button>
+          </div>
+        </OverlayTrigger>
+      </Sublist>
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Available Rooms:" search={searchDebounce}
        filter={(room) -> not room.archived and
@@ -216,7 +232,7 @@ RoomList.displayName = 'RoomList'
 searchMatches = (search, text) ->
   0 <= text.toLowerCase().indexOf search.toLowerCase()
 
-Sublist = ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, search, filter, startClosed}) -> # eslint-disable-line react/display-name
+Sublist = ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, search, filter, startClosed, children}) ->
   subrooms = useMemo ->
     matching = sortedRooms.filter filter
     if search
@@ -239,6 +255,7 @@ Sublist = ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, s
       </CardToggle>
       <Accordion.Collapse eventKey="0">
         <Card.Body>
+          {children}
           <ListGroup>
             {for room in subrooms
               do (id = room._id) ->
