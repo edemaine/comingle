@@ -19,7 +19,7 @@ import {Rooms} from '/lib/rooms'
 import {validId} from '/lib/id'
 import {getPresenceId} from './lib/presenceId'
 #import {useIdMap} from './lib/useIdMap'
-import {useLocalStorage} from './lib/useLocalStorage'
+import {useSessionStorage} from './lib/useLocalStorage'
 
 export MeetingContext = React.createContext {}
 
@@ -133,7 +133,7 @@ export Meeting = React.memo ->
   , [location.hash]
   presenceId = getPresenceId()
   name = useName()
-  [starred, setStarred] = useLocalStorage "starred-#{meetingId}", [], true
+  [starred, setStarred] = useSessionStorage "starred.#{meetingId}", []
   updatePresence = ->
     return unless name?  # wait for tracker to load name
     presence =

@@ -7,7 +7,7 @@ import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
 export Name = React.memo ->
-  [name, setName] = useLocalStorage 'name', '', true
+  [name, setName] = useLocalStorage 'name', '', sync: true
   nameDebounce = useDebounce name, 500
 
   useLayoutEffect ->
@@ -28,7 +28,7 @@ export Name = React.memo ->
 Name.displayName = 'Name'
 
 export useName = ->
-  [name] = useLocalStorage 'name', '', true
+  [name] = useLocalStorage 'name', '', sync: true
   trackedName = useTracker ->
     Session.get 'name'
   , []

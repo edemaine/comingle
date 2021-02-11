@@ -22,7 +22,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
   , [channel]
 
   ## Maintain last seen message and unseen count
-  [seen, setSeen] = useLocalStorage "chatSeen-#{channel}", null, true
+  [seen, setSeen] = useLocalStorage "chatSeen-#{channel}", null, sync: true
   [loadedSeen, setLoadedSeen] = useState()
   useLayoutEffect ->
     setSeen messages[messages.length-1]?._id if visible

@@ -17,7 +17,7 @@ export Settings = React.memo ->
 Settings.displayName = 'Settings'
 
 export Dark = React.memo ->
-  [dark, setDark] = useLocalStorage 'dark', preferDark, true
+  [dark, setDark] = useLocalStorage 'dark', preferDark, sync: true
   useLayoutEffect ->
     Session.set 'dark', dark
     undefined
@@ -28,7 +28,7 @@ export Dark = React.memo ->
 Dark.displayName = 'Dark'
 
 export useDark = ->
-  [dark] = useLocalStorage 'dark', preferDark, true
+  [dark] = useLocalStorage 'dark', preferDark, sync: true
   trackedDark = useTracker ->
     Session.get 'dark'
   , []
