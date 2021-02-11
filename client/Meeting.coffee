@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useMemo} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useParams, useLocation, useHistory} from 'react-router-dom'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
@@ -166,8 +166,10 @@ export Meeting = ->
       when FlexLayout.Actions.RENAME_TAB
         setRoomTitle action.data.node, action.data.text
     action
+  [enableMaximize, setEnableMaximize] = useState false
   onModelChange = ->
     updatePresence()
+    setEnableMaximize model._getAttribute 'tabSetEnableMaximize'
     ## Reopen Welcome screen if not in a room
     tabset = FlexLayout.getActiveTabset model
     if tabset? and not tabset.getChildren().length
@@ -201,6 +203,10 @@ export Meeting = ->
       when 'Room'
         <Room loading={loading} roomId={node.getId()}
          onClose={-> model.doAction FlexLayout.Actions.deleteTab node.getId()}
+         enableMaximize={enableMaximize}
+         maximized={node.getParent().isMaximized()}
+         onMaximize={-> model.doAction FlexLayout.Actions.maximizeToggle \
+           node.getParent().getId()}
          {...node.getConfig()}/>
   iconFactory = (node) -> # eslint-disable-line react/display-name
     if node.getComponent() == 'ChatRoom'

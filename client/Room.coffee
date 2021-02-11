@@ -5,7 +5,7 @@ import {OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import useEventListener from '@use-it/event-listener'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment, faDoorOpen, faEye, faEyeSlash, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faDoorOpen, faExpandArrowsAlt, faEye, faEyeSlash, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
@@ -43,7 +43,7 @@ tabIcon = (tab) -> # eslint-disable-line react/display-name
     else
       null
 
-export Room = ({loading, roomId, onClose}) ->
+export Room = ({loading, roomId, onClose, enableMaximize, maximized, onMaximize}) ->
   {meetingId} = useParams()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(
@@ -420,6 +420,15 @@ export Room = ({loading, roomId, onClose}) ->
        archived={room?.archived} onClick={archiveRoom}
        help="Archived rooms can still be viewed and restored from the list at the bottom."/>
       {leaveRoom 'trailing'}
+      {if enableMaximize
+        <div onClick={onMaximize} className="flexlayout__tab_button_trailing">
+          {if maximized
+            FlexLayout.icons('room').restore
+          else
+            FlexLayout.icons('room').maximize
+          }
+        </div>
+      }
     </div>
     <div className="container">
       {if loading or not model?  ### Post-loading, useEffect needs a tick to set model ###
