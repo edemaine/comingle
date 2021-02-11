@@ -90,6 +90,7 @@ export Meeting = React.memo ->
     sub = Meteor.subscribe 'meeting', meetingId
     loading: not sub.ready()
     rooms: Rooms.find().fetch()
+  , [meetingId]
   #id2room = useIdMap rooms
   layoutRef = useRef null
   useEffect ->
