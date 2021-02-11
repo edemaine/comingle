@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useReducer, useRef, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useReducer, useRef, useState} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
 import {OverlayTrigger, Tooltip} from 'react-bootstrap'
@@ -16,8 +16,9 @@ import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
 import {formatDateTime} from './lib/dates'
 import {ArchiveButton} from './ArchiveButton'
-import {Loading} from './Loading'
 import {ChatRoom} from './ChatRoom'
+import {Loading} from './Loading'
+import Meeting from './Meeting'
 import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
@@ -445,6 +446,7 @@ export setRoomTitle = (roomId, title) ->
 export RoomTitle = ({room, roomId}) ->
   [editing, setEditing] = useState false
   inputRef = useRef()
+  {openRoomWithDragAndDrop} = useContext Meeting.MeetingContext
   ## Stop editing when clicking anywhere else (like FlexLayout)
   clickOutside = useCallback (e) ->
     setEditing false unless e.target == inputRef.current
@@ -472,6 +474,10 @@ export RoomTitle = ({room, roomId}) ->
         e.preventDefault()
         setRoomTitle roomId, inputRef.current.value
         setEditing false
+  onDragStart = (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    openRoomWithDragAndDrop roomId, 'Move'
 
   className = 'room-title'
   className += ' archived' if room?.archived
@@ -499,7 +505,7 @@ export RoomTitle = ({room, roomId}) ->
     }>
       {({ref, ...triggerHandler}) ->
         <div className={className} {...triggerHandler}
-         onDoubleClick={-> setEditing true}>
+         onDoubleClick={-> setEditing true} draggable onDragStart={onDragStart}>
           <span ref={ref}>{room?.title ? roomId}</span>
         </div>
       }

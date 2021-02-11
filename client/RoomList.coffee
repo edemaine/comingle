@@ -346,7 +346,7 @@ export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
   onDragStart = (e) ->
     e.preventDefault()
     e.stopPropagation()
-    openRoomWithDragAndDrop room._id
+    openRoomWithDragAndDrop room._id, 'Open'
   toggleStar = (e) ->
     e.preventDefault()
     e.stopPropagation()

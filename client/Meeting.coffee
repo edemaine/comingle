@@ -113,11 +113,19 @@ export Meeting = ->
     else
       FlexLayout.forceSelectTab model, id
   , [model]
-  openRoomWithDragAndDrop = (id) ->
-    unless model.getNodeById id
-      json = makeRoomTabJson id
-      layoutRef.current.addTabWithDragAndDrop \
-        "Open #{json.name} (drag to location)", json
+  openRoomWithDragAndDrop = (id, verb) ->
+    json = makeRoomTabJson id
+    if move = (model.getNodeById id)?
+      json.id = 'placeholder'
+      json.component = 'Welcome'
+    layoutRef.current.addTabWithDragAndDrop \
+      "#{verb} &ldquo;#{json.name}&rdquo; (drag to location)",
+      json,
+      if move then ->
+        return unless newNode = model.getNodeById json.id
+        model.doAction FlexLayout.Actions.moveNode id,
+          newNode.getParent().getId(), FlexLayout.DockLocation.CENTER, -1
+        model.doAction FlexLayout.Actions.deleteTab json.id
   useEffect ->
     if location.hash and validId id = location.hash[1..]
       openRoom id
