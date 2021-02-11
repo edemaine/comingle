@@ -124,10 +124,10 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           block: 'nearest'
       , 0
   , []
-  {setStarred} = useContext MeetingContext
+  {updateStarred, starredOld, starredHasOld} = useContext MeetingContext
   clearStars = useCallback ->
-    setStarred []
-  , [setStarred]
+    updateStarred []
+  , [updateStarred]
 
   # SelectableContext below is workaround until release of:
   # https://github.com/react-bootstrap/react-bootstrap/pull/5201
@@ -138,6 +138,37 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
       <Warnings/>
       <MeetingTitle/>
       <Name/>
+      {if starredHasOld
+        <Alert variant="info" dismissible onClose={-> updateStarred()}>
+          <p>
+            Restore your
+            {' '}
+            <OverlayTrigger placement="right" flip overlay={(props) ->
+              <Tooltip {...props}>
+                {for id in starredOld
+                  <span key={id} className="mr-2">
+                    <FontAwesomeIcon className="mr-1" icon={faDoorOpen}/>
+                    {Rooms.findOne(id)?.title ? id}
+                  </span>
+                }
+              </Tooltip>
+            }>
+              <span className="text-help">old starred rooms</span>
+            </OverlayTrigger>
+            ?
+          </p>
+          <div className="text-center">
+            <ButtonGroup>
+              <Button variant="success" onClick={-> updateStarred starredOld}>
+                Yes
+              </Button>
+              <Button variant="danger" onClick={-> updateStarred()}>
+                No
+              </Button>
+            </ButtonGroup>
+          </div>
+        </Alert>
+      }
       {if rooms.length > 0
         <Accordion>
           <Card>
@@ -244,6 +275,7 @@ Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model,
         include
     matching
   , [sortedRooms, filter, search, (if search then presenceByRoom)]
+
   <Accordion defaultActiveKey={unless startClosed then '0'}>
     <Card>
       <CardToggle eventKey="0">
@@ -301,7 +333,7 @@ RoomList.onRenderTab = (node, renderState) ->
 
 export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
-  {openRoom, openRoomWithDragAndDrop, starred, setStarred} = useContext MeetingContext
+  {openRoom, openRoomWithDragAndDrop, starred, updateStarred} = useContext MeetingContext
   link = useRef()
   {myPresence, presenceClusters} = useMemo ->
     clusters = {}
@@ -351,9 +383,9 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     e.preventDefault()
     e.stopPropagation()
     if starred.includes room._id
-      setStarred (star for star in starred when star != room._id)
+      updateStarred (star for star in starred when star != room._id)
     else
-      setStarred starred.concat [room._id]
+      updateStarred starred.concat [room._id]
 
   <Link ref={link} to="/m/#{meetingId}##{room._id}"
    onClick={onClick()} onDragStart={onDragStart}

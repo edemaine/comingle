@@ -17,9 +17,10 @@ import {useName} from './Name'
 import {Presence} from '/lib/presence'
 import {Rooms} from '/lib/rooms'
 import {validId} from '/lib/id'
+import {sameSorted} from '/lib/sort'
 import {getPresenceId} from './lib/presenceId'
 #import {useIdMap} from './lib/useIdMap'
-import {useSessionStorage} from './lib/useLocalStorage'
+import {useLocalStorage, useSessionStorage} from './lib/useLocalStorage'
 
 export MeetingContext = React.createContext {}
 
@@ -141,7 +142,21 @@ export Meeting = React.memo ->
   , [location.hash]
   presenceId = getPresenceId()
   name = useName()
+
+  ## `starredOld` is remembered across the browser (all tabs), and may contain
+  ## a list of previously starred rooms.  In this case, `starredHasOld`
+  ## starts true.  Once `changeStarred` gets called, though, `starredOld`
+  ## mirrors `starred` and `starredHasOld` gets set to false.
+  [starredOld, setStarredOld] = useLocalStorage "starredOld.#{meetingId}", []
   [starred, setStarred] = useSessionStorage "starred.#{meetingId}", []
+  [starredHasOld, setStarredHasOld] = useState ->
+    starredOld?.length and not sameSorted starred, starredOld
+  updateStarred = (newStarred) ->
+    setStarredHasOld false
+    setStarredOld newStarred ? starred
+    return unless newStarred?  # no argument means just remove old version
+    setStarred newStarred
+
   updatePresence = ->
     return unless name?  # wait for tracker to load name
     presence =
@@ -247,7 +262,7 @@ export Meeting = React.memo ->
     else if node.getComponent() == 'ChatRoom'
       return ChatRoom.onRenderTab node, renderState
 
-  <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop, starred, setStarred}}>
+  <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop, starred, starredOld, starredHasOld, updateStarred}}>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
      onRenderTab={onRenderTab}
      onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}

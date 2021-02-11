@@ -52,3 +52,16 @@ export uniqCountNames = (items, item2name = ((x) -> x), distinguisher) ->
       lastName = name
       lastDistinct = distinct
   out
+
+export sameSorted = (array1, array2) ->
+  return false unless array1?.length == array2?.length
+  object1 = {}
+  for item in array1
+    object1[item] ?= 0
+    object1[item] += 1
+  for item in array2
+    return false unless object1[item]
+    object1[item] -= 1
+  for item, count of object1
+    return false unless count == 0
+  true

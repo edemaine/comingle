@@ -57,9 +57,11 @@ nav
   // Give dismissible alerts normal margin; instead use float for close button
   .alert-dismissible
     padding-right: 1.25rem
+    margin-top: 1rem  // match bottom margin
     .close
       position: static
       float: right
+      padding: 0 0 0.25rem 0.5rem !important
 
 .room-title, .tab-title
   &.archived
@@ -257,3 +259,7 @@ nav
 
 .highlight
   background: hsla(60,71%,50%,0.4)
+
+.text-help
+  text-decoration: dotted underline gray
+  cursor: help
