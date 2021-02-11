@@ -18,17 +18,17 @@ export useStorage = (storage, key, initialValue, options) ->
   # Return a wrapped version of useState's setter function that
   # persists the new value to storage.
   setValue = (value) ->
+    # Allow value to be a function so we have same API as useState
+    value = value storedValue if value instanceof Function
+    # Easy case: no change
+    return if value == storedValue
+    # Save state, unless requested to not update the state variable
+    setStoredValue value unless options?.noUpdate
     try
-      # Allow value to be a function so we have same API as useState
-      value = value storedValue if value instanceof Function
-      # Easy case: no change
-      return if value == storedValue
-      # Save state, unless requested to not update the state variable
-      setStoredValue value unless options?.noUpdate
       # Save to local storage
       storage.setItem key, JSON.stringify value
     catch error
-      console.error error
+      console.error "Failed to set storage key #{key}: #{error}"
 
   # If requested to sync across tabs/windows, monitor for storage event.
   if options?.sync
@@ -37,7 +37,7 @@ export useStorage = (storage, key, initialValue, options) ->
         try
           setStoredValue JSON.parse e.newValue
         catch error
-          console.warn error
+          console.warn "Failed to load storage key #{key}: #{error}"
 
   [storedValue, setValue]
 
@@ -59,7 +59,7 @@ export getStorage = (storage, key, initialValue) ->
       initial initialValue
   catch error
     # If error also return initialValue
-    console.warn error
+    console.warn "Failed to load storage key #{key}: #{error}"
     initial initialValue
 
 # Support raw initial value or function generating that value
