@@ -5,7 +5,7 @@ import {OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import useEventListener from '@use-it/event-listener'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment, faDoorOpen, faExpandArrowsAlt, faEye, faEyeSlash, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faDoorOpen, faEye, faEyeSlash, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
