@@ -6,9 +6,11 @@ import {Presence} from '/lib/presence'
 ## meeting subscription
 Rooms.rawCollection().createIndex
   meeting: 1
-## also for presenceUpdate, presenceRemove methods:
 Presence.rawCollection().createIndex
   meeting: 1
+
+## presenceUpdate, presenceRemove methods
+Presence.rawCollection().createIndex
   id: 1
 
 ## room subscription

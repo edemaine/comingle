@@ -23,15 +23,14 @@ Meteor.methods
       connections[@connection.id] = presence.id
       presence.updated = new Date
     Presence.update
-      meeting: presence.meeting
       id: presence.id
     ,
       $set:
+        meeting: presence.meeting
         name: presence.name
         rooms: presence.rooms
       $setOnInsert:
         id: presence.id
-        meeting: presence.meeting
     ,
       upsert: true
   presenceRemove: (presenceId) ->

@@ -8,5 +8,5 @@ Presence.remove {}
 ## https://github.com/Meteor-Community-Packages/meteor-user-status/blob/master/server/status.js
 Meteor.onConnection (connection) ->
   connection.onClose ->
-    presenceId = connections[connection.id]
-    Meteor.call 'presenceRemove', presenceId if presenceId?
+    if presenceId = connections[connection.id]
+      Meteor.call 'presenceRemove', presenceId
