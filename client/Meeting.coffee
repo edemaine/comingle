@@ -72,11 +72,13 @@ initModel = ->
         type: 'tabset'
         children: [welcomeTab]
       ]
+  ###
   model.setOnAllowDrop (dragNode, dropInfo) ->
-    return false if dropInfo.node.getId() == 'roomsTabSet' and dropInfo.location != FlexLayout.DockLocation.RIGHT
+    #return false if dropInfo.node.getId() == 'roomsTabSet' and dropInfo.location != FlexLayout.DockLocation.RIGHT
     #return false if dropInfo.node.getType() == 'border'
     #return false if dragNode.getParent()?.getType() == 'border'
     true
+  ###
   model
 
 export Meeting = React.memo ->
@@ -119,13 +121,18 @@ export Meeting = React.memo ->
       json.id = 'placeholder'
       json.component = 'Welcome'
     layoutRef.current.addTabWithDragAndDrop \
-      "#{verb} &ldquo;#{json.name}&rdquo; (drag to location)",
-      json,
-      if move then ->
+      "#{verb} &ldquo;#{json.name}&rdquo; (drag to location)", json,
+      ->
         return unless newNode = model.getNodeById json.id
-        model.doAction FlexLayout.Actions.moveNode id,
-          newNode.getParent().getId(), FlexLayout.DockLocation.CENTER, -1
-        model.doAction FlexLayout.Actions.deleteTab json.id
+        tabset = newNode.getParent()
+        ## In move case, replace placeholder tab with actual tab
+        if move
+          model.doAction FlexLayout.Actions.moveNode id,
+            tabset.getId(), FlexLayout.DockLocation.CENTER, -1
+          model.doAction FlexLayout.Actions.deleteTab json.id
+        ## Delete other tabs in tabset, as they aren't visible
+        for child in tabset.getChildren() when child? and child.getId() != id
+          model.doAction FlexLayout.Actions.deleteTab child.getId()
   useEffect ->
     if location.hash and validId id = location.hash[1..]
       openRoom id
