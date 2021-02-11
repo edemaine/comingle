@@ -15,7 +15,7 @@ base64 = (str) ->
   btoa encodeURIComponent(str).replace /%([0-9A-F]{2})/g, (match, hex) ->
     String.fromCharCode "0x#{hex}"
 
-export TabZoom = ({tabId}) ->
+export TabZoom = React.memo ({tabId}) ->
   tab = useTracker ->
     Tabs.findOne tabId
   , [tabId]

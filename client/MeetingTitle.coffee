@@ -7,7 +7,7 @@ import {Meetings} from '/lib/meetings'
 import {getCreator} from './lib/presenceId'
 import {useDebounce} from './lib/useDebounce'
 
-export MeetingTitle = ->
+export MeetingTitle = React.memo ->
   {meetingId} = useParams()
   meeting = useTracker ->
     Meetings.findOne meetingId

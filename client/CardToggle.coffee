@@ -3,7 +3,7 @@ import {AccordionContext, useAccordionToggle, Card} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faChevronCircleUp, faChevronCircleDown} from '@fortawesome/free-solid-svg-icons'
 
-export CardToggle = ({children, eventKey}) ->
+export CardToggle = React.memo ({children, eventKey}) ->
   eventKey ?= 0
   currentEventKey = useContext AccordionContext
   onClick = useAccordionToggle eventKey

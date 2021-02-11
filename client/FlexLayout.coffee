@@ -57,7 +57,7 @@ export icons = (tabPhrase) ->
       aria-label="Overflow #{capitalize tabPhrase}s"/>
     </OverlayTrigger>
 
-export Layout = forwardRef ({tabPhrase, ...props}, ref) ->
+export Layout = React.memo forwardRef ({tabPhrase, ...props}, ref) ->
   ## Shorten titles that are longer than titleLimit.
   titleFactory = (node) ->
     title = node.getName()

@@ -6,7 +6,7 @@ import {useTracker} from 'meteor/react-meteor-data'
 import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
-export Name = ->
+export Name = React.memo ->
   [name, setName] = useLocalStorage 'name', '', true
   nameDebounce = useDebounce name, 500
 

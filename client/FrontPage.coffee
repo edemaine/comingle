@@ -8,7 +8,7 @@ import {Dark} from './Settings'
 import {getCreator} from './lib/presenceId'
 import {bugs, homepage, repository} from '/package.json'
 
-export FrontPage = ->
+export FrontPage = React.memo ->
   history = useHistory()
   newMeeting = ->
     Meteor.call 'meetingNew',

@@ -47,7 +47,7 @@ defaultSort = Config.defaultSort ?
   key: 'title'
   reverse: false
 
-export RoomList = ({loading, model, extraData, updateTab}) ->
+export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   {meetingId} = useParams()
   [sortKey, setSortKey] = useState null  # null means "use default"
   [reverse, setReverse] = useState null  # null means "use default"
@@ -232,7 +232,7 @@ RoomList.displayName = 'RoomList'
 searchMatches = (search, text) ->
   0 <= text.toLowerCase().indexOf search.toLowerCase()
 
-Sublist = ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, search, filter, startClosed, children}) ->
+Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, search, filter, startClosed, children}) ->
   subrooms = useMemo ->
     matching = sortedRooms.filter filter
     if search
@@ -299,7 +299,7 @@ RoomList.onRenderTab = (node, renderState) ->
         </Badge>
       </OverlayTrigger>
 
-export RoomInfo = ({room, search, presence, selected, selectRoom, leave}) ->
+export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
   {openRoom, openRoomWithDragAndDrop, starred, setStarred} = useContext MeetingContext
   link = useRef()
@@ -461,8 +461,7 @@ presencePhrasing =
     singular: 'person in this room'
     plural: 'people in this room'
 
-export PresenceCount = ({type, presence, presenceClusters, heading, children,
-                         onClick}) ->
+export PresenceCount = React.memo ({type, presence, presenceClusters, heading, children, onClick}) ->
   phrasing = presencePhrasing[type]
   presence ?= []
   <OverlayTrigger placement="top" overlay={(props) -> # xxlint-disable-line react/display-name
@@ -481,7 +480,7 @@ export PresenceCount = ({type, presence, presenceClusters, heading, children,
   </OverlayTrigger>
 PresenceCount.displayName = 'PresenceCount'
 
-export PresenceList = ({presenceClusters, search}) ->
+export PresenceList = React.memo ({presenceClusters, search}) ->
   return null unless presenceClusters?.length
   <div className="presence">
     {for person in presenceClusters
@@ -502,7 +501,7 @@ export PresenceList = ({presenceClusters, search}) ->
   </div>
 PresenceList.displayName = 'PresenceList'
 
-export RaisedTimer = ({raised}) ->
+export RaisedTimer = React.memo ({raised}) ->
   recomputeTimer = ->
     delta = timesync.offset + (new Date).getTime() - raised
     delta = 0 if delta < 0
@@ -520,7 +519,7 @@ export RaisedTimer = ({raised}) ->
   </span>
 RaisedTimer.displayName = 'RaisedTimer'
 
-export RoomNew = ({selectRoom}) ->
+export RoomNew = React.memo ({selectRoom}) ->
   {meetingId} = useParams()
   [title, setTitle] = useState ''
   {openRoom} = useContext MeetingContext

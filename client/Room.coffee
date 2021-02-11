@@ -43,7 +43,7 @@ tabIcon = (tab) -> # eslint-disable-line react/display-name
     else
       null
 
-export Room = ({loading, roomId, onClose, enableMaximize, maximized, onMaximize}) ->
+export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, onMaximize}) ->
   {meetingId} = useParams()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, false, true
   [tabNews, replaceTabNew] = useReducer(

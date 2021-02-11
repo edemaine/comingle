@@ -6,7 +6,7 @@ import {getName} from './Name'
 import {getDark} from './Settings'
 import {Tabs} from '/lib/tabs'
 
-export TabJitsi = ({tabId, room}) ->
+export TabJitsi = React.memo ({tabId, room}) ->
   tab = useTracker ->
     Tabs.findOne tabId
   , [tabId]

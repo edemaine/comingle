@@ -1,6 +1,6 @@
 import React from 'react'
 
-export Header = ->
+export Header = React.memo ->
   <nav>
     <LinkToFrontPage className="flex-shrink-1" style={maxWidth:"35px"}>
       <img src="/comingle.svg" className="w-100"/>
@@ -11,7 +11,7 @@ export Header = ->
   </nav>
 Header.displayName = 'Header'
 
-export LinkToFrontPage = (props) ->
+export LinkToFrontPage = React.memo (props) ->
   <a href={Meteor.absoluteUrl()} target="_blank" {...props}> {### eslint-disable-line react/jsx-no-target-blank ###}
     {props.children}
   </a>

@@ -5,7 +5,7 @@ import {useTracker} from 'meteor/react-meteor-data'
 
 import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
 
-export Settings = ->
+export Settings = React.memo ->
   <Card>
     <Card.Body>
       <Card.Title as="h3">Settings</Card.Title>
@@ -16,7 +16,7 @@ export Settings = ->
   </Card>
 Settings.displayName = 'Settings'
 
-export Dark = ->
+export Dark = React.memo ->
   [dark, setDark] = useLocalStorage 'dark', preferDark, true
   useLayoutEffect ->
     Session.set 'dark', dark

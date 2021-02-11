@@ -6,14 +6,14 @@ import {Meeting} from './Meeting'
 import {useDark} from './Settings'
 import {Redirect} from './lib/Redirect'
 
-export App = ->
+export App = React.memo ->
   <>
     <DarkClass/>
     <AppRouter/>
   </>
 App.displayName = 'App'
 
-export AppRouter = ->
+export AppRouter = React.memo ->
   <Router>
     <Switch>
       <Route path="/m/:meetingId">
@@ -30,7 +30,7 @@ export AppRouter = ->
   </Router>
 AppRouter.displayName = 'AppRouter'
 
-export DarkClass = ->
+export DarkClass = React.memo ->
   dark = useDark()
   if dark
     document.body.classList.add 'dark'

@@ -30,8 +30,7 @@ do -> # avoid namespace pollution
     tabTypesByCategory[category] ?= {}
     tabTypesByCategory[category][tabType] = tabData
 
-export TabNew = ({node, meetingId, roomId,
-                  replaceTabNew, existingTabTypes}) ->
+export TabNew = React.memo ({node, meetingId, roomId, replaceTabNew, existingTabTypes}) ->
   [url, setUrl] = useState ''
   [mixed, setMixed] = useState false
   [title, setTitle] = useState ''

@@ -23,7 +23,7 @@ allowList = [
 ]
 export allow = allowList.join ';'
 
-export TabIFrame = ({tabId}) ->
+export TabIFrame = React.memo ({tabId}) ->
   tab = useTracker ->
     Tabs.findOne tabId
   , [tabId]

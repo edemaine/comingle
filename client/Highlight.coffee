@@ -2,7 +2,7 @@ import React from 'react'
 
 import {escapeHTML, escapeRegExp} from './lib/escape'
 
-export Highlight = ({search, text, ...props}) ->
+export Highlight = React.memo ({search, text, ...props}) ->
   unless search
     return <span {...props}>{text}</span>
   text = escapeHTML text

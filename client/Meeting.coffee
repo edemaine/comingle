@@ -79,7 +79,7 @@ initModel = ->
     true
   model
 
-export Meeting = ->
+export Meeting = React.memo ->
   {meetingId} = useParams()
   model = useMemo initModel, []
   location = useLocation()

@@ -5,7 +5,7 @@ import {faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
 
 import {capitalize} from './lib/capitalize'
 
-export ArchiveButton = ({className, noun, archived, help, onClick}) ->
+export ArchiveButton = React.memo ({className, noun, archived, help, onClick}) ->
   buttonRef = useRef()
   [click, setClick] = useState false
   [hover, setHover] = useState false
