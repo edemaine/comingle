@@ -1,8 +1,9 @@
 import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
 
-import {validId, checkId} from './id.coffee'
-import {checkMeeting} from './meetings.coffee'
+import {validId, checkId} from './id'
+import {checkMeeting} from './meetings'
+import log from './log'
 
 export Presence = new Mongo.Collection 'presence'
 
@@ -22,6 +23,7 @@ Meteor.methods
       checkMeeting presence.meeting
       connections[@connection.id] = presence.id
       presence.updated = new Date
+      return unless log.logPresence presence
     Presence.update
       id: presence.id
     ,
@@ -35,4 +37,5 @@ Meteor.methods
       upsert: true
   presenceRemove: (presenceId) ->
     checkId presenceId
+    log.logPresenceRemove presenceId
     Presence.remove id: presenceId

@@ -1,4 +1,5 @@
 import {Chat} from './chat'
+import {Log} from '/lib/log'
 import {Rooms} from '/lib/rooms'
 import {Tabs} from '/lib/tabs'
 import {Presence} from '/lib/presence'
@@ -21,3 +22,8 @@ Tabs.rawCollection().createIndex
 Chat.rawCollection().createIndex
   channel: 1
   sent: 1
+
+## log query
+Log.rawCollection().createIndex
+  meeting: 1
+  updated: 1

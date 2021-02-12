@@ -173,10 +173,8 @@ export Meeting = React.memo ->
       id: presenceId
       meeting: meetingId
     unless current? and current.name == presence.name and
-           current?.rooms?.joined?.toString?() ==
-           presence.rooms.joined.toString() and
-           current?.rooms?.starred?.toString?() ==
-           presence.rooms.starred.toString()
+           sameSorted(current?.rooms?.joined, presence.rooms.joined) and
+           sameSorted(current?.rooms?.starred?, presence.rooms.starred)
       Meteor.call 'presenceUpdate', presence
   ## Send presence when name changes, when list of starred rooms changes, or
   ## when we reconnect to server (so server may have deleted our presence).
