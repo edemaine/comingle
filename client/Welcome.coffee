@@ -15,7 +15,7 @@ export Welcome = ->
       </p>
       <h5>Getting Started:</h5>
       <ul>
-        <li>First, <b>enter your name</b> (first and last) in the left panel (second text box).</li>
+        <li>First, <b>enter your name</b> (first and last) in the left panel (top text box).</li>
         <li>To <b>join a room</b>, click on a room (such as &ldquo;Main Room&rdquo;) in the room list on the left.</li>
         <li>When you click a second room, you'll be offered to &ldquo;<b>Switch to Room</b>&rdquo; which leaves the current room and any video calls  (shortcut: hold <kbd>Shift</kbd> while clicking).</li>
         <li>Each room contains one or more <b>tabs</b>: video call, whiteboard, etc.
