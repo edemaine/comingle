@@ -1,13 +1,28 @@
 import React from 'react'
+import {Tooltip, OverlayTrigger} from 'react-bootstrap'
+
+import {useMeetingTitle} from './MeetingTitle'
 
 export Header = React.memo ->
+  title = useMeetingTitle()
   <nav>
-    <LinkToFrontPage className="flex-shrink-1" style={maxWidth:"35px"}>
-      <img src="/comingle.svg" className="w-100"/>
-    </LinkToFrontPage>
-    <LinkToFrontPage className="navbar-brand ml-1 mr-0 mb-0 h1">
-      Comingle
-    </LinkToFrontPage>
+    <OverlayTrigger placement="bottom" overlay={(props) ->
+      <Tooltip {...props}>Comingle</Tooltip>
+    }>
+      <LinkToFrontPage className="flex-shrink-1 mr-1" style={maxWidth:"30px"}>
+        <img src="/comingle.svg" className="w-100"/>
+      </LinkToFrontPage>
+    </OverlayTrigger>
+    <OverlayTrigger placement="bottom" overlay={(props) ->
+      <Tooltip {...props}>
+        Meeting title<br/>
+        <small>(change in Settings)</small>
+      </Tooltip>
+    }>
+      <div className="text-center">
+        {title or 'Comingle'}
+      </div>
+    </OverlayTrigger>
   </nav>
 Header.displayName = 'Header'
 

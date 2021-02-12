@@ -15,7 +15,6 @@ import {Presence} from '/lib/presence'
 import {Loading} from './Loading'
 import {Header} from './Header'
 import {MeetingContext} from './Meeting'
-import {MeetingTitle} from './MeetingTitle'
 import {Name} from './Name'
 import {Warnings} from './Warnings'
 import {CardToggle} from './CardToggle'
@@ -133,10 +132,9 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   # https://github.com/react-bootstrap/react-bootstrap/pull/5201
 
   <div className="d-flex flex-column h-100">
-    <div className="RoomList flex-grow-1 overflow-auto pb-2" ref={roomList}>
+    <div className="sidebar flex-grow-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
       <Warnings/>
-      <MeetingTitle/>
       <Name/>
       {if starredHasOld
         <Alert variant="info" dismissible onClose={-> updateStarred()}>

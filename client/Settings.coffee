@@ -4,16 +4,22 @@ import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
+import {MeetingTitle} from './MeetingTitle'
 
 export Settings = React.memo ->
-  <Card>
-    <Card.Body>
-      <Card.Title as="h3">Settings</Card.Title>
-      <Form>
-        <Dark/>
-      </Form>
-    </Card.Body>
-  </Card>
+  <>
+    <Card>
+      <Card.Body>
+        <Card.Title as="h3">Settings</Card.Title>
+        <Form>
+          <Dark/>
+        </Form>
+      </Card.Body>
+    </Card>
+    <div className="sidebar">
+      <MeetingTitle/>
+    </div>
+  </>
 Settings.displayName = 'Settings'
 
 export Dark = React.memo ->
