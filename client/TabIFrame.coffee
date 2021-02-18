@@ -20,7 +20,7 @@ allowList = [
   "display-capture"
   "microphone"
   # Screen control e.g. YouTube
-  "fullscreen" # YouTube
+  "fullscreen"
   "wake-lock"
   "screen-wake-lock"
   # Sensors e.g. for games
