@@ -19,13 +19,14 @@ export logPresence = (presence) ->
   diff.updated = presence.updated
   ## Diff name and rooms
   diff.name = presence.name unless old? and old.name == presence.name
+  diff.admin = presence.admin unless old? and old.admin == presence.admin
   diff.rooms = {}
   for key of presence.rooms
     unless old? and sameSorted old.rooms[key], presence.rooms[key]
       diff.rooms[key] = presence.rooms[key]
   delete diff.rooms unless (key for key of diff.rooms).length
   ## Check for no-op update
-  return false unless diff.name? or diff.rooms?
+  return false unless diff.name? or diff.admin? or diff.rooms?
   ## Write log
   Log.insert diff
   true

@@ -6,7 +6,7 @@ import SelectableContext from 'react-bootstrap/SelectableContext'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen, faUser, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
+import {faDoorOpen, faUser, faUserTie, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
 import {faClone, faHandPaper as faHandPaperOutline, faStar as faStarOutline} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
@@ -85,6 +85,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           byRoom[room][type].push
             type: type
             name: presence.name
+            admin: presence.admin
             id: presence.id
             match: match
     byRoom
@@ -515,10 +516,13 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
   <div className="presence">
     {for person in presenceClusters
       <span key="#{person.item.type}:#{person.item.id}"
-       className="presence-#{person.item.type}">
+       className="presence-#{person.item.type} #{if person.item.admin then 'presence-admin' else ''}">
         {switch person.item.type
           when 'joined'
-            <FontAwesomeIcon icon={faUser}/>
+            if person.item.admin
+              <FontAwesomeIcon icon={faUserTie}/>
+            else
+              <FontAwesomeIcon icon={faUser}/>
           when 'starred'
             <FontAwesomeIcon icon={faStar}/>
         }

@@ -9,6 +9,7 @@ import {clipboardLink} from './icons/clipboardLink'
 
 import FlexLayout from './FlexLayout'
 import {ChatRoom} from './ChatRoom'
+import {useMeetingSecret} from './MeetingSecret'
 import {RoomList} from './RoomList'
 import {Room, setRoomTitle} from './Room'
 import {Settings} from './Settings'
@@ -157,11 +158,12 @@ export Meeting = React.memo ->
     return unless newStarred?  # no argument means just remove old version
     setStarred newStarred
 
+  meetingSecret = useMeetingSecret meetingId
   updatePresence = ->
-    return unless name?  # wait for tracker to load name
     presence =
       id: presenceId
       meeting: meetingId
+      secret: meetingSecret
       name: name
       rooms:
         joined: []
@@ -173,12 +175,14 @@ export Meeting = React.memo ->
       id: presenceId
       meeting: meetingId
     unless current? and current.name == presence.name and
+           Boolean(current.secret) == Boolean(presence.secret) and
            sameSorted(current?.rooms?.joined, presence.rooms.joined) and
            sameSorted(current?.rooms?.starred?, presence.rooms.starred)
       Meteor.call 'presenceUpdate', presence
+    undefined
   ## Send presence when name changes, when list of starred rooms changes, or
   ## when we reconnect to server (so server may have deleted our presence).
-  useEffect updatePresence, [name, starred.join '\t']
+  useEffect updatePresence, [name, meetingSecret, starred.join '\t']
   useTracker ->
     updatePresence() if Meteor.status().connected
   , []

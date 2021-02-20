@@ -15,19 +15,23 @@ Meteor.methods
     check presence,
       id: Match.Where validId
       meeting: Match.Where validId
+      secret: Match.Maybe String
       name: String
       rooms:
         joined: [Match.Where validId]
         starred: [Match.Where validId]
     unless @isSimulation
-      checkMeeting presence.meeting
+      meeting = checkMeeting presence.meeting
+      ## Convert 'secret' to boolean representing whether you know the secret
+      presence.admin = (presence.secret == meeting.secret)  # for log
+      setAdmin = admin: presence.admin
       connections[@connection.id] = presence.id
       presence.updated = new Date
       return unless log.logPresence presence
     Presence.update
       id: presence.id
     ,
-      $set:
+      $set: Object.assign (setAdmin ? {}),
         meeting: presence.meeting
         name: presence.name
         rooms: presence.rooms
