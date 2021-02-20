@@ -1,9 +1,15 @@
 import React from 'react'
-import {Card} from 'react-bootstrap'
+import {useParams} from 'react-router-dom'
+import {Card, OverlayTrigger, Tooltip} from 'react-bootstrap'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {clipboardLink} from './icons/clipboardLink'
 
 import {homepage, repository} from '/package.json'
 
 export Welcome = ->
+  {meetingId} = useParams()
+  meetingUrl = Meteor.absoluteUrl "/m/#{meetingId}"
+
   <Card>
     <Card.Body>
       <Card.Title as="h3">Welcome to Comingle!</Card.Title>
@@ -23,5 +29,22 @@ export Welcome = ->
         <li><b>Star</b> rooms to (publicly) indicate your interest in that topic. To focus on just starred rooms, unfold the &ldquo;<b>Your Starred Rooms</b>&rdquo; section.</li>
         <li><a href={homepage}>Read the documentation</a> for more information.</li>
       </ul>
+      <h5>
+        <span className="mr-2">Meeting&nbsp;Link:</span>
+        {' '}
+        <code className="text-break user-select-all">{meetingUrl}</code>
+        <OverlayTrigger placement="top" overlay={(props) ->
+          <Tooltip {...props}>Copy meeting link to clipboard</Tooltip>
+        }>
+          <div aria-label="Copy meeting link to clipboard"
+           onClick={-> navigator.clipboard.writeText meetingUrl}
+           className="flexlayout__tab_button_trailing">
+            <FontAwesomeIcon icon={clipboardLink}/>
+          </div>
+        </OverlayTrigger>
+      </h5>
+      <p className="ml-4">
+        Send this link to other people to let them join the meeting.
+      </p>
     </Card.Body>
   </Card>
