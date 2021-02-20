@@ -1,9 +1,10 @@
 import React, {useState, useLayoutEffect} from 'react'
 import {useParams} from 'react-router-dom'
-import {Accordion, Card, Form} from 'react-bootstrap'
+import {Accordion, Button, Card, Form, OverlayTrigger, Tooltip} from 'react-bootstrap'
 import SelectableContext from 'react-bootstrap/SelectableContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faKey} from '@fortawesome/free-solid-svg-icons'
+import {clipboardLink} from './icons/clipboardLink'
 
 import {CardToggle} from './CardToggle'
 import {LocalStorageVar} from './lib/useLocalStorage'
@@ -55,10 +56,22 @@ export MeetingSecret = React.memo ->
     {###<AutoHideAccordion ms={60000}/>###}
     <Card>
       <CardToggle eventKey="0">
-        Meeting Secret:
-        {if storedSecret
-          <FontAwesomeIcon icon={faKey} className="ml-1"/>
-        }
+        <OverlayTrigger position="top" overlay={(props) ->
+          <Tooltip {...props}>
+            {if storedSecret
+              "You have administrative access via the meeting secret. Send the secret to anyone you want to give administrative access."
+            else
+              "Enter the meeting secret to gain administrative access."
+            }
+          </Tooltip>
+        }>
+          <span>
+            Meeting Secret:
+            {if storedSecret
+              <FontAwesomeIcon icon={faKey} className="ml-1"/>
+            }
+          </span>
+        </OverlayTrigger>
       </CardToggle>
       <Accordion.Collapse eventKey="0">
         <SelectableContext.Provider value={null}>
@@ -66,6 +79,11 @@ export MeetingSecret = React.memo ->
             <Form.Control type="text" placeholder="(administrative access)"
             value={secret} onChange={(e) -> setSecret e.target.value}
             className={state}/>
+            <Button block
+             onClick={-> navigator.clipboard.writeText storedSecret}>
+              Copy to clipboard
+              <FontAwesomeIcon icon={clipboardLink} className="ml-1"/>
+            </Button>
           </Card.Body>
         </SelectableContext.Provider>
       </Accordion.Collapse>
