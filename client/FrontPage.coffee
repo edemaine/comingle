@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGithub} from '@fortawesome/free-brands-svg-icons'
 
 import {Dark} from './Settings'
+import {setMeetingSecret} from './MeetingSecret'
 import {getCreator} from './lib/presenceId'
 import {bugs, homepage, repository} from '/package.json'
 
@@ -16,10 +17,12 @@ export FrontPage = React.memo ->
     Meteor.call 'meetingNew',
       creator: getCreator()
       title: titleRef.current.value
-    , (error, meetingId) ->
+    , (error, meeting) ->
       if error?
         return console.error "Meeting creation failed: #{error}"
-      history.push "/m/#{meetingId}"
+      {_id, secret} = meeting
+      setMeetingSecret _id, secret
+      history.push "/m/#{_id}"
 
   <Jumbotron className="text-center">
     <h1 className="mb-3">

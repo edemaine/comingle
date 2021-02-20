@@ -218,7 +218,10 @@ export Meeting = React.memo ->
          visible={node.isVisible()}
          extraData={node.getExtraData()} updateTab={updateTab}/>
       when 'Settings'
-        <Settings/>
+        if node.isVisible()
+          <Settings/>
+        else
+          null  # reset MeetingSecret visibility
       when 'Welcome'
         <Welcome/>
       when 'Room'

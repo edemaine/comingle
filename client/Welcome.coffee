@@ -4,11 +4,13 @@ import {Card, OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {clipboardLink} from './icons/clipboardLink'
 
+import {useMeetingSecret} from './MeetingSecret'
 import {homepage, repository} from '/package.json'
 
 export Welcome = ->
   {meetingId} = useParams()
   meetingUrl = Meteor.absoluteUrl "/m/#{meetingId}"
+  meetingSecret = useMeetingSecret()
 
   <Card>
     <Card.Body>
@@ -46,5 +48,13 @@ export Welcome = ->
       <p className="ml-4">
         Send this link to other people to let them join the meeting.
       </p>
+      {if meetingSecret
+        <>
+          <h5>Administrative Access</h5>
+          <p className="ml-4">
+            You have administrative access to this meeting because you either created it or entered the <b>Meeting Secret</b> (under Settings). You should record the secret (for gaining access on other machines/browsers) and give it to anyone you want to have administrative access.
+          </p>
+        </>
+      }
     </Card.Body>
   </Card>

@@ -3,6 +3,7 @@ global._ = require('meteor/underscore')._
 
 import '/lib/main'
 import '/lib/log'
+import './bootstrap'
 import './chat'
 import './indexes'
 import './meetings'

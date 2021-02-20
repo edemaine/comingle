@@ -3,6 +3,7 @@ import {Card, Form} from 'react-bootstrap'
 
 import {LocalStorageVar} from './lib/useLocalStorage'
 import {MeetingTitle} from './MeetingTitle'
+import {MeetingSecret} from './MeetingSecret'
 
 export Settings = React.memo ->
   <>
@@ -16,6 +17,7 @@ export Settings = React.memo ->
     </Card>
     <div className="sidebar">
       <MeetingTitle/>
+      <MeetingSecret/>
     </div>
   </>
 Settings.displayName = 'Settings'
