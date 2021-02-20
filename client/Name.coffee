@@ -1,17 +1,24 @@
-import React, {useLayoutEffect} from 'react'
+import React, {useLayoutEffect, useState} from 'react'
 import {Card, Form} from 'react-bootstrap'
-import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 
-import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
+import {LocalStorageVar} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
+nameVar = new LocalStorageVar 'name', '', sync: true
+export useName = -> nameVar.use()
+export getName = -> nameVar.get()
+
 export Name = React.memo ->
-  [name, setName] = useLocalStorage 'name', '', sync: true
+  [name, setName] = useState -> nameVar.get()
   nameDebounce = useDebounce name, 500
 
+  ## Synchronize global with form state
+  useTracker ->
+    setName nameVar.get()
+  , []
   useLayoutEffect ->
-    Session.set 'name', nameDebounce
+    nameVar.set nameDebounce
     undefined
   , [nameDebounce]
 
@@ -26,13 +33,3 @@ export Name = React.memo ->
     </Card.Body>
   </Card>
 Name.displayName = 'Name'
-
-export useName = ->
-  [name] = useLocalStorage 'name', '', sync: true
-  trackedName = useTracker ->
-    Session.get 'name'
-  , []
-  trackedName ? name
-
-export getName = ->
-  Session.get('name') ? getLocalStorage 'name', ''

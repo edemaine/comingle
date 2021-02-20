@@ -1,5 +1,6 @@
 import {Random} from 'meteor/random'
-import {Session} from 'meteor/session'
+
+import {getName} from '../Name'
 
 ## Modeled after Cocreate's remoteId mechanism
 
@@ -18,4 +19,4 @@ export getPresenceId = (key = 'presenceId') ->
 
 export getCreator = ->
   presenceId: getPresenceId()
-  name: Session.get('name') ? window.localStorage.getItem('name') ? ''
+  name: getName()

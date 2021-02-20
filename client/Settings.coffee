@@ -1,9 +1,7 @@
-import React, {useLayoutEffect} from 'react'
+import React from 'react'
 import {Card, Form} from 'react-bootstrap'
-import {Session} from 'meteor/session'
-import {useTracker} from 'meteor/react-meteor-data'
 
-import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
+import {LocalStorageVar} from './lib/useLocalStorage'
 import {MeetingTitle} from './MeetingTitle'
 
 export Settings = React.memo ->
@@ -22,26 +20,14 @@ export Settings = React.memo ->
   </>
 Settings.displayName = 'Settings'
 
-export Dark = React.memo ->
-  [dark, setDark] = useLocalStorage 'dark', preferDark, sync: true
-  useLayoutEffect ->
-    Session.set 'dark', dark
-    undefined
-  , [dark]
-
-  <Form.Switch id="dark" label="Dark Mode" checked={dark}
-   onChange={(e) -> setDark e.target.checked}/>
-Dark.displayName = 'Dark'
-
-export useDark = ->
-  [dark] = useLocalStorage 'dark', preferDark, sync: true
-  trackedDark = useTracker ->
-    Session.get 'dark'
-  , []
-  trackedDark ? dark
-
-export getDark = ->
-  Session.get('dark') ? getLocalStorage 'dark', preferDark
-
-preferDark = ->
+darkVar = new LocalStorageVar 'dark', ->
   window.matchMedia('(prefers-color-scheme: dark)').matches
+, sync: true
+export useDark = -> darkVar.use()
+export getDark = -> darkVar.get()
+
+export Dark = React.memo ->
+  dark = useDark()
+  <Form.Switch id="dark" label="Dark Mode" checked={dark}
+   onChange={(e) -> darkVar.set e.target.checked}/>
+Dark.displayName = 'Dark'
