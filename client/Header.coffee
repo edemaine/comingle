@@ -19,7 +19,7 @@ export Header = React.memo ->
         <small>(change in Settings)</small>
       </Tooltip>
     }>
-      <div className="text-center">
+      <div className="text-center text-break">
         {title or 'Comingle'}
       </div>
     </OverlayTrigger>
