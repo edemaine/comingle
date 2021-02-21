@@ -516,7 +516,7 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
   <div className="presence">
     {for person in presenceClusters
       <span key="#{person.item.type}:#{person.item.id}"
-       className="presence-#{person.item.type} #{if person.item.admin then 'presence-admin' else ''}">
+       className="presence-#{person.item.type} #{if person.item.admin then 'admin' else ''}">
         {switch person.item.type
           when 'joined'
             if person.item.admin

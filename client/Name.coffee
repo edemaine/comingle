@@ -2,6 +2,7 @@ import React, {useLayoutEffect, useState} from 'react'
 import {Card, Form} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 
+import {useMeetingAdmin} from './MeetingSecret'
 import {LocalStorageVar} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
@@ -12,6 +13,7 @@ export getName = -> nameVar.get()
 export Name = React.memo ->
   [name, setName] = useState -> nameVar.get()
   nameDebounce = useDebounce name, 500
+  admin = useMeetingAdmin()
 
   ## Synchronize global with form state
   useTracker ->
@@ -28,7 +30,7 @@ export Name = React.memo ->
     </Card.Header>
     <Card.Body>
       <Form.Control type="text" placeholder="FirstName LastName"
-       className="name #{if nameDebounce.trim() then '' else 'is-invalid'}"
+       className="name #{if nameDebounce.trim() then '' else 'is-invalid'} #{if admin then 'admin' else ''}"
        value={name} onChange={(e) -> setName e.target.value}/>
     </Card.Body>
   </Card>

@@ -21,6 +21,9 @@ export useMeetingSecret = ->
   {meetingId} = useParams()
   meetingSecret(meetingId)?.use()
 
+export useMeetingAdmin = ->
+  Boolean useMeetingSecret()
+
 export setMeetingSecret = (meetingId, secret) ->
   meetingSecret(meetingId)?.set secret
 
