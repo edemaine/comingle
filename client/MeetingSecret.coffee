@@ -7,25 +7,20 @@ import {faKey} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import {CardToggle} from './CardToggle'
-import {LocalStorageVar} from './lib/useLocalStorage'
+import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
 import {useDebounce} from './lib/useDebounce'
 
-meetingSecrets = {}
-meetingSecret = (meetingId) ->
-  return unless meetingId?
-  meetingSecrets[meetingId] ?=
-    new LocalStorageVar "secret.#{meetingId}", '', sync: true
-  meetingSecrets[meetingId]
+meetingSecrets = new StorageDict LocalStorageVar, 'secret', '', sync: true
 
 export useMeetingSecret = ->
   {meetingId} = useParams()
-  meetingSecret(meetingId)?.use()
+  meetingSecrets.get(meetingId)?.use()
 
 export useMeetingAdmin = ->
   Boolean useMeetingSecret()
 
 export setMeetingSecret = (meetingId, secret) ->
-  meetingSecret(meetingId)?.set secret
+  meetingSecrets.get(meetingId)?.set secret
 
 export MeetingSecret = React.memo ->
   {meetingId} = useParams()

@@ -106,3 +106,11 @@ export class LocalStorageVar extends StorageVar
   @storage: window.localStorage
 export class SessionStorageVar extends StorageVar
   @storage: window.sessionStorage
+
+export class StorageDict
+  constructor: (@storageClass, @key, @initialValue, @options) ->
+    @dict = {}
+  get: (id) ->
+    return unless id?
+    @dict[id] ?= new @storageClass "#{@key}.#{id}", @initialValue, @options
+    @dict[id]
