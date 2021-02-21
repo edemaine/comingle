@@ -6,6 +6,9 @@ import {sameSorted} from './sort'
 Log = new Mongo.Collection 'log' if Meteor.isServer
 export {Log}
 
+## Returns an object with up to two keys
+## * `old` is the fetched old presence with the same ID.
+## * `diff` is an object with changed presence keys, missing if no changes.
 export logPresence = (presence) ->
   old = Presence.findOne id: presence.id
   diff = type:
@@ -26,10 +29,10 @@ export logPresence = (presence) ->
       diff.rooms[key] = presence.rooms[key]
   delete diff.rooms unless (key for key of diff.rooms).length
   ## Check for no-op update
-  return false unless diff.name? or diff.admin? or diff.rooms?
+  return {old} unless diff.name? or diff.admin? or diff.rooms?
   ## Write log
   Log.insert diff
-  true
+  {old, diff}
 
 export logPresenceRemove = (presenceId) ->
   now = new Date
@@ -39,3 +42,4 @@ export logPresenceRemove = (presenceId) ->
     id: presenceId
     meeting: old?.meeting
     updated: now
+  {old}

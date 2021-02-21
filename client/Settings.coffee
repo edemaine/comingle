@@ -1,11 +1,13 @@
 import React from 'react'
+import {useParams} from 'react-router-dom'
 import {Card, Form} from 'react-bootstrap'
 
-import {LocalStorageVar} from './lib/useLocalStorage'
+import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
 import {MeetingTitle} from './MeetingTitle'
-import {MeetingSecret} from './MeetingSecret'
+import {MeetingSecret, useMeetingAdmin} from './MeetingSecret'
 
 export Settings = React.memo ->
+  admin = useMeetingAdmin()
   <>
     <Card>
       <Card.Body>
@@ -19,6 +21,16 @@ export Settings = React.memo ->
       <MeetingTitle/>
       <MeetingSecret/>
     </div>
+    {if admin
+      <Card>
+        <Card.Body>
+          <Card.Title as="h3">Admin</Card.Title>
+          <Form>
+            <AdminVisit/>
+          </Form>
+        </Card.Body>
+      </Card>
+    }
   </>
 Settings.displayName = 'Settings'
 
@@ -33,3 +45,16 @@ export Dark = React.memo ->
   <Form.Switch id="dark" label="Dark Mode" checked={dark}
    onChange={(e) -> darkVar.set e.target.checked}/>
 Dark.displayName = 'Dark'
+
+adminVisitVars = new StorageDict LocalStorageVar,
+  'adminVisit', false, sync: true
+export useAdminVisit = ->
+  {meetingId} = useParams()
+  adminVisitVars.get(meetingId)?.use()
+
+export AdminVisit = React.memo ->
+  {meetingId} = useParams()
+  adminVisit = useAdminVisit()
+  <Form.Switch id="adminVisit" label="Show timer since last admin visit" checked={adminVisit}
+   onChange={(e) -> adminVisitVars.get(meetingId).set e.target.checked}/>
+AdminVisit.displayName = 'AdminVisit'

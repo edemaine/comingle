@@ -12,13 +12,15 @@ import {faClone, faHandPaper as faHandPaperOutline, faStar as faStarOutline} fro
 import FlexLayout from './FlexLayout'
 import {Rooms, roomWithTemplate, roomDuplicate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
-import {Loading} from './Loading'
-import {Header} from './Header'
-import {MeetingContext} from './Meeting'
-import {Name} from './Name'
-import {Warnings} from './Warnings'
 import {CardToggle} from './CardToggle'
+import {Header} from './Header'
 import {Highlight} from './Highlight'
+import {Loading} from './Loading'
+import {MeetingContext} from './Meeting'
+import {useMeetingAdmin} from './MeetingSecret'
+import {Name} from './Name'
+import {useAdminVisit} from './Settings'
+import {Warnings} from './Warnings'
 import {getPresenceId, getCreator} from './lib/presenceId'
 import {formatTimeDelta, formatDateTime} from './lib/dates'
 import timesync from './lib/timesync'
@@ -35,12 +37,17 @@ findMyPresence = (presence) ->
       myPresence[type] = me
   myPresence
 
-sortKeys =
-  title: 'Title'
-  created: 'Creation time'
-  participants: 'Participant count'
-  starred: 'Star count'
-  raised: 'Raised hand timer'
+sortKeys = (admin) ->
+  map =
+    title: 'Title'
+    created: 'Creation time'
+    participants: 'Participant count'
+    starred: 'Star count'
+    raised: 'Raised hand timer'
+  if admin
+    Object.assign map,
+      adminVisit: 'Last admin visit'
+  map
 
 defaultSort = Config.defaultSort ?
   key: 'title'
@@ -48,6 +55,7 @@ defaultSort = Config.defaultSort ?
 
 export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   {meetingId} = useParams()
+  admin = useMeetingAdmin()
   [sortKey, setSortKey] = useState null  # null means "use default"
   [reverse, setReverse] = useState null  # null means "use default"
   meeting = useTracker ->
@@ -104,6 +112,12 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
         ## room.raised will briefly be true instead of a time
         raised = new Date if typeof raised == 'boolean'
         -raised.getTime()
+      else
+        -Infinity
+    adminVisit: (room) ->
+      adminVisit = room.adminVisit
+      if adminVisit instanceof Date
+        -adminVisit.getTime()
       else
         -Infinity
   sortedRooms = useMemo ->
@@ -183,7 +197,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
                  onChange={(e) -> setSearch e.target.value}/>
                 <ButtonGroup size="sm" className="sorting w-100 text-center">
                   <DropdownButton title="Sort By" variant="light">
-                    {for key, phrase of sortKeys
+                    {for key, phrase of sortKeys admin
                       <Dropdown.Item key={key} active={key == sortKey}
                        onClick={do (key) -> (e) -> e.stopPropagation(); e.preventDefault(); setSortKey key}>
                         {phrase}
@@ -346,6 +360,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   roomInfoClass += " presence-#{type}" for type of myPresence
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
+  adminVisit = useAdminVisit()
 
   onClick = (force) -> (e) ->
     e.preventDefault()
@@ -434,8 +449,8 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
         <Tooltip {...props}>{help}</Tooltip>
       }>
         <div className="raise-hand #{if room.raised then 'active' else ''}">
-          {if room.raised and typeof room.raised != 'boolean'
-            <RaisedTimer raised={room.raised}/>
+          {if room.raised instanceof Date
+            <Timer since={room.raised}/>
           }
           {if room.raised
             <FontAwesomeIcon aria-label={label} icon={faHandPaper}
@@ -444,6 +459,17 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
             <FontAwesomeIcon aria-label={label} icon={faHandPaperOutline}
             onClick={toggleHand}/>
           }
+        </div>
+      </OverlayTrigger>
+    }
+    {if adminVisit and room.adminVisit instanceof Date
+      <OverlayTrigger placement="top" overlay={(props) ->
+        <Tooltip {...props}>
+          Time since room last visited by admin or room became nonempty
+        </Tooltip>
+      }>
+        <div className="adminVisit">
+          <Timer since={room.adminVisit}/>
         </div>
       </OverlayTrigger>
     }
@@ -535,9 +561,9 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
   </div>
 PresenceList.displayName = 'PresenceList'
 
-export RaisedTimer = React.memo ({raised}) ->
+export Timer = React.memo ({since}) ->
   recomputeTimer = ->
-    delta = timesync.offset + (new Date).getTime() - raised
+    delta = timesync.offset + (new Date).getTime() - since
     delta = 0 if delta < 0
     if delta <= (99*60 + 59) * 1000
       formatTimeDelta delta
@@ -551,7 +577,7 @@ export RaisedTimer = React.memo ({raised}) ->
   <span className="timer">
     {timer}
   </span>
-RaisedTimer.displayName = 'RaisedTimer'
+Timer.displayName = 'Timer'
 
 export RoomNew = React.memo ({selectRoom}) ->
   {meetingId} = useParams()

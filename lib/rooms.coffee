@@ -22,7 +22,9 @@ Meteor.methods
       creator: creatorPattern
     unless @isSimulation
       room.created = new Date
-    checkMeeting room.meeting
+      checkMeeting room.meeting
+    room.joined = []
+    room.adminVisit = false
     Rooms.insert room
   roomEdit: (diff) ->
     check diff,
@@ -46,6 +48,57 @@ Meteor.methods
         set.raiser = set.updator
     Rooms.update diff.id,
       $set: set
+
+## Server-only methods to maintain `joined` list
+export roomJoin = (roomId, presence) ->
+  Rooms.update
+    _id: roomId
+  ,
+    $push: joined:
+      presenceId: presence.id
+      name: presence.name
+      admin: presence.admin
+  roomCheck roomId, joined: true
+export roomChange = (roomId, presenceDiff) ->
+  set = {}
+  set["joined.$.admin"] = presenceDiff.admin if presenceDiff.admin?
+  set["joined.$.name"] = presenceDiff.name if presenceDiff.name?
+  return unless (key for own key of set).length
+  Rooms.update
+    _id: roomId
+    joined: $elemMatch: presenceId: presenceDiff.id
+  ,
+    $set: set
+  roomCheck roomId, adminLeft: presenceDiff.admin == false
+export roomLeave = (roomId, presence) ->
+  Rooms.update
+    _id: roomId
+  ,
+    $pull: joined: presenceId: presence.id
+  roomCheck roomId, adminLeft: presence.admin
+roomCheck = (roomId, options) ->
+  room = Rooms.findOne roomId
+  ## Lower hand in empty rooms
+  if not room.joined.length and room.raised
+    Rooms.update
+      _id: roomId
+    ,
+      $set: raised: false
+  ## Maintain adminVisit = Date of last admin visit or room became occupied,
+  ## or true if room has an admin right now, or false if room is empty.
+  if room.joined.length
+    admins = (presence for presence in room.joined when presence.admin).length
+    if admins
+      adminVisit = true
+    else if options?.adminLeft or (options?.joined and room.joined.length == 1)
+      adminVisit = new Date
+  else
+    adminVisit = false
+  if adminVisit? and adminVisit != room.adminVisit
+    Rooms.update
+      _id: roomId
+    ,
+      $set: adminVisit: adminVisit
 
 export roomWithTemplate = (room) ->
   template = room.template ? ''
