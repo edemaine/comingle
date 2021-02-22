@@ -78,6 +78,8 @@ export roomLeave = (roomId, presence) ->
   roomCheck roomId, adminLeft: presence.admin
 roomCheck = (roomId, options) ->
   room = Rooms.findOne roomId
+  unless room?
+    return console.error "Invalid room ID: #{roomId}"
   ## Lower hand in empty rooms
   if not room.joined.length and room.raised
     Rooms.update
