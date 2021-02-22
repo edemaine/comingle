@@ -56,7 +56,7 @@
   "devDependencies": {
     "eslint": "^7.20.0",
     "eslint-plugin-coffeescript": "^1.0.0",
-    "eslint-plugin-meteor": "git+https://github.com/edemaine/eslint-plugin-meteor.git#check-return",
+    "eslint-plugin-meteor": "^7.3.0",
     "eslint-plugin-react": "^7.22.0"
   }
 }
