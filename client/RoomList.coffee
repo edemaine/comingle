@@ -553,6 +553,7 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
           when 'starred'
             <FontAwesomeIcon icon={faStar}/>
         }
+        &nbsp;
         <Highlight search={search} text={person.name}/>
         {if person.count > 1
           <span className="ml-1 badge badge-secondary">{person.count}</span>

@@ -150,13 +150,14 @@ nav
 .presence
   font-size: 75%
   > span
-    display: inline-block
     margin-right: 0.75em
+    white-space: nowrap  // prevent line break between icon and name
     &.presence-starred
       color: var(--warning-fg)
     > svg
       font-size: 0.77em
-      margin-right: 0.25rem
+    > span
+      white-space: normal  // allow line break within name
 
 .admin
   color: #8224df  // purple from logo
