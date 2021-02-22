@@ -542,9 +542,8 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
   return null unless presenceClusters?.length
   <div className="presence">
     {for person in presenceClusters
-      <>
-        <span key="#{person.item.type}:#{person.item.id}"
-        className="presence-#{person.item.type} #{if person.item.admin then 'admin' else ''}">
+      <React.Fragment key="#{person.item.type}:#{person.item.id}">
+        <span className="presence-#{person.item.type} #{if person.item.admin then 'admin' else ''}">
           {switch person.item.type
             when 'joined'
               if person.item.admin
@@ -561,7 +560,7 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
           }
         </span>
         {' '}
-      </>
+      </React.Fragment>
     }
   </div>
 PresenceList.displayName = 'PresenceList'
