@@ -542,23 +542,26 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
   return null unless presenceClusters?.length
   <div className="presence">
     {for person in presenceClusters
-      <span key="#{person.item.type}:#{person.item.id}"
-       className="presence-#{person.item.type} #{if person.item.admin then 'admin' else ''}">
-        {switch person.item.type
-          when 'joined'
-            if person.item.admin
-              <FontAwesomeIcon icon={faUserTie}/>
-            else
-              <FontAwesomeIcon icon={faUser}/>
-          when 'starred'
-            <FontAwesomeIcon icon={faStar}/>
-        }
-        &nbsp;
-        <Highlight search={search} text={person.name}/>
-        {if person.count > 1
-          <span className="ml-1 badge badge-secondary">{person.count}</span>
-        }
-      </span>
+      <>
+        <span key="#{person.item.type}:#{person.item.id}"
+        className="presence-#{person.item.type} #{if person.item.admin then 'admin' else ''}">
+          {switch person.item.type
+            when 'joined'
+              if person.item.admin
+                <FontAwesomeIcon icon={faUserTie}/>
+              else
+                <FontAwesomeIcon icon={faUser}/>
+            when 'starred'
+              <FontAwesomeIcon icon={faStar}/>
+          }
+          &nbsp;
+          <Highlight search={search} text={person.name}/>
+          {if person.count > 1
+            <span className="ml-1 badge badge-secondary">{person.count}</span>
+          }
+        </span>
+        {' '}
+      </>
     }
   </div>
 PresenceList.displayName = 'PresenceList'
