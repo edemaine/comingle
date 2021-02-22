@@ -146,7 +146,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   # SelectableContext below is workaround until release of:
   # https://github.com/react-bootstrap/react-bootstrap/pull/5201
 
-  <div className="d-flex flex-column h-100">
+  <div className="d-flex flex-column h-100 RoomList">
     <div className="sidebar flex-grow-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
       <Warnings/>
@@ -247,7 +247,8 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
       }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Your Starred Rooms:" startClosed search={searchDebounce}
-       filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}>
+       filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}
+       className="starred">
         <OverlayTrigger placement="top" overlay={(props) ->
           <Tooltip {...props}>
             Unstar all rooms
@@ -261,11 +262,12 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
         </OverlayTrigger>
       </Sublist>
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
-       heading="Available Rooms:" search={searchDebounce}
+       heading="Available Rooms:" search={searchDebounce} className="available"
        filter={(room) -> not room.archived and
                          (not nonempty or hasJoined(room) or selected == room._id)}/>
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Archived Rooms:" startClosed search={searchDebounce}
+       className="archived"
        filter={(room) -> room.archived and
                          (not nonempty or hasJoined(room) or selected == room._id)}/>
     </div>
@@ -276,7 +278,7 @@ RoomList.displayName = 'RoomList'
 searchMatches = (search, text) ->
   0 <= text.toLowerCase().indexOf search.toLowerCase()
 
-Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, search, filter, startClosed, children}) ->
+Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model, heading, search, filter, startClosed, children, className}) ->
   subrooms = useMemo ->
     matching = sortedRooms.filter filter
     if search
@@ -289,7 +291,8 @@ Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model,
     matching
   , [sortedRooms, filter, search, (if search then presenceByRoom)]
 
-  <Accordion defaultActiveKey={unless startClosed then '0'}>
+  <Accordion defaultActiveKey={unless startClosed then '0'}
+   className={className}>
     <Card>
       <CardToggle eventKey="0">
         {heading}
@@ -326,11 +329,12 @@ RoomList.onRenderTab = (node, renderState) ->
     showHand = (e) ->
       e.preventDefault()
       e.stopPropagation()
-      hands = (elt for elt in document.querySelectorAll '.RoomList .raise-hand.active')
+      hands = document.querySelectorAll '.RoomList .accordion:not(.starred) .raise-hand.active'
+      hands = (elt for elt in hands)  # convert to Array
       return unless hands.length
       index = hands.indexOf hand
       hand = hands[(index + 1) % hands.length]
-      hand.scrollIntoView
+      hand.parentNode.scrollIntoView
         behavior: 'smooth'
     renderState.buttons.push \
       <OverlayTrigger key="handCount" placement="right" overlay={(props) ->
