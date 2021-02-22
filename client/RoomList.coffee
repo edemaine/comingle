@@ -6,7 +6,7 @@ import SelectableContext from 'react-bootstrap/SelectableContext'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen, faUser, faUserTie, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
+import {faDoorOpen, faHourglass, faUser, faUserTie, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
 import {faClone, faHandPaper as faHandPaperOutline, faStar as faStarOutline} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
@@ -470,6 +470,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
       }>
         <div className="adminVisit">
           <Timer since={room.adminVisit}/>
+          <FontAwesomeIcon icon={faHourglass} className="ml-1"/>
         </div>
       </OverlayTrigger>
     }
