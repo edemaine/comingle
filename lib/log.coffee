@@ -1,3 +1,5 @@
+## These functions should be called only on the server.
+
 import {Mongo} from 'meteor/mongo'
 
 import {Presence} from './presence'
@@ -30,8 +32,9 @@ export logPresence = (presence) ->
   delete diff.rooms unless (key for key of diff.rooms).length
   ## Check for no-op update
   return {old} unless diff.name? or diff.admin? or diff.rooms?
-  ## Write log
-  Log.insert diff
+  ## Write log.  Use rawCollection() to let server assign _id,
+  ## which guarantees no conflict.
+  Log.rawCollection().insert diff
   {old, diff}
 
 export logPresenceRemove = (presenceId) ->
