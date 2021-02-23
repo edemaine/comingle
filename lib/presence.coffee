@@ -4,7 +4,10 @@ import {check, Match} from 'meteor/check'
 import {validId, checkId} from './id'
 import {checkMeeting} from './meetings'
 import {roomJoin, roomChange, roomLeave} from './rooms'
-import log from './log'
+
+## Load log code on server only
+if Meteor.server
+  log = require '/server/log.coffee'
 
 export Presence = new Mongo.Collection 'presence'
 

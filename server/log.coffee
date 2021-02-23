@@ -1,11 +1,9 @@
-## These functions should be called only on the server.
-
 import {Mongo} from 'meteor/mongo'
 
-import {Presence} from './presence'
-import {sameSorted} from './sort'
+import {Presence} from '/lib/presence'
+import {sameSorted} from '/lib/sort'
 
-Log = new Mongo.Collection 'log' if Meteor.isServer
+Log = new Mongo.Collection 'log'
 export {Log}
 
 ## Returns an object with up to two keys

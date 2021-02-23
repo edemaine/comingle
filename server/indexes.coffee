@@ -1,5 +1,5 @@
 import {Chat} from './chat'
-import {Log} from '/lib/log'
+import {Log} from './log'
 import {Rooms} from '/lib/rooms'
 import {Tabs} from '/lib/tabs'
 import {Presence} from '/lib/presence'
