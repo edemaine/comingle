@@ -50,6 +50,7 @@ export TabIFrame = React.memo ({tabId}) ->
   dark = useDark()
   [coop, setCoop] = useState 0
   useEventListener 'message', (e) ->
+    return unless ref.current
     return unless e.source == ref.current.contentWindow
     return unless e.data?.coop
     setCoop coop + 1  # force update
