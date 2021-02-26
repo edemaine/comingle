@@ -15,7 +15,6 @@ import {Room, setRoomTitle} from './Room'
 import {Settings} from './Settings'
 import {Welcome} from './Welcome'
 import {useName} from './Name'
-import {Presence} from '/lib/presence'
 import {Rooms} from '/lib/rooms'
 import {validId} from '/lib/id'
 import {sameSorted} from '/lib/sort'
@@ -159,6 +158,7 @@ export Meeting = React.memo ->
     setStarred newStarred
 
   meetingSecret = useMeetingSecret meetingId
+  lastPresence = useRef()
   updatePresence = ->
     presence =
       id: presenceId
@@ -171,21 +171,22 @@ export Meeting = React.memo ->
     model.visitNodes (node) ->
       if node.getType() == 'tab' and node.getComponent() == 'Room'
         presence.rooms.joined.push node.getId()
-    current = Presence.findOne
-      id: presenceId
-      meeting: meetingId
-    unless current? and current.name == presence.name and
-           Boolean(current.secret) == Boolean(presence.secret) and
-           sameSorted(current?.rooms?.joined, presence.rooms.joined) and
-           sameSorted(current?.rooms?.starred?, presence.rooms.starred)
+    last = lastPresence.current
+    unless last? and last.meeting == presence.meeting and
+           last.name == presence.name and last.secret == presence.secret and
+           sameSorted(last.rooms.joined, presence.rooms.joined) and
+           sameSorted(last.rooms.starred, presence.rooms.starred)
       Meteor.call 'presenceUpdate', presence
+      lastPresence.current = presence
     undefined
   ## Send presence when name changes, when list of starred rooms changes, or
   ## when we reconnect to server (so server may have deleted our presence).
-  useEffect updatePresence, [name, meetingSecret, starred.join '\t']
   useTracker ->
-    updatePresence() if Meteor.status().connected
+    if Meteor.status().connected
+      lastPresence.current = null  # force update on reconnect
+      updatePresence true
   , []
+  useEffect updatePresence, [meetingId, name, meetingSecret, starred.join '\t']
   onAction = (action) ->
     switch action.type
       when FlexLayout.Actions.RENAME_TAB
