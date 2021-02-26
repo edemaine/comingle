@@ -6,7 +6,7 @@ export validId = (id) -> typeof id == 'string' and fullIdRegExp.test id
 export checkId = (id, type = '') ->
   unless validId id
     type += ' ' if type
-    throw new Error "Invalid #{type}ID #{id}"
+    throw new Meteor.Error 'checkId.invalid', "Invalid #{type}ID #{id}"
 
 ## Match pattern for `creator` and `updator` fields
 

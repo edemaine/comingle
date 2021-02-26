@@ -12,7 +12,7 @@ export checkMeeting = (meeting) ->
   if validId(meeting) and data = Meetings.findOne meeting
     data
   else
-    throw new Error "Invalid meeting ID #{meeting}"
+    throw new Meteor.Error 'checkMeeting.invalid', "Invalid meeting ID #{meeting}"
 
 export makeMeetingSecret = ->
   Random.id()

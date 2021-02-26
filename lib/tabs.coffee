@@ -13,7 +13,7 @@ export checkTab = (tab) ->
   if validId(tab) and data = Tabs.findOne tab
     data
   else
-    throw new Error "Invalid tab ID #{tab}"
+    throw new Meteor.Error 'checkTab.invalid', "Invalid tab ID #{tab}"
 
 export validURL = (url) ->
   return false unless typeof url == 'string'
@@ -24,7 +24,7 @@ export validURL = (url) ->
     false
 export checkURL = (url) ->
   unless validURL url
-    throw new Error "Invalid URL #{url}"
+    throw new Meteor.Error 'checkURL.invalid', "Invalid URL #{url}"
   true
 export trimURL = (x) -> x.replace /\/+$/, ''
 
@@ -76,18 +76,18 @@ Meteor.methods
       url: Match.Where checkURL
       creator: creatorPattern
     unless tab.type of tabTypes
-      throw new Error "Invalid tab type: #{tab?.type}"
+      throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
     #switch tab?.type
     #  when 'iframe', 'cocreate', 'jitsi'
     #    Object.assign pattern,
     #      url: Match.Where checkURL
     #  else
-    #    throw new Error "Invalid tab type: #{tab?.type}"
+    #    throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
     check tab, pattern
     checkMeeting tab.meeting
     room = checkRoom tab.room
     if tab.meeting != room.meeting
-      throw new Error "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
+      throw new Meteor.Error 'tabNew.wrongMeeting', "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
     unless @isSimulation
       tab.created = new Date
     Tabs.insert tab

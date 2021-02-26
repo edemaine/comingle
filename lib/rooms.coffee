@@ -12,7 +12,7 @@ export checkRoom = (room) ->
   if validId(room) and data = Rooms.findOne room
     data
   else
-    throw new Error "Invalid room ID #{room}"
+    throw new Meteor.Error 'checkRoom.invalid', "Invalid room ID #{room}"
 
 Meteor.methods
   roomNew: (room) ->

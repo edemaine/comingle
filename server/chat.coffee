@@ -37,6 +37,6 @@ Meteor.methods
       body: String
     message.sent = new Date
     unless Meetings.findOne(message.channel) or Rooms.findOne(message.channel)
-      throw new Error "Invalid channel #{message.channel}"
+      throw new Meteor.Error 'chatSend.invalidChannel', "Invalid channel #{message.channel}"
     message._id = Chat.insert message
     ChatStream.emit message.channel, message
