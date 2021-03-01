@@ -51,7 +51,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
   [tabNews, replaceTabNew] = useReducer(
     (state, {id, node}) -> state[id] = node; state
   , {})
-  {subLoading, room, tabs} = useTracker ->
+  {subLoading, room} = useTracker ->
     sub = Meteor.subscribe 'room', roomId
     subLoading: not sub.ready()
     room: Rooms.findOne roomId
@@ -193,12 +193,12 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           FlexLayout.forceSelectTab model, tabLayout.id
         model.doAction FlexLayout.Actions.setActiveTabset location
     ## Start new tab in every empty tabset
-    if authorized
+    if authorized and not loading
       for tabset in FlexLayout.getTabsets model
         if tabset.getChildren().length == 0
           tabNew tabset
     undefined
-  , [model, tabs, authorized]
+  , [loading, model, tabs, authorized]
   ## End of hooks
 
   tabNew = (parent) ->
