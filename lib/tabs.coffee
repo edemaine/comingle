@@ -3,7 +3,7 @@ import {check, Match} from 'meteor/check'
 import {Random} from 'meteor/random'
 
 import {validId, creatorPattern} from './id'
-import {checkMeeting} from './meetings'
+import {checkMeeting, checkMeetingSecret} from './meetings'
 import {checkRoom} from './rooms'
 import {Config} from '/Config'
 
@@ -66,6 +66,16 @@ export categories =
   'Video Conference':
     onePerRoom: true
 
+tabCheckSecret = (op, tab, room, meeting) ->
+  return if Meteor.isClient
+  if op.secret
+    checkMeetingSecret (meeting ? tab?.meeting), op.secret
+    delete op.secret
+  else
+    room ?= checkRoom tab.room
+    if room.protected
+      throw new Meteor.Error 'tabCheckSecret.protected', "Need meeting secret to modify tab in protected room #{tab.room}"
+
 Meteor.methods
   tabNew: (tab) ->
     pattern =
@@ -75,6 +85,7 @@ Meteor.methods
       title: String
       url: Match.Where checkURL
       creator: creatorPattern
+      secret: Match.Optional String
     unless tab.type of tabTypes
       throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
     #switch tab?.type
@@ -84,8 +95,9 @@ Meteor.methods
     #  else
     #    throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
     check tab, pattern
-    checkMeeting tab.meeting
+    meeting = checkMeeting tab.meeting
     room = checkRoom tab.room
+    tabCheckSecret tab, tab, room, meeting
     if tab.meeting != room.meeting
       throw new Meteor.Error 'tabNew.wrongMeeting', "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
     unless @isSimulation
@@ -97,7 +109,9 @@ Meteor.methods
       title: Match.Optional String
       archived: Match.Optional Boolean
       updator: creatorPattern
+      secret: Match.Optional String
     tab = checkTab diff.id
+    tabCheckSecret diff, tab
     set = {}
     for key, value of diff when key != 'id'
       set[key] = value unless tab[key] == value

@@ -2,7 +2,7 @@ import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
 
 import {validId, creatorPattern} from './id'
-import {checkMeeting} from './meetings'
+import {checkMeeting, checkMeetingSecret} from './meetings'
 import {meteorCallPromise} from './meteorPromise'
 import {Tabs, tabTypes, mangleTab} from './tabs'
 
@@ -14,15 +14,46 @@ export checkRoom = (room) ->
   else
     throw new Meteor.Error 'checkRoom.invalid', "Invalid room ID #{room}"
 
+roomCheckSecret = (op, room, meeting) ->
+  return if Meteor.isClient
+  if op.secret
+    checkMeetingSecret (meeting ? room?.meeting), op.secret
+    delete op.secret
+  else
+    for key in ['protected']
+      if op[key]?
+        throw new Meteor.Error 'roomCheckSecret.unauthorized', "Need meeting secret to use '#{key}' flag"
+    if room.protected
+      for key in ['title', 'archived']  # allow 'raised'
+        if op[key]?
+          throw new Meteor.Error 'roomCheckSecret.protected', "Need meeting secret to modify #{key} in protected room #{room._id}"
+
+setUpdated = (op) ->
+  op.updated = new Date
+  if op.archived
+    op.archived = op.updated
+    op.archiver = op.updator
+  if op.protected
+    op.protected = op.updated
+    op.protecter = op.updator
+  if op.raised
+    op.raised = op.updated
+    op.raiser = op.updator
+
 Meteor.methods
   roomNew: (room) ->
     check room,
       meeting: String
       title: String
+      archived: Match.Optional Boolean
+      protected: Match.Optional Boolean
       creator: creatorPattern
+      secret: Match.Optional String
     unless @isSimulation
-      room.created = new Date
-      checkMeeting room.meeting
+      setUpdated room
+      room.created = room.updated
+      meeting = checkMeeting room.meeting
+      roomCheckSecret room, room, meeting
     room.joined = []
     room.adminVisit = false
     Rooms.insert room
@@ -32,20 +63,17 @@ Meteor.methods
       title: Match.Optional String
       raised: Match.Optional Boolean
       archived: Match.Optional Boolean
+      protected: Match.Optional Boolean
       updator: creatorPattern
+      secret: Match.Optional String
     room = checkRoom diff.id
+    roomCheckSecret diff, room
     set = {}
     for key, value of diff when key != 'id'
       set[key] = value unless room[key] == value
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
-      set.updated = new Date
-      if set.archived
-        set.archived = set.updated
-        set.archiver = set.updator
-      if set.raised
-        set.raised = set.updated
-        set.raiser = set.updator
+      setUpdated set
     Rooms.update diff.id,
       $set: set
 

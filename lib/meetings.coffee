@@ -14,6 +14,11 @@ export checkMeeting = (meeting) ->
   else
     throw new Meteor.Error 'checkMeeting.invalid', "Invalid meeting ID #{meeting}"
 
+export checkMeetingSecret = (meeting, secret) ->
+  meeting = checkMeeting meeting if typeof meeting == 'string'
+  unless meeting.secret == secret
+    throw new Meteor.Error 'checkMeetingSecret.invalid', "Incorrect meeting secret for meeting #{meeting._id}"
+
 export makeMeetingSecret = ->
   Random.id()
 

@@ -190,7 +190,7 @@ export Meeting = React.memo ->
   onAction = (action) ->
     switch action.type
       when FlexLayout.Actions.RENAME_TAB
-        setRoomTitle action.data.node, action.data.text
+        setRoomTitle meetingId, action.data.node, action.data.text
     action
   [enableMaximize, setEnableMaximize] = useState false
   onModelChange = ->

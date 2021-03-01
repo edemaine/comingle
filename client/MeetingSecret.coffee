@@ -19,8 +19,19 @@ export useMeetingSecret = ->
 export useMeetingAdmin = ->
   Boolean useMeetingSecret()
 
+export getMeetingSecret = (meetingId) ->
+  meetingSecrets.get(meetingId)?.get()
+
+export getMeetingAdmin = (meetingId) ->
+  Boolean getMeetingSecret meetingId
+
 export setMeetingSecret = (meetingId, secret) ->
   meetingSecrets.get(meetingId)?.set secret
+
+export addMeetingSecret = (meetingId, obj) ->
+  secret = getMeetingSecret meetingId
+  obj.secret = secret if secret
+  obj
 
 export MeetingSecret = React.memo ->
   {meetingId} = useParams()

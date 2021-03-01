@@ -15,10 +15,11 @@ import {getCreator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
 import {formatDateTime} from './lib/dates'
-import {ArchiveButton} from './ArchiveButton'
 import {ChatRoom} from './ChatRoom'
+import {ArchiveButton, ProtectButton} from './ConfirmButton'
 import {Loading} from './Loading'
 import Meeting from './Meeting'
+import {useMeetingAdmin, addMeetingSecret} from './MeetingSecret'
 import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
@@ -45,6 +46,7 @@ tabIcon = (tab) -> # eslint-disable-line react/display-name
 
 export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, onMaximize}) ->
   {meetingId} = useParams()
+  admin = useMeetingAdmin()
   [layout, setLayout] = useLocalStorage "layout.#{roomId}", {}, noUpdate: true
   [tabNews, replaceTabNew] = useReducer(
     (state, {id, node}) -> state[id] = node; state
@@ -55,6 +57,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     room: Rooms.findOne roomId
   , [roomId]
   loading or= subLoading
+  authorized = admin or not room?.protected
   [showArchived, setShowArchived] = useState false
   tabs = useTracker ->
     roomTabs roomId, showArchived
@@ -160,7 +163,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     tabSettings = (tab) ->
       name: tabTitle tab
       component: tabComponent tab
-      enableRename: true  # override TabNew
+      enableRename: authorized  # override TabNew
       enableClose: false
       enableRenderOnDemand: not tabTypes[tab.type]?.alwaysRender
     model.visitNodes (node) ->
@@ -190,11 +193,12 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           FlexLayout.forceSelectTab model, tabLayout.id
         model.doAction FlexLayout.Actions.setActiveTabset location
     ## Start new tab in every empty tabset
-    for tabset in FlexLayout.getTabsets model
-      if tabset.getChildren().length == 0
-        tabNew tabset
+    if authorized
+      for tabset in FlexLayout.getTabsets model
+        if tabset.getChildren().length == 0
+          tabNew tabset
     undefined
-  , [model, tabs]
+  , [model, tabs, authorized]
   ## End of hooks
 
   tabNew = (parent) ->
@@ -242,7 +246,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     <Tooltip {...props}>
       Tab &ldquo;{tab.title}&rdquo;<br/>
       <code>{tab.url}</code><br/>
-      created by {tab.creator?.name ? 'unknown'}<br/>
+      <b>created</b> by {tab.creator?.name ? 'unknown'}<br/>
       on {formatDateTime tab.created}
       {if tab.archived
         <i>
@@ -251,7 +255,9 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
         </i>
       }
       <br/>
-      <small>(Double click to rename.)</small>
+      {if authorized
+        <small>(Double click to rename.)</small>
+      }
     </Tooltip>
   onRenderTab = (node, renderState) ->
     return if node.getComponent() == 'TabNew'
@@ -320,17 +326,19 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           </OverlayTrigger>
         </div>
       archiveTab = ->
-        Meteor.call 'tabEdit',
+        Meteor.call 'tabEdit', addMeetingSecret meetingId,
           id: tab._id
           archived: not tab.archived
           updator: getCreator()
-      buttons?.push <ArchiveButton key="archive" noun="tab"
-        className="flexlayout__tab_button_trailing"
-        archived={tab.archived} onClick={archiveTab}
-        help="Archived tabs can still be restored using the room's eye icon."
-      />
+      if authorized
+        buttons?.push <ArchiveButton key="archive" noun="tab"
+          className="flexlayout__tab_button_trailing"
+          archived={tab.archived} onClick={archiveTab}
+          help="Archived tabs can still be restored using the room's eye icon."
+        />
   onRenderTabSet = (node, {buttons}) ->
     return if node.getType() == 'border'
+    return unless authorized
     buttons.push \
       <OverlayTrigger key="add" placement="bottom" overlay={(tipProps) ->
         <Tooltip {tipProps...}>
@@ -352,7 +360,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
         ## Sanitize tab title and push to other users
         action.data.text = action.data.text.trim()
         return unless action.data.text  # prevent empty title
-        Meteor.call 'tabEdit',
+        Meteor.call 'tabEdit', addMeetingSecret meetingId,
           id: action.data.node
           title: action.data.text
           updator: getCreator()
@@ -370,9 +378,15 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       Meteor.absoluteUrl "/m/#{meetingId}##{roomId}"
   archiveRoom = ->
     return unless room?
-    Meteor.call 'roomEdit',
+    Meteor.call 'roomEdit', addMeetingSecret meetingId,
       id: room._id
       archived: not room.archived
+      updator: getCreator()
+  protectRoom = ->
+    return unless room?
+    Meteor.call 'roomEdit', addMeetingSecret meetingId,
+      id: room._id
+      protected: not room.protected
       updator: getCreator()
 
   leaveRoom = (position) -> # eslint-disable-line react/display-name
@@ -415,10 +429,15 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           </div>
         </OverlayTrigger>
       }
-      <ArchiveButton type="tab" noun="room"
-       className="flexlayout__tab_button_trailing"
-       archived={room?.archived} onClick={archiveRoom}
-       help="Archived rooms can still be viewed and restored from the list at the bottom."/>
+      {if authorized
+        <ArchiveButton noun="room" className="flexlayout__tab_button_trailing"
+         archived={room?.archived} onClick={archiveRoom}
+         help="Archived rooms can still be viewed and restored from the list at the bottom of the room list."/>
+      }
+      {if admin
+        <ProtectButton className="flexlayout__tab_button_trailing"
+         protected={room?.protected} onClick={protectRoom}/>
+      }
       {leaveRoom 'trailing'}
       {if enableMaximize
         <div onClick={onMaximize} className="flexlayout__tab_button_trailing">
@@ -443,16 +462,19 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
 
 Room.displayName = 'Room'
 
-export setRoomTitle = (roomId, title) ->
+export setRoomTitle = (meetingId, roomId, title) ->
   ## Sanitize room title and push to other users
   title = title.trim()
   return unless title  # prevent empty title
-  Meteor.call 'roomEdit',
+  Meteor.call 'roomEdit', addMeetingSecret meetingId,
     id: roomId
     title: title
     updator: getCreator()
 
 export RoomTitle = ({room, roomId}) ->
+  {meetingId} = useParams()
+  admin = useMeetingAdmin()
+  authorized = admin or not room?.protected
   [editing, setEditing] = useState false
   inputRef = useRef()
   {openRoomWithDragAndDrop} = useContext Meeting.MeetingContext
@@ -481,12 +503,15 @@ export RoomTitle = ({room, roomId}) ->
         setEditing false
       when 'Enter'
         e.preventDefault()
-        setRoomTitle roomId, inputRef.current.value
+        setRoomTitle meetingId, roomId, inputRef.current.value
         setEditing false
   onDragStart = (e) ->
     e.preventDefault()
     e.stopPropagation()
     openRoomWithDragAndDrop roomId, 'Move'
+  onRename = (e) ->
+    e.preventDefault()
+    setEditing true if authorized
 
   className = 'room-title'
   className += ' archived' if room?.archived
@@ -500,21 +525,29 @@ export RoomTitle = ({room, roomId}) ->
       return <div/> unless room?
       <Tooltip {...props}>
         Room &ldquo;{room.title}&rdquo;<br/>
-        created by {room.creator?.name ? 'unknown'}<br/>
+        <b>created</b> by {room.creator?.name ? 'unknown'}<br/>
         on {formatDateTime room.created}
+        {if room.protected
+          <>
+            <br/><b>protected</b> by {room.protecter?.name ? 'unknown'}
+            <br/>on {formatDateTime room.protected}
+          </>
+        }
         {if room.archived
           <>
-            <br/>archived by {room.archiver?.name ? 'unknown'}
+            <br/><b>archived</b> by {room.archiver?.name ? 'unknown'}
             <br/>on {formatDateTime room.archived}
           </>
         }
         <br/>
-        <small>(Double click to rename.)</small>
+        {if authorized
+          <small>(Double click to rename.)</small>
+        }
       </Tooltip>
     }>
       {({ref, ...triggerHandler}) ->
         <div className={className} {...triggerHandler}
-         onDoubleClick={-> setEditing true} draggable onDragStart={onDragStart}>
+         onDoubleClick={onRename} draggable onDragStart={onDragStart}>
           <span ref={ref}>{room?.title ? roomId}</span>
         </div>
       }
