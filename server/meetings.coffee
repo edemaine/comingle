@@ -8,6 +8,8 @@ Meteor.publish 'meeting', (meetingId) ->
   [
     Meetings.find (_id: meetingId),
       fields: secret: false
-    Rooms.find meeting: meetingId
+    Rooms.find
+      meeting: meetingId
+      deleted: null
     Presence.find meeting: meetingId
   ]

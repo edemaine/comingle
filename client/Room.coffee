@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useReducer, useRef, useState} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
-import {OverlayTrigger, Tooltip} from 'react-bootstrap'
+import {Alert, OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import useEventListener from '@use-it/event-listener'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -16,7 +16,7 @@ import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
 import {formatDateTime} from './lib/dates'
 import {ChatRoom} from './ChatRoom'
-import {ArchiveButton, ProtectButton} from './ConfirmButton'
+import {ArchiveButton, DeleteButton, ProtectButton} from './ConfirmButton'
 import {Loading} from './Loading'
 import Meeting from './Meeting'
 import {useMeetingAdmin, addMeetingSecret} from './MeetingSecret'
@@ -330,12 +330,20 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           id: tab._id
           archived: not tab.archived
           updator: getCreator()
+      deleteTab = ->
+        Meteor.call 'tabEdit', addMeetingSecret meetingId,
+          id: tab._id
+          deleted: true
+          updator: getCreator()
       if authorized
         buttons?.push <ArchiveButton key="archive" noun="tab"
           className="flexlayout__tab_button_trailing"
           archived={tab.archived} onClick={archiveTab}
           help="Archived tabs can still be restored using the room's eye icon."
         />
+      if admin
+        buttons?.push <DeleteButton key="delete" noun="tab" onClick={deleteTab}
+          className="flexlayout__tab_button_trailing admin"/>
   onRenderTabSet = (node, {buttons}) ->
     return if node.getType() == 'border'
     return unless authorized
@@ -382,6 +390,12 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       id: room._id
       archived: not room.archived
       updator: getCreator()
+  deleteRoom = ->
+    return unless room?
+    Meteor.call 'roomEdit', addMeetingSecret meetingId,
+      id: room._id
+      deleted: true
+      updator: getCreator()
   protectRoom = ->
     return unless room?
     Meteor.call 'roomEdit', addMeetingSecret meetingId,
@@ -415,7 +429,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           <FontAwesomeIcon icon={clipboardLink}/>
         </div>
       </OverlayTrigger>
-      {
+      {if room?
         label = "#{if showArchived then "Hide" else "Show"} Archived Tabs"
         <OverlayTrigger placement="bottom" overlay={(props) ->
           <Tooltip {...props}>
@@ -429,13 +443,17 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           </div>
         </OverlayTrigger>
       }
-      {if authorized
+      {if room? and authorized
         <ArchiveButton noun="room" className="flexlayout__tab_button_trailing"
          archived={room?.archived} onClick={archiveRoom}
          help="Archived rooms can still be viewed and restored from the list at the bottom of the room list."/>
       }
-      {if admin
-        <ProtectButton className="flexlayout__tab_button_trailing"
+      {if room? and admin
+        <DeleteButton noun="room" onClick={deleteRoom}
+         className="flexlayout__tab_button_trailing admin"/>
+      }
+      {if room? and admin
+        <ProtectButton className="flexlayout__tab_button_trailing admin"
          protected={room?.protected} onClick={protectRoom}/>
       }
       {leaveRoom 'trailing'}
@@ -452,6 +470,15 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     <div className="container">
       {if loading or not model?  ### Post-loading, useEffect needs a tick to set model ###
         <Loading/>
+      else unless room? or loading
+        <Alert variant="danger">
+          No such room! Perhaps&hellip;
+          <ul>
+          <li>A typo in the room ID (the part after the <code>#</code> in the URL)?</li>
+          <li>The room was deleted?</li>
+          <li>You do not have access to this room?</li>
+          </ul>
+        </Alert>
       else
         <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
         onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}

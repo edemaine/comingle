@@ -20,25 +20,25 @@ roomCheckSecret = (op, room, meeting) ->
     checkMeetingSecret (meeting ? room?.meeting), op.secret
     delete op.secret
   else
-    for key in ['protected']
+    for key in ['protected', 'deleted']  # admin-only
       if op[key]?
-        throw new Meteor.Error 'roomCheckSecret.unauthorized', "Need meeting secret to use '#{key}' flag"
+        throw new Meteor.Error 'roomCheckSecret.unauthorized', "Need meeting secret to use #{key} flag"
     if room.protected
       for key in ['title', 'archived']  # allow 'raised'
         if op[key]?
           throw new Meteor.Error 'roomCheckSecret.protected', "Need meeting secret to modify #{key} in protected room #{room._id}"
 
-setUpdated = (op) ->
+export setUpdated = (op) ->
   op.updated = new Date
-  if op.archived
-    op.archived = op.updated
-    op.archiver = op.updator
-  if op.protected
-    op.protected = op.updated
-    op.protecter = op.updator
-  if op.raised
-    op.raised = op.updated
-    op.raiser = op.updator
+  for key in ['archived', 'protected', 'deleted', 'raised']
+    if op[key]
+      op[key] = op.updated
+      # archiver, protecter, deleter, raiser
+      op["#{key[...key.length-1]}r"] = op.updator
+  ## deleted flag behaves specially: null to indicate false.
+  ## (See publications in server/rooms.coffee and server/tabs.coffee.)
+  if op.deleted == false
+    op.deleted = null
 
 Meteor.methods
   roomNew: (room) ->
@@ -63,6 +63,7 @@ Meteor.methods
       title: Match.Optional String
       raised: Match.Optional Boolean
       archived: Match.Optional Boolean
+      deleted: Match.Optional Boolean
       protected: Match.Optional Boolean
       updator: creatorPattern
       secret: Match.Optional String
