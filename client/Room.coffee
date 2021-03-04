@@ -51,17 +51,17 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
   [tabNews, replaceTabNew] = useReducer(
     (state, {id, node}) -> state[id] = node; state
   , {})
-  {subLoading, room} = useTracker ->
-    sub = Meteor.subscribe 'room', roomId
+  [showArchived, setShowArchived] = useState false
+  sub = useTracker ->
+    Meteor.subscribe 'room', roomId
+  , [roomId]
+  {subLoading, room, tabs} = useTracker ->
     subLoading: not sub.ready()
     room: Rooms.findOne roomId
-  , [roomId]
+    tabs: roomTabs roomId, showArchived
+  , [roomId, showArchived]
   loading or= subLoading
   authorized = admin or not room?.protected
-  [showArchived, setShowArchived] = useState false
-  tabs = useTracker ->
-    roomTabs roomId, showArchived
-  , [roomId, showArchived]
   id2tab = useIdMap tabs
   existingTabTypes = useIdMap tabs, 'type'
   tabsetUsed = useRef {}
