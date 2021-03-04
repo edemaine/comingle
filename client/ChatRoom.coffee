@@ -1,8 +1,9 @@
-import React, {useState, useEffect, useLayoutEffect, useRef} from 'react'
+import React, {useState, useLayoutEffect} from 'react'
 import {Alert, Badge, Button, Form, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faComment} from '@fortawesome/free-solid-svg-icons'
 import {useTracker} from 'meteor/react-meteor-data'
+import ScrollableFeed from 'react-scrollable-feed'
 
 import {Loading} from './Loading'
 import {Markdown} from './lib/Markdown'
@@ -43,16 +44,6 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
     undefined
   , [messages, seen]
 
-  ## Keep chat scrolled to bottom unless user modifies scroll position.
-  messagesDiv = useRef()
-  if elt = messagesDiv.current
-    atBottom = (elt.scrollHeight - elt.scrollTop - elt.clientHeight <= 3)
-  useEffect ->
-    if atBottom
-      ## Setting scrollTop to too-large value pushes us to the bottom.
-      messagesDiv.current?.scrollTop = messagesDiv.current.scrollHeight
-    undefined
-
   ## Form
   [body, setBody] = useState ''
   submit = (e) ->
@@ -67,7 +58,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
 
   return null unless visible
   <div className="chat">
-    <div className="messages" ref={messagesDiv}>
+    <ScrollableFeed className="messages">
       {for message in messages
         date = formatDate message.sent
         <React.Fragment key={message._id}>
@@ -93,7 +84,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
           Empty chat. Post the first message below!
         </Alert>
       }
-    </div>
+    </ScrollableFeed>
     <Form onSubmit={submit}>
       <InputGroup>
         <Form.Control type="text" placeholder="Message #{audience}"
