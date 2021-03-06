@@ -9,8 +9,7 @@ with the following key features:
   creating and jumping between **rooms** (something like physical tables).
   To facilitate e.g. deciding which room to go into:
   * Everyone can see who is in what room
-  * Users can indicate their interest in multiple rooms
-    by "joining" rooms in the background
+  * Users can star rooms to (publicly) indicate their interest in topics
 * Rooms have **state**, such as whiteboard, chat messages,
   or key web pages being discussed.
   * Anyone joining late instantly has access to this state,

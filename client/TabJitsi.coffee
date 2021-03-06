@@ -6,8 +6,10 @@ import {getName} from './Name'
 import {getDark} from './Settings'
 import {Tabs} from '/lib/tabs'
 
-export TabJitsi = ({tabId, room}) ->
-  tab = useTracker -> Tabs.findOne tabId
+export TabJitsi = React.memo ({tabId, room}) ->
+  tab = useTracker ->
+    Tabs.findOne tabId
+  , [tabId]
   return null unless tab
   url = tab.url
 

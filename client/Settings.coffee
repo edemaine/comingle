@@ -1,38 +1,60 @@
-import React, {useLayoutEffect} from 'react'
+import React from 'react'
+import {useParams} from 'react-router-dom'
 import {Card, Form} from 'react-bootstrap'
-import {Session} from 'meteor/session'
-import {useTracker} from 'meteor/react-meteor-data'
 
-import {useLocalStorage, getLocalStorage} from './lib/useLocalStorage'
+import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
+import {MeetingTitle} from './MeetingTitle'
+import {MeetingSecret, useMeetingAdmin} from './MeetingSecret'
 
-export Settings = ->
-  <Card>
-    <Card.Body>
-      <Card.Title as="h3">Settings</Card.Title>
-      <Form>
-        <Dark/>
-      </Form>
-    </Card.Body>
-  </Card>
+export Settings = React.memo ->
+  admin = useMeetingAdmin()
+  <>
+    <Card>
+      <Card.Body>
+        <Card.Title as="h3">Settings</Card.Title>
+        <Form>
+          <Dark/>
+        </Form>
+      </Card.Body>
+    </Card>
+    <div className="sidebar">
+      <MeetingTitle/>
+      <MeetingSecret/>
+    </div>
+    {if admin
+      <Card>
+        <Card.Body>
+          <Card.Title as="h3">Admin</Card.Title>
+          <Form>
+            <AdminVisit/>
+          </Form>
+        </Card.Body>
+      </Card>
+    }
+  </>
 Settings.displayName = 'Settings'
 
-export Dark = ->
-  [dark, setDark] = useLocalStorage 'dark', preferDark, true
-  useLayoutEffect ->
-    Session.set 'dark', dark
-    undefined
-  , [dark]
+darkVar = new LocalStorageVar 'dark', ->
+  window.matchMedia('(prefers-color-scheme: dark)').matches
+, sync: true
+export useDark = -> darkVar.use()
+export getDark = -> darkVar.get()
 
+export Dark = React.memo ->
+  dark = useDark()
   <Form.Switch id="dark" label="Dark Mode" checked={dark}
-   onChange={(e) -> setDark e.target.checked}/>
+   onChange={(e) -> darkVar.set e.target.checked}/>
 Dark.displayName = 'Dark'
 
-export useDark = ->
-  [dark] = useLocalStorage 'dark', preferDark, true
-  useTracker -> Session.get('dark') ? dark
+adminVisitVars = new StorageDict LocalStorageVar,
+  'adminVisit', false, sync: true
+export useAdminVisit = ->
+  {meetingId} = useParams()
+  adminVisitVars.get(meetingId)?.use()
 
-export getDark = ->
-  Session.get('dark') ? getLocalStorage 'dark', preferDark
-
-preferDark = ->
-  window.matchMedia('(prefers-color-scheme: dark)').matches
+export AdminVisit = React.memo ->
+  {meetingId} = useParams()
+  adminVisit = useAdminVisit()
+  <Form.Switch id="adminVisit" label="Show timer since last admin visit" checked={adminVisit}
+   onChange={(e) -> adminVisitVars.get(meetingId).set e.target.checked}/>
+AdminVisit.displayName = 'AdminVisit'

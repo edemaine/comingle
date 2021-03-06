@@ -29,11 +29,14 @@ Installation instructions:
 1. Install Meteor and download Comingle as above.
 2. Install `mup` via `npm install -g mup`
    (after installing [Node](https://nodejs.org/en/) and thus NPM).
-3. Edit `.deploy/mup.js` to point to your SSH key (for accessing the server),
+3. Copy `settings.json` to `.deploy/settings.json` and optionally edit
+   [to add Zoom web client support](#zoom-support) and/or
+   [APM](#application-performance-management-apm).
+4. Edit `.deploy/mup.js` to point to your SSH key (for accessing the server),
    and your SSL certificate (for an https server).
-4. `cd .deploy`
-5. `mup setup` to install all necessary software on the server
-6. `mup deploy` each time you want to deploy code to server
+5. `cd .deploy`
+6. `mup setup` to install all necessary software on the server
+7. `mup deploy` each time you want to deploy code to server
    (initially and after each `git pull`)
 
 ## Configuration
@@ -52,8 +55,8 @@ you need to sign up for an API Key &amp; Secret.  Go to the
 [Zoom Marketplace](https://marketplace.zoom.us/) and select "Create a JWT App".
 See https://marketplace.zoom.us/docs/sdk/native-sdks/web/getting-started/integrate
 
-Then add the API Key &amp; Secret into [`settings.json`](settings.json)
-at the root of this repository.  It should look something like this:
+Then add the API Key &amp; Secret into `.deploy/settings.json`.
+It should look something like this:
 
 ```json
 {
@@ -64,19 +67,16 @@ at the root of this repository.  It should look something like this:
 }
 ```
 
-DO NOT commit your changes to this file into Git; the secret needs to
-STAY SECRET.  To ensure Git doesn't accidentally commit your changes, use
-
-```
-git update-index --assume-unchanged settings.json
-```
+DO NOT commit your changes into Git; the secret needs to STAY SECRET.
+Thus we recommend copying [root `settings.json`](settings.json) file
+into `.deploy` and editing the copy only.
 
 If you're deploying a public server via `mup`, it should pick up these keys.
 If you're developing on a local test server, use the following instead of
 `meteor`:
 
 ```
-meteor --settings settings.json
+meteor --settings .deploy/settings.json
 ```
 
 ## Application Performance Management (APM)
@@ -91,7 +91,7 @@ To monitor server performance, you can use one of the following:
   [kadira-compose](https://github.com/edemaine/kadira-compose).
 
 After creating an application on one of the servers above,
-edit `settings.json` to look like the following
+edit `.deploy/settings.json` to look like the following
 (omit `endpoint` if you're using Monti):
 
 ```json
@@ -104,7 +104,7 @@ edit `settings.json` to look like the following
 }
 ```
 
-If you want Zoom support and APM, `settings.json` should look like this
+If you want Zoom support and APM, `.deploy/settings.json` should look like this
 (omit `endpoint` if you're using Monti):
 
 ```json

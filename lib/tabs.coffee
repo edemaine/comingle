@@ -3,8 +3,8 @@ import {check, Match} from 'meteor/check'
 import {Random} from 'meteor/random'
 
 import {validId, creatorPattern} from './id'
-import {checkMeeting} from './meetings'
-import {checkRoom} from './rooms'
+import {checkMeeting, checkMeetingSecret} from './meetings'
+import {checkRoom, setUpdated} from './rooms'
 import {Config} from '/Config'
 
 export Tabs = new Mongo.Collection 'tabs'
@@ -13,7 +13,7 @@ export checkTab = (tab) ->
   if validId(tab) and data = Tabs.findOne tab
     data
   else
-    throw new Error "Invalid tab ID #{tab}"
+    throw new Meteor.Error 'checkTab.invalid', "Invalid tab ID #{tab}"
 
 export validURL = (url) ->
   return false unless typeof url == 'string'
@@ -24,7 +24,7 @@ export validURL = (url) ->
     false
 export checkURL = (url) ->
   unless validURL url
-    throw new Error "Invalid URL #{url}"
+    throw new Meteor.Error 'checkURL.invalid', "Invalid URL #{url}"
   true
 export trimURL = (x) -> x.replace /\/+$/, ''
 
@@ -66,6 +66,19 @@ export categories =
   'Video Conference':
     onePerRoom: true
 
+tabCheckSecret = (op, tab, room, meeting) ->
+  return if Meteor.isClient
+  if op.secret
+    checkMeetingSecret (meeting ? tab?.meeting), op.secret
+    delete op.secret
+  else
+    for key in ['deleted']  # admin-only
+      if op[key]?
+        throw new Meteor.Error 'tabCheckSecret.unauthorized', "Need meeting secret to use #{key} flag"
+    room ?= checkRoom tab.room
+    if room.protected
+      throw new Meteor.Error 'tabCheckSecret.protected', "Need meeting secret to modify tab in protected room #{tab.room}"
+
 Meteor.methods
   tabNew: (tab) ->
     pattern =
@@ -74,39 +87,43 @@ Meteor.methods
       room: String
       title: String
       url: Match.Where checkURL
+      archived: Match.Optional Boolean
       creator: creatorPattern
+      secret: Match.Optional String
     unless tab.type of tabTypes
-      throw new Error "Invalid tab type: #{tab?.type}"
+      throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
     #switch tab?.type
     #  when 'iframe', 'cocreate', 'jitsi'
     #    Object.assign pattern,
     #      url: Match.Where checkURL
     #  else
-    #    throw new Error "Invalid tab type: #{tab?.type}"
+    #    throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
     check tab, pattern
-    checkMeeting tab.meeting
+    meeting = checkMeeting tab.meeting
     room = checkRoom tab.room
+    tabCheckSecret tab, tab, room, meeting
     if tab.meeting != room.meeting
-      throw new Error "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
+      throw new Meteor.Error 'tabNew.wrongMeeting', "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
     unless @isSimulation
-      tab.created = new Date
+      setUpdated tab
+      tab.created = tab.updated
     Tabs.insert tab
   tabEdit: (diff) ->
     check diff,
       id: String
       title: Match.Optional String
       archived: Match.Optional Boolean
+      deleted: Match.Optional Boolean
       updator: creatorPattern
+      secret: Match.Optional String
     tab = checkTab diff.id
+    tabCheckSecret diff, tab
     set = {}
     for key, value of diff when key != 'id'
       set[key] = value unless tab[key] == value
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
-      set.updated = new Date
-      if set.archived
-        set.archived = set.updated
-        set.archiver = set.updator
+      setUpdated set
     Tabs.update diff.id,
       $set: set
 

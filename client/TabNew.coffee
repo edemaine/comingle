@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Alert, Button, Card, Form, Nav} from 'react-bootstrap'
 
+import {addMeetingSecret} from './MeetingSecret'
 import {validURL, tabTypes, categories, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
 import {getCreator} from './lib/presenceId'
@@ -21,15 +22,16 @@ export tabTypePage =
     bottomDescription:
       <p>Or paste a Zoom invitation link:</p>
 
+tabCategory = (tabData) -> tabData.category ? tabData.title
+
 tabTypesByCategory = {}
 do -> # avoid namespace pollution
   for tabType, tabData of tabTypes
-    category = tabData.category ? tabData.title
+    category = tabCategory tabData
     tabTypesByCategory[category] ?= {}
     tabTypesByCategory[category][tabType] = tabData
 
-export TabNew = ({node, meetingId, roomId,
-                  replaceTabNew, existingTabTypes}) ->
+export TabNew = React.memo ({node, meetingId, roomId, replaceTabNew, existingTabTypes}) ->
   [url, setUrl] = useState ''
   [mixed, setMixed] = useState false
   [title, setTitle] = useState ''
@@ -63,7 +65,9 @@ export TabNew = ({node, meetingId, roomId,
     tab = mangleTab {url, title, type, manualTitle}
     setUrl tab.url if tab.url != url
     setTitle tab.title if tab.title != title
-    setType tab.type if tab.type != type
+    if tab.type != type
+      setType tab.type
+      setCategory tabCategory tabTypes[tab.type]
     setManualTitle tab.manualTitle if tab.manualTitle != manualTitle
     setMixed window.location.protocol == 'https:' and /^http:\/\//i.test tab.url
     if submit
@@ -95,7 +99,8 @@ export TabNew = ({node, meetingId, roomId,
       manualTitle: manualTitle
       creator: getCreator()
     , true
-    id = Meteor.apply 'tabNew', [tab], returnStubValue: true
+    id = Meteor.apply 'tabNew', [addMeetingSecret meetingId, tab],
+      returnStubValue: true
     replaceTabNew {id, node}
   <Card>
     <Card.Body>

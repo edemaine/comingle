@@ -1,4 +1,5 @@
 import {Mongo} from 'meteor/mongo'
+import {Random} from 'meteor/random'
 import {check, Match} from 'meteor/check'
 
 import {validId, creatorPattern} from './id'
@@ -11,13 +12,22 @@ export checkMeeting = (meeting) ->
   if validId(meeting) and data = Meetings.findOne meeting
     data
   else
-    throw new Error "Invalid meeting ID #{meeting}"
+    throw new Meteor.Error 'checkMeeting.invalid', "Invalid meeting ID #{meeting}"
+
+export checkMeetingSecret = (meeting, secret) ->
+  meeting = checkMeeting meeting if typeof meeting == 'string'
+  unless meeting.secret == secret
+    throw new Meteor.Error 'checkMeetingSecret.invalid', "Incorrect meeting secret for meeting #{meeting._id}"
+
+export makeMeetingSecret = ->
+  Random.id()
 
 Meteor.methods
   meetingNew: (meeting) ->
     check meeting,
       title: Match.Optional String
       creator: creatorPattern
+    meeting.secret = makeMeetingSecret()
     unless @isSimulation
       meeting.created = new Date
     meetingId = Meetings.insert meeting
@@ -27,7 +37,8 @@ Meteor.methods
           meeting: meetingId
           creator: meeting.creator
         , room
-    meetingId
+    meeting._id = meetingId
+    meeting
   meetingEdit: (diff) ->
     check diff,
       id: String
@@ -42,3 +53,8 @@ Meteor.methods
     return unless (key for key of set).length  # nothing to update
     Meetings.update diff.id,
       $set: set
+  meetingSecretTest: (meetingId, secret) ->
+    return if @isSimulation
+    meeting = checkMeeting meetingId
+    check secret, String
+    secret == meeting.secret

@@ -2,7 +2,7 @@ import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
 
 import {validId, creatorPattern} from './id'
-import {checkMeeting} from './meetings'
+import {checkMeeting, checkMeetingSecret} from './meetings'
 import {meteorCallPromise} from './meteorPromise'
 import {Tabs, tabTypes, mangleTab} from './tabs'
 
@@ -12,17 +12,50 @@ export checkRoom = (room) ->
   if validId(room) and data = Rooms.findOne room
     data
   else
-    throw new Error "Invalid room ID #{room}"
+    throw new Meteor.Error 'checkRoom.invalid', "Invalid room ID #{room}"
+
+roomCheckSecret = (op, room, meeting) ->
+  return if Meteor.isClient
+  if op.secret
+    checkMeetingSecret (meeting ? room?.meeting), op.secret
+    delete op.secret
+  else
+    for key in ['protected', 'deleted']  # admin-only
+      if op[key]?
+        throw new Meteor.Error 'roomCheckSecret.unauthorized', "Need meeting secret to use #{key} flag"
+    if room.protected
+      for key in ['title', 'archived']  # allow 'raised'
+        if op[key]?
+          throw new Meteor.Error 'roomCheckSecret.protected', "Need meeting secret to modify #{key} in protected room #{room._id}"
+
+export setUpdated = (op) ->
+  op.updated = new Date
+  for key in ['archived', 'protected', 'deleted', 'raised']
+    if op[key]
+      op[key] = op.updated
+      # archiver, protecter, deleter, raiser
+      op["#{key[...key.length-1]}r"] = op.updator
+  ## deleted flag behaves specially: null to indicate false.
+  ## (See publications in server/rooms.coffee and server/tabs.coffee.)
+  if op.deleted == false
+    op.deleted = null
 
 Meteor.methods
   roomNew: (room) ->
     check room,
       meeting: String
       title: String
+      archived: Match.Optional Boolean
+      protected: Match.Optional Boolean
       creator: creatorPattern
+      secret: Match.Optional String
     unless @isSimulation
-      room.created = new Date
-    checkMeeting room.meeting
+      setUpdated room
+      room.created = room.updated
+      meeting = checkMeeting room.meeting
+      roomCheckSecret room, room, meeting
+    room.joined = []
+    room.adminVisit = false
     Rooms.insert room
   roomEdit: (diff) ->
     check diff,
@@ -30,20 +63,18 @@ Meteor.methods
       title: Match.Optional String
       raised: Match.Optional Boolean
       archived: Match.Optional Boolean
+      deleted: Match.Optional Boolean
+      protected: Match.Optional Boolean
       updator: creatorPattern
+      secret: Match.Optional String
     room = checkRoom diff.id
+    roomCheckSecret diff, room
     set = {}
     for key, value of diff when key != 'id'
       set[key] = value unless room[key] == value
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
-      set.updated = new Date
-      if set.archived
-        set.archived = set.updated
-        set.archiver = set.updator
-      if set.raised
-        set.raised = set.updated
-        set.raiser = set.updator
+      setUpdated set
     Rooms.update diff.id,
       $set: set
   roomWithTabs: (room) ->
@@ -65,6 +96,59 @@ Meteor.methods
         creator: room.creator
       , true)
     roomId
+
+## Server-only methods to maintain `joined` list
+export roomJoin = (roomId, presence) ->
+  Rooms.update
+    _id: roomId
+  ,
+    $push: joined:
+      presenceId: presence.id
+      name: presence.name
+      admin: presence.admin
+  roomCheck roomId, joined: true
+export roomChange = (roomId, presenceDiff) ->
+  set = {}
+  set["joined.$.admin"] = presenceDiff.admin if presenceDiff.admin?
+  set["joined.$.name"] = presenceDiff.name if presenceDiff.name?
+  return unless (key for own key of set).length
+  Rooms.update
+    _id: roomId
+    joined: $elemMatch: presenceId: presenceDiff.id
+  ,
+    $set: set
+  roomCheck roomId, adminLeft: presenceDiff.admin == false
+export roomLeave = (roomId, presence) ->
+  Rooms.update
+    _id: roomId
+  ,
+    $pull: joined: presenceId: presence.id
+  roomCheck roomId, adminLeft: presence.admin
+roomCheck = (roomId, options) ->
+  room = Rooms.findOne roomId
+  unless room?
+    return console.error "Invalid room ID: #{roomId}"
+  ## Lower hand in empty rooms
+  if not room.joined.length and room.raised
+    Rooms.update
+      _id: roomId
+    ,
+      $set: raised: false
+  ## Maintain adminVisit = Date of last admin visit or room became occupied,
+  ## or true if room has an admin right now, or false if room is empty.
+  if room.joined.length
+    admins = (presence for presence in room.joined when presence.admin).length
+    if admins
+      adminVisit = true
+    else if options?.adminLeft or (options?.joined and room.joined.length == 1)
+      adminVisit = new Date
+  else
+    adminVisit = false
+  if adminVisit? and adminVisit != room.adminVisit
+    Rooms.update
+      _id: roomId
+    ,
+      $set: adminVisit: adminVisit
 
 export roomWithTemplate = (room) ->
   template = room.template ? ''

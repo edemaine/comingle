@@ -24,6 +24,7 @@ rules:
   linebreak-style:
     - error
     - unix
+  no-unreachable: off  # currently incompatible with CoffeeScript's switch
   no-useless-escape: off  # incompatible with CoffeeScript's ///
   quotes:
     - error

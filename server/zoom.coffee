@@ -39,6 +39,5 @@ Meteor.methods
     timestamp = (new Date).getTime() - 30000
     msg = Buffer.from(Meteor.settings.zoom.apiKey + meetingID + timestamp + role).toString 'base64'
     hash = crypto.createHmac('sha256', Meteor.settings.zoom.apiSecret).update(msg).digest 'base64'
-    console.log "#{Meteor.settings.zoom.apiKey}.#{meetingID}.#{timestamp}.#{role}.#{hash}"
     signature: Buffer.from("#{Meteor.settings.zoom.apiKey}.#{meetingID}.#{timestamp}.#{role}.#{hash}").toString 'base64'
     apiKey: Meteor.settings.zoom.apiKey

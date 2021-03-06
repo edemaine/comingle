@@ -32,6 +32,8 @@ $font-size: 12px
 
 .dark .flexlayout__layout .flexlayout__layout
   @import "{}/node_modules/flexlayout-react/style/dark.scss"
+  .flexlayout__tab_button_textbox
+    color: lightgreen  // override green default for dark mode
 
 // Override button placement
 
@@ -65,8 +67,6 @@ $font-size: 12px
   outline-width: 0
 
 .flexlayout__tab_button_trailing
-  &:active
-    color: #555
   a, a:visited, a:hover
     color: inherit !important
   a
@@ -77,3 +77,6 @@ $font-size: 12px
 
 .flexlayout__border_button_trailing
   margin-left: 0.25rem  // smaller than default 8px
+
+.flexlayout__popup_menu_item
+  cursor: pointer

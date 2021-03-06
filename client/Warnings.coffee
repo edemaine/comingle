@@ -3,7 +3,7 @@ import {Alert} from 'react-bootstrap'
 
 import {useAsync} from './lib/useAsync'
 
-export Warnings = ->
+export Warnings = React.memo ->
   [warnings, updateWarning] = useReducer (warnings, op) ->
     warnings = Object.assign {}, warnings
     switch op.op

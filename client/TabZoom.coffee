@@ -15,8 +15,10 @@ base64 = (str) ->
   btoa encodeURIComponent(str).replace /%([0-9A-F]{2})/g, (match, hex) ->
     String.fromCharCode "0x#{hex}"
 
-export TabZoom = ({tabId}) ->
-  tab = useTracker -> Tabs.findOne tabId
+export TabZoom = React.memo ({tabId}) ->
+  tab = useTracker ->
+    Tabs.findOne tabId
+  , [tabId]
   return null unless tab
   match = zoomRegExp.exec tab.url
   unless match

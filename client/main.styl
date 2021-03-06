@@ -1,6 +1,13 @@
 body
   overflow: hidden
 
+\:root // light mode needs darker version of these colors for foreground text
+  --warning-fg: #a8871f
+  --danger-fg: #c83342
+.dark
+  --warning-fg: var(--warning)
+  --danger-fg: var(--danger)
+
 #react-root
   position: absolute
   left: 0
@@ -19,12 +26,12 @@ nav
   justify-content: center
   align-items: center
   background-color: var(--flexlayout-color-2)  // .flexlayout__border_left
-  padding: 3px 0
+  padding: 3px 0.25rem
   a, a:visited { color: inherit !important }
 
-.RoomList
+.sidebar
   .card
-    overflow: visible !important  // allow timer and Sort By to spill out of card
+    overflow: visible !important  // allow Sort By to spill out of card
   .card-header
     padding: 0.25rem // 0.75rem
     text-align: center
@@ -50,13 +57,15 @@ nav
   // Give dismissible alerts normal margin; instead use float for close button
   .alert-dismissible
     padding-right: 1.25rem
+    margin-top: 1rem  // match bottom margin
     .close
       position: static
       float: right
+      padding: 0 0 0.25rem 0.5rem !important
 
-.tab-title
+.room-title, .tab-title
   &.archived
-    color: var(--danger)  // danger color
+    color: var(--danger-fg)  // danger color
 
 .room-info
   color: black
@@ -65,73 +74,105 @@ nav
   &:active
     color: #0069d9
 
-  &.presence-visible, &.selected
+  /*
+  &.presence-starred
+    background-color: var(--list-group-item-secondary-bg)
+    &:hover, &:focus
+      background-color: var(--list-group-item-secondary-bg-1)
+  */
+  &.presence-joined
     background-color: var(--list-group-item-primary-bg)
     &:hover, &:focus
       background-color: var(--list-group-item-primary-bg-1)
-  &.presence-invisible
+  &.selected
     background-color: var(--list-group-item-secondary-bg)
     &:hover, &:focus
       background-color: var(--list-group-item-secondary-bg-1)
   &.archived
     &, &:hover, &:focus
-      .title
-        color: var(--danger)
+      .room-title
+        color: var(--danger-fg)
 
   .raise-hand
     float: right
     clear: right
+    margin-left: 0.5rem
     margin-right: -0.75rem
     z-index: 1
-    opacity: 0.1
+    opacity: 0.5
+    color: var(--danger-fg)
     &:hover
-      opacity: 0.25
+      opacity: 0.65
     &:active
-      opacity: 0.5
+      opacity: 0.8
     &.active
       opacity: 1.0
       &:hover
-        opacity: 0.75
+        opacity: 0.8
+      &:active
+        opacity: 0.65
       svg
         transform: scale(1)
         animation: pulse 2s infinite ease-in-out
     .timer
-      position: absolute
-      transform: rotate(90deg)
-      transform-origin: 0.55rem 0.75rem //0.65rem 0.65rem
-      z-index: 1
       opacity: 1
+      margin-right: 0.25rem
 
   .presence-count
     float: right
     clear: right
+    margin-left: 0.25rem
     margin-right: -0.85rem
     display: flex
     flex-direction: row
     justify-content: flex-end
-    font-size: 75%
+    //font-size: 75%
     > span
-      margin-left: 0.2rem
-      &.presence-invisible
-        color: rgba(0,0,0,0.333333333) // #aaa
-        /.dark &
-          color: rgba(255,255,255,0.333333333)
-        // opacity: 0.666666666
+      margin-left: 0.25rem
+      &.presence-starred
+        color: var(--warning-fg)
+        &:hover
+          opacity: 0.8
+        &:active
+          opacity: 0.65
       > svg
-        font-size: 0.77em
-        margin-right: 0.07em
+        margin-left: 0.1em
+        //font-size: 0.77em
+        &[data-icon="star"]
+          margin-right: -0.09em // better alignment with hand icon
+
+  .adminVisit
+    float: right
+    clear: right
+    margin-left: 0.5rem
+    margin-right: -0.75rem
 
 .presence
   font-size: 75%
   > span
-    display: inline-block
-    margin-right: 1rem
-    &.presence-invisible
-      // color: rgba(0,0,0,0.333333333) // #aaa
-      opacity: 0.666666666
+    margin-right: 0.5em
+    white-space: nowrap  // prevent line break between icon and name
+    &.presence-starred
+      color: var(--warning-fg)
     > svg
       font-size: 0.77em
-      margin-right: 0.25rem
+    > span
+      white-space: normal  // allow line break within name
+
+.admin
+  color: #8224df  // purple from logo
+  &:focus
+    color: #671eaf  // purple from logo
+  /.dark &
+    color: #9b5bda
+    &:focus
+      color: #b388dd
+  /.presence &
+    font-weight: bold
+
+.btn-outline-warning
+  color: var(--warning-fg)
+  border-color: var(--warning-fg)
 
 .hand-count
   user-select: none
@@ -139,10 +180,54 @@ nav
 @keyframes pulse
   0%, 100%
     transform: scale(1)
-    filter: drop-shadow(0 0 0px #444)
+    filter: drop-shadow(0 0 0.1px #444)
   50%
     transform: scale(1.2)
     filter: drop-shadow(0 0 1px #444)
+
+.Room
+  display: flex
+  flex-direction: column
+  width: 100%
+  height: 100%
+  .header
+    padding: 0.25rem 0.5rem
+    background: linear-gradient(#fff, #bcc5c8)
+    /.dark &
+      background: linear-gradient(#000, #374043)
+    display: flex
+    flex-direction: row
+    align-items: center
+    .room-title
+      user-select: none
+      flex-grow: 1
+    div.room-title
+      cursor: pointer
+      overflow: hidden
+      white-space: nowrap
+      text-overflow: ellipsis
+    input.room-title
+      border: none
+      padding: 0
+      color: green  // like FlexLayout
+      background: #fff
+      /.dark &
+        color: lightgreen
+        background: #000
+  .container
+    position: relative
+    flex-grow: 1
+
+.flexlayout__tab_button_trailing, .icon-button
+  cursor: pointer
+  &:hover
+    color: #333
+    /.dark &
+      color: #ccc
+  &:active
+    color: #555
+    /.dark &
+      color: #aaa
 
 .chat
   height: 100%
@@ -192,3 +277,7 @@ nav
 
 .highlight
   background: hsla(60,71%,50%,0.4)
+
+.text-help
+  text-decoration: dotted underline gray
+  cursor: help
