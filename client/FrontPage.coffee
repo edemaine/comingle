@@ -6,7 +6,7 @@ import {faGithub} from '@fortawesome/free-brands-svg-icons'
 
 import {Dark} from './Settings'
 import {setMeetingSecret} from './MeetingSecret'
-import {getCreator} from './lib/presenceId'
+import {getUpdator} from './lib/presenceId'
 import {bugs, homepage, repository} from '/package.json'
 
 export FrontPage = React.memo ->
@@ -15,7 +15,7 @@ export FrontPage = React.memo ->
   newMeeting = (e) ->
     e.preventDefault()
     Meteor.call 'meetingNew',
-      creator: getCreator()
+      updator: getUpdator()
       title: titleRef.current.value
     , (error, meeting) ->
       if error?

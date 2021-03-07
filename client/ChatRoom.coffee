@@ -8,7 +8,7 @@ import ScrollableFeed from 'react-scrollable-feed'
 import {Loading} from './Loading'
 import {Markdown} from './lib/Markdown'
 import {Chat, useChat} from './lib/chat'
-import {getCreator} from './lib/presenceId'
+import {getUpdator} from './lib/presenceId'
 import {formatDate, formatTime} from './lib/dates'
 import {useLocalStorage} from './lib/useLocalStorage'
 
@@ -51,7 +51,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
     return unless body.trim()
     Meteor.call 'chatSend',
       channel: channel
-      sender: getCreator()
+      sender: getUpdator()
       type: 'msg'
       body: body
     setBody ''

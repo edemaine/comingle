@@ -1,7 +1,7 @@
 import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
 
-import {checkId, creatorPattern} from '/lib/id'
+import {checkId, updatorPattern} from '/lib/id'
 import {ChatStream} from '/lib/chat'
 import {Meetings} from '/lib/meetings'
 import {Rooms} from '/lib/rooms'
@@ -32,7 +32,7 @@ Meteor.methods
   chatSend: (message) ->
     check message,
       channel: String
-      sender: creatorPattern
+      sender: updatorPattern
       type: 'msg'
       body: String
     message.sent = new Date

@@ -1,10 +1,10 @@
 import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
 
-import {validId, creatorPattern} from './id'
+import {validId, updatorPattern} from './id'
 import {checkMeeting, checkMeetingSecret} from './meetings'
 import {meteorCallPromise} from './meteorPromise'
-import {Tabs, tabTypes, mangleTab} from './tabs'
+import {Tabs, tabTypes, checkURL} from './tabs'
 
 export Rooms = new Mongo.Collection 'rooms'
 
@@ -28,27 +28,40 @@ roomCheckSecret = (op, room, meeting) ->
         if op[key]?
           throw new Meteor.Error 'roomCheckSecret.protected', "Need meeting secret to modify #{key} in protected room #{room._id}"
 
+export dateFlags = ['archived', 'protected', 'deleted', 'raised']
 export setUpdated = (op) ->
   op.updated = new Date
-  for key in ['archived', 'protected', 'deleted', 'raised']
+  for key in dateFlags
     if op[key]
       op[key] = op.updated
       # archiver, protecter, deleter, raiser
       op["#{key[...key.length-1]}r"] = op.updator
-  ## deleted flag behaves specially: null to indicate false.
-  ## (See publications in server/rooms.coffee and server/tabs.coffee.)
-  if op.deleted == false
-    op.deleted = null
+    ## Use null to indicate false.  (For examples of use, see
+    ## publications in server/rooms.coffee and server/tabs.coffee.)
+    else if op[key] == false
+      op[key] = null
+      op["un#{key[...key.length-1]}r"] = op.updator
 
 Meteor.methods
   roomNew: (room) ->
     check room,
-      meeting: String
+      meeting: Match.Where validId
       title: String
       archived: Match.Optional Boolean
       protected: Match.Optional Boolean
-      creator: creatorPattern
+      updator: updatorPattern
       secret: Match.Optional String
+      tabs: [
+        type: Match.Optional String
+        title: Match.Optional String
+        url: Match.Optional Match.Where checkURL
+        archived: Match.Optional Boolean
+      ]
+    ## Check tabs for validity
+    tabs = room.tabs ? []
+    delete room.tabs
+    ## Prepare room
+    room.creator = room.updator
     unless @isSimulation
       setUpdated room
       room.created = room.updated
@@ -56,16 +69,23 @@ Meteor.methods
       roomCheckSecret room, room, meeting
     room.joined = []
     room.adminVisit = false
-    Rooms.insert room
+    roomId = Rooms.insert room
+    ## Add tabs
+    for tab in tabs
+      Meteor.call 'tabNew', Object.assign tab,
+        meeting: room.meeting
+        room: roomId
+        updator: room.updator
+    roomId
   roomEdit: (diff) ->
     check diff,
-      id: String
+      id: Match.Where validId
       title: Match.Optional String
       raised: Match.Optional Boolean
       archived: Match.Optional Boolean
       deleted: Match.Optional Boolean
       protected: Match.Optional Boolean
-      updator: creatorPattern
+      updator: updatorPattern
       secret: Match.Optional String
     room = checkRoom diff.id
     roomCheckSecret diff, room
@@ -77,25 +97,38 @@ Meteor.methods
       setUpdated set
     Rooms.update diff.id,
       $set: set
-  roomWithTabs: (room) ->
-    tabs = room.tabs ? {}
-    delete room.tabs
-    roomId = Meteor.call 'roomNew', room
-    for title, tab of tabs when title and tab.type
-      if tab.url
-        url = tab.url
-      else
-        url = tabTypes[tab.type].createNew()
-        url = await url if url.then?
-      await meteorCallPromise 'tabNew', mangleTab(
-        meeting: room.meeting
-        room: roomId
-        type: tab.type
-        title: title
-        url: url
-        creator: room.creator
-      , true)
-    roomId
+  roomGet: (query) ->
+    check query,
+      meeting: Match.Optional Match.Where validId
+      room: Match.Optional Match.Where validId
+      rooms: Match.Optional [Match.Where validId]
+      title: Match.Optional Match.OneOf String, RegExp
+      raised: Match.Optional Boolean
+      archived: Match.Optional Boolean
+      deleted: Match.Optional Boolean
+      protected: Match.Optional Boolean
+      secret: Match.Optional String
+    delete query[key] for key of query when not query[key]?
+    unless query.meeting? or query.room? or query.rooms?
+      throw new Meteor.Error 'roomGet.underspecified', 'Need to specify meeting, room, or rooms'
+    if query.room?
+      query._id = query.room
+      delete query.room
+    if query.rooms?
+      query._id = $in: query.rooms
+      delete query.rooms
+    if query.secret
+      checkMeetingSecret query.meeting, query.secret
+      delete query.secret
+    else
+      ## Only admins can see deleted rooms
+      query.deleted = false
+    for key in dateFlags
+      if query[key]
+        query[key] = $ne: null
+      else if query[key] == false
+        query[key] = null
+    Rooms.find(query).fetch()
 
 ## Server-only methods to maintain `joined` list
 export roomJoin = (roomId, presence) ->
@@ -150,30 +183,13 @@ roomCheck = (roomId, options) ->
     ,
       $set: adminVisit: adminVisit
 
-export roomWithTemplate = (room) ->
-  template = room.template ? ''
-  delete room.template
-  roomId = await meteorCallPromise 'roomNew', room
-  for type in template.split '+' when type
-    url = tabTypes[type].createNew()
-    url = await url if url.then?
-    await meteorCallPromise 'tabNew', mangleTab(
-      meeting: room.meeting
-      room: roomId
-      type: type
-      title: ''
-      url: url
-      creator: room.creator
-    , true)
-  roomId
-
 export roomTabs = (roomId, showArchived) ->
   roomId = roomId._id if roomId._id?
   query = room: roomId
-  query.archived = $in: [null, false] unless showArchived
+  query.archived = null unless showArchived
   Tabs.find(query).fetch()
 
-export roomDuplicate = (room, creator) ->
+export roomDuplicate = (room, updator) ->
   tabs = roomTabs room, false
   room = checkRoom room unless room._id?
   ## Name room with existing title followed by an unused number like (2).
@@ -189,7 +205,7 @@ export roomDuplicate = (room, creator) ->
   newRoom = await meteorCallPromise 'roomNew',
     meeting: room.meeting
     title: title
-    creator: creator
+    updator: updator
   ## Duplicate tabs, calling createNew method if desired to avoid e.g.
   ## identical Cocreate boards or identical Jitsi meeting rooms.
   for tab in tabs
@@ -204,5 +220,5 @@ export roomDuplicate = (room, creator) ->
       room: newRoom
       title: tab.title
       url: url
-      creator: creator
+      updator: updator
   newRoom

@@ -17,6 +17,6 @@ export getPresenceId = (key = 'presenceId') ->
   id
 ###
 
-export getCreator = ->
+export getUpdator = ->
   presenceId: getPresenceId()
   name: getName()

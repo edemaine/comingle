@@ -4,7 +4,7 @@ import {Alert, Button, Card, Form, Nav} from 'react-bootstrap'
 import {addMeetingSecret} from './MeetingSecret'
 import {validURL, tabTypes, categories, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
-import {getCreator} from './lib/presenceId'
+import {getUpdator} from './lib/presenceId'
 import {capitalize} from './lib/capitalize'
 
 export tabTypePage =
@@ -97,9 +97,9 @@ export TabNew = React.memo ({node, meetingId, roomId, replaceTabNew, existingTab
       type: type
       url: url
       manualTitle: manualTitle
-      creator: getCreator()
+      updator: getUpdator()
     , true
-    id = Meteor.apply 'tabNew', [addMeetingSecret meetingId, tab],
+    id = await Meteor.apply 'tabNew', [addMeetingSecret meetingId, tab],
       returnStubValue: true
     replaceTabNew {id, node}
   <Card>

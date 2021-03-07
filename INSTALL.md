@@ -44,7 +44,7 @@ Installation instructions:
 [`Config.coffee`](Config.coffee) stores a few configuration options defining
 Comingle's behavior:
 
-* `newMeetingRooms` specifies rooms (including titles and templates)
+* `newMeetingRooms` specifies rooms (including their titles and initial tabs)
   to automatically create in any newly created meeting.
 * `defaultServers` specifies the default servers for Cocreate and Jitsi.
 

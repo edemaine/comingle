@@ -8,6 +8,7 @@ extends:
   - 'plugin:react/recommended'
 globals:
   Meteor: readonly
+  WebApp: readonly
 parserOptions:
   ecmaFeatures:
     jsx: true

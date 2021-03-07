@@ -1,10 +1,11 @@
 import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
+import {fetch} from 'meteor/fetch'
 import {Random} from 'meteor/random'
 
-import {validId, creatorPattern} from './id'
+import {validId, updatorPattern} from './id'
 import {checkMeeting, checkMeetingSecret} from './meetings'
-import {checkRoom, setUpdated} from './rooms'
+import {checkRoom, setUpdated, dateFlags} from './rooms'
 import {Config} from '/Config'
 
 export Tabs = new Mongo.Collection 'tabs'
@@ -81,29 +82,33 @@ tabCheckSecret = (op, tab, room, meeting) ->
 
 Meteor.methods
   tabNew: (tab) ->
-    pattern =
-      type: String
+    check tab,
+      type: Match.Optional String  # default set via mangleTab
       meeting: String
       room: String
-      title: String
-      url: Match.Where checkURL
+      title: Match.Optional String  # default set via mangleTab
+      url: Match.Optional Match.Where checkURL  # default set via mangleTab
       archived: Match.Optional Boolean
-      creator: creatorPattern
+      updator: updatorPattern
       secret: Match.Optional String
+    tab.type ?= 'iframe'  # default if mangleTab doesn't set it
     unless tab.type of tabTypes
       throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
-    #switch tab?.type
-    #  when 'iframe', 'cocreate', 'jitsi'
-    #    Object.assign pattern,
-    #      url: Match.Where checkURL
-    #  else
-    #    throw new Meteor.Error 'tabNew.invalidType', "Invalid tab type: #{tab?.type}"
-    check tab, pattern
+    unless @isSimulation  # avoid calling createNew() on both client and server
+      unless tab.url
+        unless tabTypes[tab.type].createNew?
+          throw new Meteor.Error 'tabNew.uncreatable', 'Tab needs to have url or creatable type'
+        tab.url = tabTypes[tab.type].createNew()
+        tab.url = await tab.url if tab.url.then?
+        check tab.url, Match.Where checkURL
+      tab = mangleTab tab, true
+      check tab.title, String
     meeting = checkMeeting tab.meeting
     room = checkRoom tab.room
     tabCheckSecret tab, tab, room, meeting
     if tab.meeting != room.meeting
       throw new Meteor.Error 'tabNew.wrongMeeting', "Meeting #{tab.meeting} doesn't match room #{tab.room}'s meeting #{room.meeting}"
+    tab.creator = tab.updator
     unless @isSimulation
       setUpdated tab
       tab.created = tab.updated
@@ -114,7 +119,7 @@ Meteor.methods
       title: Match.Optional String
       archived: Match.Optional Boolean
       deleted: Match.Optional Boolean
-      updator: creatorPattern
+      updator: updatorPattern
       secret: Match.Optional String
     tab = checkTab diff.id
     tabCheckSecret diff, tab
@@ -126,6 +131,43 @@ Meteor.methods
       setUpdated set
     Tabs.update diff.id,
       $set: set
+  tabGet: (query) ->
+    check query,
+      meeting: Match.Optional Match.Where validId
+      room: Match.Optional Match.Where validId
+      rooms: Match.Optional [Match.Where validId]
+      tab: Match.Optional Match.Where validId
+      tabs: Match.Optional [Match.Where validId]
+      title: Match.Optional Match.OneOf String, RegExp
+      raised: Match.Optional Boolean
+      archived: Match.Optional Boolean
+      deleted: Match.Optional Boolean
+      protected: Match.Optional Boolean
+      secret: Match.Optional String
+    delete query[key] for key of query when not query[key]?
+    unless query.meeting? or query.room? or query.rooms? or query.tab? or query.tabs?
+      throw new Meteor.Error 'tabGet.underspecified', 'Need to specify meeting, room, rooms, tab, or tabs'
+    if query.rooms?
+      query.room = $in: query.rooms
+      delete query.rooms
+    if query.tab?
+      query._id = query.tab
+      delete query.tab
+    if query.tabs?
+      query._id = $in: query.tabs
+      delete query.tabs
+    if query.secret
+      checkMeetingSecret query.meeting, query.secret
+      delete query.secret
+    else
+      ## Only admins can see deleted tabs
+      query.deleted = false
+    for key in dateFlags
+      if query[key]
+        query[key] = $ne: null
+      else if query[key] == false
+        query[key] = null
+    Tabs.find(query).fetch()
 
 export zoomRegExp =
     ///^(https://[^/]*zoom.us/) (?: j/([0-9]*))? (?: \?pwd=(\w*))? ///

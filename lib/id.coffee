@@ -10,7 +10,7 @@ export checkId = (id, type = '') ->
 
 ## Match pattern for `creator` and `updator` fields
 
-export creatorPattern =
+export updatorPattern =
   #username: Match.Optional String
   name: String  # name at the time of operation
   presenceId: String
