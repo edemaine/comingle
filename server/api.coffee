@@ -67,6 +67,7 @@ apiMethods =
   '/meeting/edit': apiEdit 'meeting'
   '/room/edit': apiEdit 'room'
   '/tab/edit': apiEdit 'tab'
+  '/log/get': (options) -> logs: Meteor.call 'logGet', options
 
 ## Allow CORS for API calls
 WebApp.rawConnectHandlers.use '/api', (req, res, next) ->
