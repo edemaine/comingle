@@ -222,7 +222,8 @@ Request fields (in addition to `secret` and `updator` described above):
 
 * `room` (corequired string): ID of room to modify
 * `rooms` (corequired object or array of strings):
-  Array of IDs of rooms to modify, or a query object like `/api/room/get`
+  Array of IDs of rooms to modify, or a query object like
+  [`/api/room/get`](#apiroomget-fetch-data-for-one-or-more-rooms)
   (e.g. `{"meeting": ...}`)
 * `title` (optional string): New title for room(s)
 * `raised` (optional boolean): New raised-hand state for room(s)
@@ -256,7 +257,8 @@ Request fields (in addition to `secret` and `updator` described above):
 
 * `tab` (corequired string): ID of tab to modify
 * `tabs` (corequired object or array of strings):
-  Array of IDs of tabs to modify, or a query object like `/api/tab/get`
+  Array of IDs of tabs to modify, or a query object like
+  [`/api/tab/get`](#apitabget-fetch-data-for-one-or-more-tabs)
   (e.g. `{"meeting": ...}`)
 * `title` (optional string): New title for tab(s)
 * `archived` (optional boolean): New archived state for tab(s)
@@ -268,7 +270,8 @@ Response fields (when `ok` is `true`):
 
 ## Create Operations
 
-All create operations except `/api/meeting/new` require `secret`,
+All create operations except
+[`/api/meeting/new`](#apimeetingnew-create-new-meeting) require `secret`,
 and all create operations support `updator` request fields.
 See [Edit Operations](#edit-operations) for their description.
 
@@ -287,7 +290,8 @@ Request fields (in addition to `secret` and `updator` described above):
 * `archived` (optional boolean): Whether new room should be archived
 * `protected` (optional boolean): Whether new room should be protected
 * `tabs` (optional array of objects): Initial tabs to create within room.
-  Each object should have the same fields as in `/api/tab/new`,
+  Each object should have the same fields as in
+  [`/api/tab/new`](#apitabnew-create-new-tab),
   excluding `meeting`, `room`, `secret`, and `updator`.
 
 ### `/api/tab/new`: Create new tab
@@ -297,7 +301,7 @@ Request fields (in addition to `secret` and `updator` described above):
 * `meeting` (required string): ID of meeting to add tab to
 * `room` (required string): ID of room to add tab to
 * `type` (optional string): Tab type as defined in
-  [`/api/tab/get`](#-api-tab-get-fetch-data-for-one-or-more-tabs),
+  [`/api/tab/get`](#apitabget-fetch-data-for-one-or-more-tabs),
   defaulting to a guessed value based on `url`
 * `title` (optional string): Title of new tab,
   defaulting to a value based on `url`

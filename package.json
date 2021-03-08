@@ -63,6 +63,6 @@
     "eslint-plugin-meteor": "^7.3.0",
     "eslint-plugin-react": "^7.22.0",
     "markdownlint-cli": "^0.27.1",
-    "markdownlint-rule-github-internal-links": "0.0.1"
+    "markdownlint-rule-github-internal-links": "0.0.2"
   }
 }
