@@ -393,7 +393,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     e.stopPropagation()
     newRoom = await roomDuplicate room, getUpdator()
     #openRoom newRoom
-    selectRoom newRoom, false
+    selectRoom newRoom._id, false
   onDragStart = (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -603,12 +603,12 @@ export RoomNew = React.memo ({selectRoom}) ->
         for type in template.split '+' when type  # skip blank
           {type}
     setTitle ''
-    roomId = await meteorCallPromise 'roomNew', room
+    room = await meteorCallPromise 'roomNew', room
     if e.shiftKey or e.ctrlKey or e.metaKey
-      openRoom roomId
+      openRoom room._id
       selectRoom null
     else
-      selectRoom roomId, true
+      selectRoom room._id, true
   ## We need to manually capture Enter so that e.g. Ctrl-Enter works.
   ## This has the added benefit of getting modifiers' state.
   onKeyDown = (e) ->

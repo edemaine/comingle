@@ -53,7 +53,7 @@ Comingle's behavior:
 To use the [Zoom Web Client SDK](https://github.com/zoom/sample-app-web),
 you need to sign up for an API Key &amp; Secret.  Go to the
 [Zoom Marketplace](https://marketplace.zoom.us/) and select "Create a JWT App".
-See https://marketplace.zoom.us/docs/sdk/native-sdks/web/getting-started/integrate
+See <https://marketplace.zoom.us/docs/sdk/native-sdks/web/getting-started/integrate>
 
 Then add the API Key &amp; Secret into `.deploy/settings.json`.
 It should look something like this:
@@ -75,7 +75,7 @@ If you're deploying a public server via `mup`, it should pick up these keys.
 If you're developing on a local test server, use the following instead of
 `meteor`:
 
-```
+```sh
 meteor --settings .deploy/settings.json
 ```
 

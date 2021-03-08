@@ -59,7 +59,9 @@ Meteor.methods
     query.updated = {} if spec.start? or spec.to?
     query.updated.$gte = spec.start if spec.start?
     query.updated.$lte = spec.finish if spec.finish?
-    Log.find query, sort: updated: 1
-    .map (diff) ->
-      delete diff._id
-      diff
+    Log.find query,
+      sort: updated: 1
+      fields:
+        meeting: false  # redundant with query
+        _id: false
+    .fetch()

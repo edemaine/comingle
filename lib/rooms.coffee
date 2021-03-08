@@ -51,7 +51,7 @@ Meteor.methods
       protected: Match.Optional Boolean
       updator: updatorPattern
       secret: Match.Optional String
-      tabs: [
+      tabs: Match.Optional [
         type: Match.Optional String
         title: Match.Optional String
         url: Match.Optional Match.Where checkURL
@@ -70,13 +70,14 @@ Meteor.methods
     room.joined = []
     room.adminVisit = false
     roomId = Rooms.insert room
+    room._id = roomId
     ## Add tabs
     for tab in tabs
       Meteor.call 'tabNew', Object.assign tab,
         meeting: room.meeting
         room: roomId
         updator: room.updator
-    roomId
+    room
   roomEdit: (diff) ->
     check diff,
       id: Match.Where validId
@@ -217,7 +218,7 @@ export roomDuplicate = (room, updator) ->
     await meteorCallPromise 'tabNew',
       type: tab.type
       meeting: tab.meeting
-      room: newRoom
+      room: newRoom._id
       title: tab.title
       url: url
       updator: updator

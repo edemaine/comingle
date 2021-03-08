@@ -112,13 +112,15 @@ Meteor.methods
     unless @isSimulation
       setUpdated tab
       tab.created = tab.updated
-    Tabs.insert tab
+    tab._id = Tabs.insert tab
+    tab
   tabEdit: (diff) ->
     check diff,
       id: String
       title: Match.Optional String
       archived: Match.Optional Boolean
       deleted: Match.Optional Boolean
+      #protected: Match.Optional Boolean
       updator: updatorPattern
       secret: Match.Optional String
     tab = checkTab diff.id
@@ -138,11 +140,12 @@ Meteor.methods
       rooms: Match.Optional [Match.Where validId]
       tab: Match.Optional Match.Where validId
       tabs: Match.Optional [Match.Where validId]
+      type: Match.Optional Match.OneOf String, RegExp
       title: Match.Optional Match.OneOf String, RegExp
-      raised: Match.Optional Boolean
+      url: Match.Optional Match.OneOf String, RegExp
       archived: Match.Optional Boolean
       deleted: Match.Optional Boolean
-      protected: Match.Optional Boolean
+      #protected: Match.Optional Boolean
       secret: Match.Optional String
     delete query[key] for key of query when not query[key]?
     unless query.meeting? or query.room? or query.rooms? or query.tab? or query.tabs?

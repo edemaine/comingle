@@ -1,3 +1,5 @@
+## API via /api HTTP GET/POST.  See /doc/api.md for documentation
+
 import {check, Match} from 'meteor/check'
 import {EJSON} from 'meteor/ejson'
 import bodyParser from 'body-parser'
@@ -29,9 +31,10 @@ checker =
 apiGet = (type) -> (options) ->
   "#{type}s": Meteor.call "#{type}Get", options
 apiNew = (type) -> (options) ->
+  ## /api/meeting/new cannot require secret, but other operations do
+  checkMeetingSecret options.meeting, options.secret unless type == 'meeting'
   apiUpdator options
-  id = Meteor.call "#{type}New", options
-  "#{type}s": Meteor.call "#{type}Get", "#{type}": id
+  "#{type}s": Meteor.call "#{type}New", options
 apiEdit = (type) -> (options) ->
   types = "#{type}s"
   checkMeetingSecret options.meeting ? options[types]?.meeting ?

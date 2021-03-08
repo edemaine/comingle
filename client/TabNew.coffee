@@ -99,9 +99,11 @@ export TabNew = React.memo ({node, meetingId, roomId, replaceTabNew, existingTab
       manualTitle: manualTitle
       updator: getUpdator()
     , true
-    id = await Meteor.apply 'tabNew', [addMeetingSecret meetingId, tab],
+    tab = await Meteor.apply 'tabNew', [addMeetingSecret meetingId, tab],
       returnStubValue: true
-    replaceTabNew {id, node}
+    replaceTabNew
+      id: tab._id
+      node: node
   <Card>
     <Card.Body>
       <Card.Title as="h3">Add Shared Tab to Room</Card.Title>
