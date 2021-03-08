@@ -28,3 +28,4 @@ session@1.2.0
 rocketchat:streamer
 montiapm:agent
 zodern:standard-minifier-js@4.0.0
+fetch

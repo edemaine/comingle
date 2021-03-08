@@ -17,7 +17,9 @@
   "scripts": {
     "start": "meteor run",
     "visualize": "meteor --production --extra-packages bundle-visualizer",
-    "lint": "eslint --ext .coffee .",
+    "doc:lint": "markdownlint **/*.md --ignore node_modules --rules markdownlint-rule-github-internal-links",
+    "eslint": "eslint --ext .coffee .",
+    "lint": "npm run eslint && npm run doc:lint",
     "test": "npm run lint"
   },
   "dependencies": {
@@ -29,6 +31,7 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@use-it/event-listener": "^0.1.6",
     "@use-it/interval": "^1.0.0",
+    "body-parser": "^1.19.0",
     "bootstrap": "^4.5.3",
     "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#intercept-mouse-down",
     "katex": "^0.12.0",
@@ -58,6 +61,8 @@
     "eslint": "^7.20.0",
     "eslint-plugin-coffeescript": "^1.0.0",
     "eslint-plugin-meteor": "^7.3.0",
-    "eslint-plugin-react": "^7.22.0"
+    "eslint-plugin-react": "^7.22.0",
+    "markdownlint-cli": "^0.27.1",
+    "markdownlint-rule-github-internal-links": "0.0.2"
   }
 }

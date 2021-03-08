@@ -10,7 +10,7 @@ import {faDoorOpen, faHourglass, faUser, faUserTie, faHandPaper, faSortAlphaDown
 import {faClone, faHandPaper as faHandPaperOutline, faStar as faStarOutline} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
-import {Rooms, roomWithTemplate, roomDuplicate} from '/lib/rooms'
+import {Rooms, roomDuplicate} from '/lib/rooms'
 import {Presence} from '/lib/presence'
 import {CardToggle} from './CardToggle'
 import {Header} from './Header'
@@ -21,11 +21,12 @@ import {useMeetingAdmin} from './MeetingSecret'
 import {Name} from './Name'
 import {useAdminVisit} from './Settings'
 import {Warnings} from './Warnings'
-import {getPresenceId, getCreator} from './lib/presenceId'
+import {getPresenceId, getUpdator} from './lib/presenceId'
 import {formatTimeDelta, formatDateTime} from './lib/dates'
 import timesync from './lib/timesync'
 import {useDebounce} from './lib/useDebounce'
 import {Meetings} from '/lib/meetings'
+import {meteorCallPromise} from '/lib/meteorPromise'
 import {sortByKey, titleKey, sortNames, uniqCountNames} from '/lib/sort'
 import {Config} from '/Config'
 
@@ -390,9 +391,9 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   onSplit = (e) ->
     e.preventDefault()
     e.stopPropagation()
-    newRoom = await roomDuplicate room, getCreator()
+    newRoom = await roomDuplicate room, getUpdator()
     #openRoom newRoom
-    selectRoom newRoom, false
+    selectRoom newRoom._id, false
   onDragStart = (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -448,7 +449,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
         Meteor.call 'roomEdit',
           id: room._id
           raised: not room.raised
-          updator: getCreator()
+          updator: getUpdator()
       <OverlayTrigger placement="top" overlay={(props) ->
         <Tooltip {...props}>{help}</Tooltip>
       }>
@@ -591,21 +592,23 @@ export RoomNew = React.memo ({selectRoom}) ->
   {meetingId} = useParams()
   [title, setTitle] = useState ''
   {openRoom} = useContext MeetingContext
-  submit = (e, template) ->
+  submit = (e, template = 'jitsi') ->
     e.preventDefault?()
     return unless title.trim().length
     room =
       meeting: meetingId
       title: title.trim()
-      creator: getCreator()
-      template: template ? 'jitsi'
+      updator: getUpdator()
+      tabs:
+        for type in template.split '+' when type  # skip blank
+          {type}
     setTitle ''
-    roomId = await roomWithTemplate room
+    room = await meteorCallPromise 'roomNew', room
     if e.shiftKey or e.ctrlKey or e.metaKey
-      openRoom roomId
+      openRoom room._id
       selectRoom null
     else
-      selectRoom roomId, true
+      selectRoom room._id, true
   ## We need to manually capture Enter so that e.g. Ctrl-Enter works.
   ## This has the added benefit of getting modifiers' state.
   onKeyDown = (e) ->

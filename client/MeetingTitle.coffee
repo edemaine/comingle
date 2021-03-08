@@ -4,7 +4,7 @@ import {Card, Form} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {Meetings} from '/lib/meetings'
-import {getCreator} from './lib/presenceId'
+import {getUpdator} from './lib/presenceId'
 import {useDebounce} from './lib/useDebounce'
 
 export useMeetingTitle = ->
@@ -35,7 +35,7 @@ export MeetingTitle = React.memo ->
       Meteor.call 'meetingEdit',
         id: meetingId
         title: title
-        updator: getCreator()
+        updator: getUpdator()
     setChanged false
   , [changedDebounce]
 

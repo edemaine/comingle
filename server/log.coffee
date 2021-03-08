@@ -1,10 +1,12 @@
+import {check, Match} from 'meteor/check'
 import {Mongo} from 'meteor/mongo'
 
+import {validId} from '/lib/id'
+import {checkMeetingSecret} from '/lib/meetings'
 import {Presence} from '/lib/presence'
 import {sameSorted} from '/lib/sort'
 
-Log = new Mongo.Collection 'log'
-export {Log}
+export Log = new Mongo.Collection 'log'
 
 ## Returns an object with up to two keys
 ## * `old` is the fetched old presence with the same ID.
@@ -44,3 +46,22 @@ export logPresenceRemove = (presenceId) ->
     meeting: old?.meeting
     updated: now
   {old}
+
+Meteor.methods
+  logGet: (spec) ->
+    check spec,
+      meeting: Match.Where validId
+      secret: String
+      start: Match.Optional Date
+      finish: Match.Optional Date
+    checkMeetingSecret spec.meeting, spec.secret
+    query = meeting: spec.meeting
+    query.updated = {} if spec.start? or spec.to?
+    query.updated.$gte = spec.start if spec.start?
+    query.updated.$lte = spec.finish if spec.finish?
+    Log.find query,
+      sort: updated: 1
+      fields:
+        meeting: false  # redundant with query
+        _id: false
+    .fetch()

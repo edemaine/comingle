@@ -3,14 +3,26 @@
 export Config =
 
   ## When creating a new meeting, create rooms with the specified
-  ## title and template.  Template can be '' (blank), 'cocreate', 'jitsi',
-  ## or a combination via plus, e.g., 'cocreate+jitsi'.
+  ## title and (optional) tabs.
   newMeetingRooms: [
     title: 'Main Room'
-    template: 'jitsi'
+    tabs: [
+      type: 'jitsi'
+    ]
   #,
   #  title: 'Empty Room'
-  #  template: ''
+  #,
+  #  title: 'Drawing Room'
+  #  tabs: [
+  #    type: 'cocreate'
+  #  ]
+  #,
+  #  title: 'Living Room'
+  #  tabs: [
+  #    type: 'jitsi'
+  #  ,
+  #    type: 'cocreate'
+  #  ]
   ]
 
   ## Default servers for each of the (open-source) services.

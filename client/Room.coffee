@@ -11,7 +11,7 @@ import {clipboardLink} from './icons/clipboardLink'
 
 import {Rooms, roomTabs} from '/lib/rooms'
 import {tabTypes} from '/lib/tabs'
-import {getCreator} from './lib/presenceId'
+import {getUpdator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
 import {formatDateTime} from './lib/dates'
@@ -329,12 +329,12 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
         Meteor.call 'tabEdit', addMeetingSecret meetingId,
           id: tab._id
           archived: not tab.archived
-          updator: getCreator()
+          updator: getUpdator()
       deleteTab = ->
         Meteor.call 'tabEdit', addMeetingSecret meetingId,
           id: tab._id
           deleted: true
-          updator: getCreator()
+          updator: getUpdator()
       if authorized
         buttons?.push <ArchiveButton key="archive" noun="tab"
           className="flexlayout__tab_button_trailing"
@@ -371,7 +371,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
         Meteor.call 'tabEdit', addMeetingSecret meetingId,
           id: action.data.node
           title: action.data.text
-          updator: getCreator()
+          updator: getUpdator()
     action
   onModelChange = ->
     ## Update localstorage saved layout whenever layout changes.
@@ -389,19 +389,19 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     Meteor.call 'roomEdit', addMeetingSecret meetingId,
       id: room._id
       archived: not room.archived
-      updator: getCreator()
+      updator: getUpdator()
   deleteRoom = ->
     return unless room?
     Meteor.call 'roomEdit', addMeetingSecret meetingId,
       id: room._id
       deleted: true
-      updator: getCreator()
+      updator: getUpdator()
   protectRoom = ->
     return unless room?
     Meteor.call 'roomEdit', addMeetingSecret meetingId,
       id: room._id
       protected: not room.protected
-      updator: getCreator()
+      updator: getUpdator()
 
   leaveRoom = (position) -> # eslint-disable-line react/display-name
     <OverlayTrigger placement="bottom" overlay={(props) ->
@@ -496,7 +496,7 @@ export setRoomTitle = (meetingId, roomId, title) ->
   Meteor.call 'roomEdit', addMeetingSecret meetingId,
     id: roomId
     title: title
-    updator: getCreator()
+    updator: getUpdator()
 
 export RoomTitle = ({room, roomId}) ->
   {meetingId} = useParams()
