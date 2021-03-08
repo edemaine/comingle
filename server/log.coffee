@@ -52,13 +52,13 @@ Meteor.methods
     check spec,
       meeting: Match.Where validId
       secret: String
-      from: Match.Optional Date
-      to: Match.Optional Date
+      start: Match.Optional Date
+      finish: Match.Optional Date
     checkMeetingSecret spec.meeting, spec.secret
     query = meeting: spec.meeting
-    query.updated = {} if spec.from? or spec.to?
-    query.updated.$gte = spec.from if spec.from?
-    query.updated.$lte = spec.to if spec.to?
+    query.updated = {} if spec.start? or spec.to?
+    query.updated.$gte = spec.start if spec.start?
+    query.updated.$lte = spec.finish if spec.finish?
     Log.find query, sort: updated: 1
     .map (diff) ->
       delete diff._id
