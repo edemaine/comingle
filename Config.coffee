@@ -36,3 +36,6 @@ export Config =
   defaultSort:
     key: 'title'  # see client/RoomList.coffee for other options
     reverse: false
+
+  ## Whether to have a compact room list by default
+  defaultCompact: false

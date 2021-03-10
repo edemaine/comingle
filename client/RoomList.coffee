@@ -19,6 +19,7 @@ import {MeetingContext} from './Meeting'
 import {useMeetingAdmin} from './MeetingSecret'
 import {Name} from './Name'
 import {useAdminVisit} from './Settings'
+import {getUI} from './Settings'
 import {Warnings} from './Warnings'
 import {getPresenceId, getUpdator} from './lib/presenceId'
 import {formatTimeDelta, formatDateTime} from './lib/dates'
@@ -368,6 +369,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   roomInfoClass += " presence-#{type}" for type of myPresence
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
+  roomInfoClass += " compact" if getUI("compact")
   adminVisit = useAdminVisit()
 
   onClick = (force) -> (e) ->

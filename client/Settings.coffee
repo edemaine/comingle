@@ -5,6 +5,7 @@ import {Card, Form} from 'react-bootstrap'
 import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
 import {MeetingTitle} from './MeetingTitle'
 import {MeetingSecret, useMeetingAdmin} from './MeetingSecret'
+import {Config} from '/Config'
 
 export Settings = React.memo ->
   admin = useMeetingAdmin()
@@ -14,6 +15,7 @@ export Settings = React.memo ->
         <Card.Title as="h3">Settings</Card.Title>
         <Form>
           <UIToggle name="dark"/>
+          <UIToggle name="compact"/>
         </Form>
       </Card.Body>
     </Card>
@@ -46,6 +48,10 @@ addUIVar = (name, init, label) ->
 addUIVar('dark', ->
   window.matchMedia('(prefers-color-scheme: dark)').matches
 , 'Dark Mode')
+
+addUIVar('compact', ->
+  Config.defaultCompact
+, 'Compact Room List')
 
 export UIToggle = React.memo ({name}) ->
   value = useUI(name)
