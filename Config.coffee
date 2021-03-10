@@ -45,3 +45,6 @@ export Config =
 
   ## Whether to hide the title / header at the top of the room list by default
   defaultHideTitle: false
+
+  ## Whether to hide the title / button bar at the top of the room tabset by default
+  defaultHideRoombar: false

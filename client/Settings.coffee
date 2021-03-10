@@ -18,6 +18,7 @@ export Settings = React.memo ->
           <UIToggle name="compact"/>
           <UIToggle name="hidecreate"/>
           <UIToggle name="hidetitle"/>
+          <UIToggle name="hideroombar"/>
         </Form>
       </Card.Body>
     </Card>
@@ -62,6 +63,10 @@ addUIVar('hidecreate', ->
 addUIVar('hidetitle', ->
   Config.defaultHideTitle
 , 'Hide Meeting Title')
+
+addUIVar('hideroombar', ->
+  Config.defaultHideRoombar
+, 'Hide Room Menubar')
 
 export UIToggle = React.memo ({name}) ->
   value = useUI(name)
