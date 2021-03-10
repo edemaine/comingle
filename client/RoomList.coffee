@@ -249,22 +249,24 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           No rooms in this meeting.
         </Alert>
       }
-      <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
-       heading="Your Starred Rooms:" startClosed search={searchDebounce}
-       filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}
-       className="starred">
-        <OverlayTrigger placement="top" overlay={(props) ->
-          <Tooltip {...props}>
-            Unstar all rooms
-          </Tooltip>
-        }>
-          <div className="text-center">
-            <Button size="sm" variant="outline-warning" onClick={clearStars}>
-              Clear Stars
-            </Button>
-          </div>
-        </OverlayTrigger>
-      </Sublist>
+      {unless getUI('hideStarred')
+        <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+         heading="Your Starred Rooms:" startClosed search={searchDebounce}
+         filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}
+         className="starred">
+          <OverlayTrigger placement="top" overlay={(props) ->
+            <Tooltip {...props}>
+              Unstar all rooms
+            </Tooltip>
+          }>
+            <div className="text-center">
+              <Button size="sm" variant="outline-warning" onClick={clearStars}>
+                Clear Stars
+              </Button>
+            </div>
+          </OverlayTrigger>
+        </Sublist>
+      }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Available Rooms:" search={searchDebounce} className="available"
        filter={(room) -> not room.archived and

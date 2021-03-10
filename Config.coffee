@@ -46,6 +46,9 @@ export Config =
   ## Whether to hide the room search widget in the room list by default
   default_hideSearch: false
 
+  ## Whether to hide the starred rooms accordion in the room list by default
+  default_hideStarred: false
+
   ## Whether to hide the title / header at the top of the room list by default
   default_hideTitle: false
 

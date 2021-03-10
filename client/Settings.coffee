@@ -51,6 +51,7 @@ addUIVar('dark', 'Dark Mode', -> window.matchMedia('(prefers-color-scheme: dark)
 addUIVar('compact', 'Compact Room List')
 addUIVar('hideCreate', 'Hide Room Creation Widget')
 addUIVar('hideSearch', 'Hide Room Search Widget')
+addUIVar('hideStarred', 'Hide Starred Rooms Accordion')
 addUIVar('hideTitle', 'Hide Meeting Title')
 addUIVar('hideRoombar', 'Hide Room Menubar')
 
