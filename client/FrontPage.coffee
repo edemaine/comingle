@@ -4,7 +4,7 @@ import {Button, ButtonGroup, Form, Jumbotron} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGithub} from '@fortawesome/free-brands-svg-icons'
 
-import {Dark} from './Settings'
+import {UIToggle} from './Settings'
 import {setMeetingSecret} from './MeetingSecret'
 import {VisitedMeetings} from './VisitedMeetings'
 import {getUpdator} from './lib/presenceId'
@@ -45,7 +45,7 @@ export FrontPage = React.memo ->
     <p/>
     <VisitedMeetings/>
     <p/>
-    <Dark/>
+    <UIToggle name="dark"/>
     <p/>
     <ButtonGroup className="flex-wrap">
       <Button variant="info" as="a" href={homepage}>

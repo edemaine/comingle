@@ -3,7 +3,7 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 
 import {FrontPage} from './FrontPage'
 import {Meeting} from './Meeting'
-import {useDark} from './Settings'
+import {useUI} from './Settings'
 import {Redirect} from './lib/Redirect'
 
 export App = React.memo ->
@@ -31,7 +31,7 @@ export AppRouter = React.memo ->
 AppRouter.displayName = 'AppRouter'
 
 export DarkClass = React.memo ->
-  dark = useDark()
+  dark = useUI('dark')
   if dark
     document.body.classList.add 'dark'
   else

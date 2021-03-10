@@ -3,7 +3,7 @@ import {useTracker} from 'meteor/react-meteor-data'
 import useEventListener from '@use-it/event-listener'
 
 import {useName} from './Name'
-import {useDark} from './Settings'
+import {useUI} from './Settings'
 import {Tabs} from '/lib/tabs'
 
 ###
@@ -47,7 +47,7 @@ export TabIFrame = React.memo ({tabId}) ->
 
   ## Send name to tab if it speaks coop protocol
   name = useName()
-  dark = useDark()
+  dark = useUI("dark")
   [coop, setCoop] = useState 0
   useEventListener 'message', (e) ->
     return unless ref.current
