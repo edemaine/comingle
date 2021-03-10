@@ -152,7 +152,9 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
 
   <div className="d-flex flex-column h-100 RoomList" onKeyDown={onKeyDown}>
     <div className="sidebar flex-grow-1 overflow-auto pb-2" ref={roomList}>
-      <Header/>
+      {unless getUI('hidetitle')
+        <Header/>
+      }
       <Warnings/>
       <Name/>
       {if starredHasOld

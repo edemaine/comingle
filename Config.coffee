@@ -42,3 +42,6 @@ export Config =
 
   ## Whether to hide the room creation widget at the bottom of the room list by default
   defaultHideCreate: false
+
+  ## Whether to hide the title / header at the top of the room list by default
+  defaultHideTitle: false
