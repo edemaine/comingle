@@ -14,11 +14,7 @@ export Settings = React.memo ->
       <Card.Body>
         <Card.Title as="h3">Settings</Card.Title>
         <Form>
-          <UIToggle name="dark"/>
-          <UIToggle name="compact"/>
-          <UIToggle name="hidecreate"/>
-          <UIToggle name="hidetitle"/>
-          <UIToggle name="hideroombar"/>
+          <UIToggles/>
         </Form>
       </Card.Body>
     </Card>
@@ -44,29 +40,23 @@ uiLabels = {}
 export useUI = (name) -> uiVars[name].use()
 export getUI = (name) -> uiVars[name].get()
 
-addUIVar = (name, init, label) ->
+addUIVar = (name, label, init) ->
+  unless init?
+    init = ->
+      Config["default_" + name]
   uiVars[name] = new LocalStorageVar name, init, sync: true
   uiLabels[name] = label
 
-addUIVar('dark', ->
-  window.matchMedia('(prefers-color-scheme: dark)').matches
-, 'Dark Mode')
+addUIVar('dark', 'Dark Mode', -> window.matchMedia('(prefers-color-scheme: dark)').matches)
+addUIVar('compact', 'Compact Room List')
+addUIVar('hideCreate', 'Hide Room Creation Widget')
+addUIVar('hideTitle', 'Hide Meeting Title')
+addUIVar('hideRoombar', 'Hide Room Menubar')
 
-addUIVar('compact', ->
-  Config.defaultCompact
-, 'Compact Room List')
-
-addUIVar('hidecreate', ->
-  Config.defaultHideCreate
-, 'Hide Room Creation Widget')
-
-addUIVar('hidetitle', ->
-  Config.defaultHideTitle
-, 'Hide Meeting Title')
-
-addUIVar('hideroombar', ->
-  Config.defaultHideRoombar
-, 'Hide Room Menubar')
+UIToggles = React.memo ->
+  for name, label of uiLabels
+    <UIToggle name={name} key={name}/>
+UIToggles.displayName = 'UIToggles'
 
 export UIToggle = React.memo ({name}) ->
   value = useUI(name)

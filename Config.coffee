@@ -38,13 +38,13 @@ export Config =
     reverse: false
 
   ## Whether to have a compact room list by default
-  defaultCompact: false
+  default_compact: false
 
   ## Whether to hide the room creation widget at the bottom of the room list by default
-  defaultHideCreate: false
+  default_hideCreate: false
 
   ## Whether to hide the title / header at the top of the room list by default
-  defaultHideTitle: false
+  default_hideTitle: false
 
   ## Whether to hide the title / button bar at the top of the room tabset by default
-  defaultHideRoombar: false
+  default_hideRoombar: false
