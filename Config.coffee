@@ -39,3 +39,6 @@ export Config =
 
   ## Whether to have a compact room list by default
   defaultCompact: false
+
+  ## Whether to hide the room creation widget at the bottom of the room list by default
+  defaultHideCreate: false

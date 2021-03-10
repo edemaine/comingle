@@ -273,7 +273,9 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
        filter={(room) -> room.archived and
                          (not nonempty or hasJoined(room) or selected == room._id)}/>
     </div>
-    <RoomNew selectRoom={selectRoom}/>
+    {unless getUI('hidecreate')
+      <RoomNew selectRoom={selectRoom}/>
+    }
   </div>
 RoomList.displayName = 'RoomList'
 
