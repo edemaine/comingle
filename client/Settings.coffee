@@ -50,6 +50,7 @@ addUIVar = (name, label, init) ->
 addUIVar('dark', 'Dark Mode', -> window.matchMedia('(prefers-color-scheme: dark)').matches)
 addUIVar('compact', 'Compact Room List')
 addUIVar('hideCreate', 'Hide Room Creation Widget')
+addUIVar('hideSearch', 'Hide Room Search Widget')
 addUIVar('hideTitle', 'Hide Meeting Title')
 addUIVar('hideRoombar', 'Hide Room Menubar')
 

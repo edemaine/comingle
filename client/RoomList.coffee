@@ -188,7 +188,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           </div>
         </Alert>
       }
-      {if rooms.length > 0
+      {if rooms.length > 0 and not getUI('hideSearch')
         <Accordion>
           <Card>
             <CardToggle eventKey="0">
