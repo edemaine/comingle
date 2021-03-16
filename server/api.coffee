@@ -84,6 +84,27 @@ WebApp.rawConnectHandlers.use '/api', (req, res, next) ->
 
 WebApp.connectHandlers.use '/api', bodyParser.text type: 'application/json'
 
+# https://262.ecma-international.org/11.0/#sec-date-time-string-format
+isDate = (value) ->
+  ///^
+    ([+\-]\d\d)?       # 6-digit year
+    \d\d\d\d           # YYYY
+    (-\d\d             # -MM
+      (-\d\d           # -DD
+      )?
+    )  # Spec doesn't require month, but we do, to distinguish from integers
+    (T\d\d:\d\d        # THH:mm
+      (:\d\d           # :ss
+        (.\d\d\d       # .sss
+        )?
+      )?
+      (Z               # Z (UTC)
+      |[+\-]\d\d:\d\d  # +-HH:mm (UTC offset)
+      )?
+    )?
+    $
+  ///.test value
+
 WebApp.connectHandlers.use '/api', (req, res) ->
   return unless req.method in ['GET', 'POST', 'OPTIONS']
   url = new URL req.url, Meteor.absoluteUrl()
@@ -105,6 +126,8 @@ WebApp.connectHandlers.use '/api', (req, res) ->
           ## meeting, room, or tab IDs) or EJSON-encoded objects.
           if validId value
             options[key] = value
+          else if isDate value
+            options[key] = new Date value
           else
             options[key] = EJSON.parse value
       catch e

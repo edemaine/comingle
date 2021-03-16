@@ -25,8 +25,11 @@ or a mixture thereof:
    specifying key/value pairs as parameters.
    Values should generally be
    [EJSON](https://docs.meteor.com/api/ejson.html)-encoded,
-   but as a special case, Meteor-style 17-character IDs (used a lot by the API)
-   can be included without quotes.
+   but for ease of use you can also use these special cases:
+   * Meteor-style 17-character IDs (used a lot by the API)
+     can be included without quotes.
+   * [ECMAScript Date/Time Strings](https://262.ecma-international.org/11.0/#sec-date-time-string-format)
+     (with at least a year and month, and without quotes)
 3. You can use both a request body and URL query parameters to provide a
    mixture of keys.  If the same key is present in both, the URL query
    parameter takes precedence.
