@@ -58,6 +58,9 @@ Responses often include "presence" objects which consist of two fields:
 
 ## Query Operations
 
+For consistency with other API calls, query operations can specify an
+`updator` field, which is ignored.
+
 ### `/api/meeting/get`: Fetch data for one or more meetings
 
 Request fields: (either `meeting` or `meetings` is required)

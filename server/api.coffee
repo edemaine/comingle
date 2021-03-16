@@ -29,6 +29,7 @@ checker =
   room: checkRoom
   tab: checkTab
 apiGet = (type) -> (options) ->
+  delete options.updator  # for consistency across different API calls
   "#{type}s": Meteor.call "#{type}Get", options
 apiNew = (type) -> (options) ->
   ## /api/meeting/new cannot require secret, but other operations do
@@ -70,7 +71,9 @@ apiMethods =
   '/meeting/edit': apiEdit 'meeting'
   '/room/edit': apiEdit 'room'
   '/tab/edit': apiEdit 'tab'
-  '/log/get': (options) -> logs: Meteor.call 'logGet', options
+  '/log/get': (options) ->
+    delete options.updator  # for consistency across different API calls
+    logs: Meteor.call 'logGet', options
 
 ## Allow CORS for API calls
 WebApp.rawConnectHandlers.use '/api', (req, res, next) ->
