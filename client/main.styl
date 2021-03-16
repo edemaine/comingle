@@ -45,6 +45,12 @@ nav
     font-weight: bold
     &.tight
       padding-bottom: 0
+      .card-header-tabs
+        margin-bottom: 0
+        margin-left: -0.25rem
+        margin-right: -0.25rem
+      .nav-link
+        padding: 0.25rem 0.5rem
     .float-right
       margin: 0.25rem
   .card-body
@@ -281,6 +287,27 @@ nav
       color: var(--gray-600)
   .body
     overflow-wrap: anywhere
+
+.schedule
+  .dow-grid
+    display: grid
+    grid-template-rows: repeat(2, auto)
+    grid-template-columns: repeat(7, 1fr)
+    grid-auto-flow: column
+    text-align: center
+    justify-self: center
+    .custom-control
+      padding-left: 1rem
+    .custom-control-label
+      &::before, &::after
+        left: -1rem
+
+input::-webkit-calendar-picker-indicator
+  margin: 0
+  padding-right: 0
+  cursor: pointer
+  /.dark &
+    filter: invert(1)
 
 .highlight
   background: hsla(60,71%,50%,0.4)

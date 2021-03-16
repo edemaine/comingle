@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react'
 import {useParams, useLocation, useHistory} from 'react-router-dom'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {Session} from 'meteor/session'
 import {useTracker} from 'meteor/react-meteor-data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faCog, faComment, faDoorOpen, faQuestion} from '@fortawesome/free-solid-svg-icons'
+import {faCalendarAlt, faCog, faComment, faDoorOpen, faQuestion} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import FlexLayout from './FlexLayout'
@@ -12,6 +12,7 @@ import {ChatRoom} from './ChatRoom'
 import {useMeetingSecret} from './MeetingSecret'
 import {RoomList} from './RoomList'
 import {Room, setRoomTitle} from './Room'
+import {Schedule} from './Schedule'
 import {Settings} from './Settings'
 import {Welcome} from './Welcome'
 import {VisitMeeting} from './VisitedMeetings'
@@ -160,6 +161,7 @@ export Meeting = React.memo ->
     setStarred newStarred
 
   meetingSecret = useMeetingSecret meetingId
+  admin = Boolean meetingSecret
   lastPresence = useRef()
   updatePresence = ->
     presence =
@@ -223,6 +225,22 @@ export Meeting = React.memo ->
     document.title = parts.reverse().join ' - '
   , []
   
+  ## Schedule tab
+  useLayoutEffect ->
+    exists = (model.getNodeById 'schedule')?
+    if admin
+      model.doAction FlexLayout.Actions.addNode
+        id: 'schedule'
+        type: 'tab'
+        name: "Schedule"
+        component: 'Schedule'
+        enableClose: false
+        enableDrag: false
+      , 'border_left', FlexLayout.DockLocation.CENTER, -1, false unless exists
+    else
+      model.doAction FlexLayout.Actions.deleteTab 'schedule' if exists
+  , [admin]
+
   factory = (node) -> # eslint-disable-line react/display-name
     updateTab = -> FlexLayout.updateNode model, node.getId()
     switch node.getComponent()
@@ -233,6 +251,8 @@ export Meeting = React.memo ->
         <ChatRoom channel={meetingId} audience="everyone"
          visible={node.isVisible()}
          extraData={node.getExtraData()} updateTab={updateTab}/>
+      when 'Schedule'
+        <Schedule/>
       when 'Settings'
         if node.isVisible()
           <Settings/>
@@ -249,14 +269,17 @@ export Meeting = React.memo ->
            node.getParent().getId()}
          {...node.getConfig()}/>
   iconFactory = (node) -> # eslint-disable-line react/display-name
-    if node.getComponent() == 'ChatRoom'
-      <FontAwesomeIcon icon={faComment}/>
-    else if node.getComponent() == 'Settings'
-      <FontAwesomeIcon icon={faCog}/>
-    else if node.getComponent() == 'Welcome'
-      <FontAwesomeIcon icon={faQuestion}/>
-    else
-      <FontAwesomeIcon icon={faDoorOpen}/>
+    switch node.getComponent()
+      when 'ChatRoom'
+        <FontAwesomeIcon icon={faComment}/>
+      when 'Settings'
+        <FontAwesomeIcon icon={faCog}/>
+      when 'Schedule'
+        <FontAwesomeIcon icon={faCalendarAlt}/>
+      when 'Welcome'
+        <FontAwesomeIcon icon={faQuestion}/>
+      else
+        <FontAwesomeIcon icon={faDoorOpen}/>
   onRenderTab = (node, renderState) ->
     type = if node.getParent().getType() == 'border' then 'border' else 'tab'
     buttons = renderState.buttons

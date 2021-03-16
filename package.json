@@ -35,6 +35,7 @@
     "body-parser": "^1.19.0",
     "bootstrap": "^4.6.0",
     "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#fix-splitter-drag",
+    "ical.js": "^1.4.0",
     "katex": "^0.13.2",
     "markdown-it": "^12.0.4",
     "markdown-it-texmath": "^0.8.0",

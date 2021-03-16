@@ -36,3 +36,6 @@ export Config =
   defaultSort:
     key: 'title'  # see client/RoomList.coffee for other options
     reverse: false
+
+  ## Default length of scheduled event, in minutes
+  defaultScheduleMinutes: 60
