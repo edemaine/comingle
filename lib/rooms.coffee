@@ -57,6 +57,7 @@ Meteor.methods
         url: Match.Optional Match.Where checkURL
         archived: Match.Optional Boolean
       ]
+    secret = room.secret  # gets deleted by roomCheckSecret
     ## Check tabs for validity
     tabs = room.tabs ? []
     delete room.tabs
@@ -73,6 +74,8 @@ Meteor.methods
     room._id = roomId
     ## Add tabs
     for tab in tabs
+      tab = Object.assign {}, tab
+      tab.secret = secret if secret?
       Meteor.call 'tabNew', Object.assign tab,
         meeting: room.meeting
         room: roomId
