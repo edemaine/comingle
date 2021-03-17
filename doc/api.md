@@ -29,7 +29,7 @@ or a mixture thereof:
    * Meteor-style 17-character IDs (used a lot by the API)
      can be included without quotes.
    * [ECMAScript Date/Time Strings](https://262.ecma-international.org/11.0/#sec-date-time-string-format)
-     (with at least a year and month, and without quotes)
+     (with at least a year and month)
 3. You can use both a request body and URL query parameters to provide a
    mixture of keys.  If the same key is present in both, the URL query
    parameter takes precedence.
@@ -38,6 +38,13 @@ or a mixture thereof:
 particular has support for `Date`s and `RegExp`s needed by some API operations.
 If you're not using `Date`s or `RegExp`s in your API operations, you can use a
 regular [JSON](https://www.json.org/json-en.html) encoder.
+Also, in queries involving dates, you can use
+[ECMAScript Date/Time Strings](https://262.ecma-international.org/11.0/#sec-date-time-string-format)
+(with at least a year and a month)
+as an alternative to the EJSON encoding of `Date`s.
+(But the output records will still use EJSON encoding, which is
+`{"$date":t}` where `t` is the
+[number of milliseconds since Unix epoch in UTC](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime).)
 
 ## Response Format
 

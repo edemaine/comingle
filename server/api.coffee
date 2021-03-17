@@ -73,6 +73,9 @@ apiMethods =
   '/tab/edit': apiEdit 'tab'
   '/log/get': (options) ->
     delete options.updator  # for consistency across different API calls
+    for key in ['start', 'finish']
+      if isDate options[key]
+        options[key] = new Date options[key]
     logs: Meteor.call 'logGet', options
 
 ## Allow CORS for API calls
@@ -86,6 +89,7 @@ WebApp.connectHandlers.use '/api', bodyParser.text type: 'application/json'
 
 # https://262.ecma-international.org/11.0/#sec-date-time-string-format
 isDate = (value) ->
+  typeof value == 'string' and
   ///^
     ([+\-]\d\d)?       # 6-digit year
     \d\d\d\d           # YYYY
