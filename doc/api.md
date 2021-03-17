@@ -35,16 +35,19 @@ or a mixture thereof:
    parameter takes precedence.
 
 [EJSON](https://docs.meteor.com/api/ejson.html) is an extension of JSON that in
-particular has support for `Date`s and `RegExp`s needed by some API operations.
+particular has support for `Date`s and `RegExp`s needed by some API operations:
+
+* A `Date` `d` is encoded as `{"$date":d.getTime()}` where `d.getTime()` is the
+  [number of milliseconds since Unix epoch in UTC](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime).
+* The `RegExp` `/[a-z]/i` is encoded as `{"$regexp":"[a-z]","$flags":"i"}`.
+
 If you're not using `Date`s or `RegExp`s in your API operations, you can use a
 regular [JSON](https://www.json.org/json-en.html) encoder.
 Also, in queries involving dates, you can use
 [ECMAScript Date/Time Strings](https://262.ecma-international.org/11.0/#sec-date-time-string-format)
 (with at least a year and a month)
 as an alternative to the EJSON encoding of `Date`s.
-(But the output records will still use EJSON encoding, which is
-`{"$date":t}` where `t` is the
-[number of milliseconds since Unix epoch in UTC](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime).)
+But the output (e.g. `updated` field) will still use EJSON encoding.
 
 ## Response Format
 
