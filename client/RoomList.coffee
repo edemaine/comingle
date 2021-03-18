@@ -6,7 +6,7 @@ import SelectableContext from 'react-bootstrap/SelectableContext'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen, faHourglass, faUser, faUserTie, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle} from '@fortawesome/free-solid-svg-icons'
+import {faDoorOpen, faHourglass, faUser, faUserTie, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
 import {faClone, faHandPaper as faHandPaperOutline, faStar as faStarOutline} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
@@ -351,6 +351,7 @@ RoomList.onRenderTab = (node, renderState) ->
 
 export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
+  admin = useMeetingAdmin()
   {openRoom, openRoomWithDragAndDrop, starred, updateStarred} = useContext MeetingContext
   link = useRef()
   {myPresence, presenceClusters} = useMemo ->
@@ -394,6 +395,14 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     newRoom = await roomDuplicate room, getUpdator()
     #openRoom newRoom
     selectRoom newRoom._id, false
+  onArchive = (e) ->
+    e.preventDefault()
+    e.stopPropagation()
+    await meteorCallPromise 'roomEdit',
+      id: room._id
+      archived: not room.archived
+      updator: getUpdator()
+    selectRoom room._id, true
   onDragStart = (e) ->
     e.preventDefault()
     e.stopPropagation()
@@ -509,6 +518,19 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
             <small><b>Leaves</b> current call</small>
           </Button>
         }
+        {if room.archived
+          <Button variant="success" onClick={onArchive}>
+            <small className="mr-1"><FontAwesomeIcon icon={faTrashRestore}/></small>
+            Unarchive Room<br/>
+            {### <small><b>Restores</b> to available room list</small> ###}
+          </Button>
+        else if admin
+          <Button variant="danger" onClick={onArchive}>
+            <small className="mr-1"><FontAwesomeIcon icon={faTrash}/></small>
+            Archive Room<br/>
+            {### <small><b>Hides</b> from available room list</small> ###}
+          </Button>
+        }
       </ButtonGroup>
     }
   </Link>
@@ -614,6 +636,7 @@ export RoomNew = React.memo ({selectRoom}) ->
   onKeyDown = (e) ->
     if e.key == 'Enter'
       submit e
+
   <form onSubmit={submit}>
     <input type="text" placeholder="Title" className="form-control"
      value={title} onChange={(e) -> setTitle e.target.value}
