@@ -498,7 +498,7 @@ export setRoomTitle = (meetingId, roomId, title) ->
     title: title
     updator: getUpdator()
 
-export RoomTitle = ({room, roomId}) ->
+export RoomTitle = React.memo ({room, roomId}) ->
   {meetingId} = useParams()
   admin = useMeetingAdmin()
   authorized = admin or not room?.protected
@@ -515,6 +515,7 @@ export RoomTitle = ({room, roomId}) ->
   useEffect ->
     return unless editing and room?
     inputRef.current.value = room.title
+    undefined
   , [editing, room?.title]
   ## Focus on <input> when start editing (like FlexLayout)
   useEffect ->
@@ -580,6 +581,7 @@ export RoomTitle = ({room, roomId}) ->
       }
     </OverlayTrigger>
   else
-    <input className={className} ref={inputRef} onKeyDown={onKeyDown}/>
+    <input type="text" className={className} ref={inputRef}
+     onKeyDown={onKeyDown}/>
 
 RoomTitle.displayName = 'RoomTitle'

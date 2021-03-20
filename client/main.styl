@@ -200,7 +200,10 @@ nav
     flex-direction: row
     align-items: center
     .room-title
-      user-select: none
+      // Prevent selection from interfering with drag or double click
+      // in div.room-title, but allow it in input.room-title:
+      &div
+        user-select: none
       flex-grow: 1
     div.room-title
       cursor: pointer
