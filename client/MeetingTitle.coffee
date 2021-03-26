@@ -20,7 +20,7 @@ export MeetingTitle = React.memo ->
     Meetings.findOne meetingId
   , [meetingId]
   [title, setTitle] = useState ''
-  [changed, setChanged] = useState false
+  [changed, setChanged] = useState null
   ## Synchronize text box to title from database whenever it changes
   useLayoutEffect ->
     return unless meeting?.title?
@@ -30,13 +30,13 @@ export MeetingTitle = React.memo ->
   ## When text box stabilizes for half a second, update database title
   changedDebounce = useDebounce changed, 500
   useLayoutEffect ->
-    return unless changedDebounce
+    return unless changedDebounce?
     unless title == meeting.title
       Meteor.call 'meetingEdit',
         id: meetingId
         title: title
         updator: getUpdator()
-    setChanged false
+    setChanged null
   , [changedDebounce]
 
   <Card>

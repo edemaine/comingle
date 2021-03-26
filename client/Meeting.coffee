@@ -15,6 +15,7 @@ import {Room, setRoomTitle} from './Room'
 import {Settings} from './Settings'
 import {Welcome} from './Welcome'
 import {useName} from './Name'
+import {Meetings} from '/lib/meetings'
 import {Rooms} from '/lib/rooms'
 import {validId} from '/lib/id'
 import {sameSorted} from '/lib/sort'
@@ -211,6 +212,15 @@ export Meeting = React.memo ->
       if location.hash
         history.replace "/m/#{meetingId}"
       Session.set 'currentRoom', undefined
+  ## Set page title
+  useTracker ->
+    parts = ["Comingle"]
+    meeting = Meetings.findOne meetingId
+    parts.push meeting.title if meeting?.title
+    room = Rooms.findOne Session.get 'currentRoom'
+    parts.push room.title if room?.title
+    document.title = parts.reverse().join ' - '
+  , []
   
   factory = (node) -> # eslint-disable-line react/display-name
     updateTab = -> FlexLayout.updateNode model, node.getId()
