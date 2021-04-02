@@ -18,8 +18,10 @@ export icons = (tabPhrase) ->
     <OverlayTrigger placement="bottom" overlay={(props) ->
       if tabPhrase == 'room'
         <Tooltip {props...}>
-          Leave Room<br/>
-          <small>You can always rejoin by selecting the room from the list on the left.</small>
+          Leave Room
+          <div className="small">
+            You can always rejoin by selecting the room from the list on the left.
+          </div>
         </Tooltip>
       else
         <Tooltip {props...}>Close New Tab</Tooltip>
@@ -29,8 +31,10 @@ export icons = (tabPhrase) ->
   maximize:
     <OverlayTrigger placement="bottom" overlay={(props) ->
       <Tooltip {props...}>
-        Maximize This {capitalize tabPhrase}<br/>
-        <small>Temporarily hide all other {tabPhrase}s to focus on this one.</small>
+        Maximize This {capitalize tabPhrase}
+        <div className="small">
+          Temporarily hide all other {tabPhrase}s to focus on this one.
+        </div>
       </Tooltip>
     }>
       <FontAwesomeIcon icon={faExpandArrowsAlt}
@@ -39,8 +43,10 @@ export icons = (tabPhrase) ->
   restore:
     <OverlayTrigger placement="bottom" overlay={(props) ->
       <Tooltip {props...}>
-        Unmaximize This {capitalize tabPhrase}<br/>
-        <small>Restore all other {tabPhrase}s.</small>
+        Unmaximize This {capitalize tabPhrase}
+        <div className="small">
+          Restore all other {tabPhrase}s.
+        </div>
       </Tooltip>
     }>
       <FontAwesomeIcon icon={faCompressArrowsAlt}
@@ -49,8 +55,10 @@ export icons = (tabPhrase) ->
   more:
     <OverlayTrigger placement="bottom" overlay={(props) ->
       <Tooltip {props...}>
-        Overflow {capitalize tabPhrase}s<br/>
-        <small>Some additional {tabPhrase}s are hiding here because of the limited width.<br/>Select to see the list.</small>
+        Overflow {capitalize tabPhrase}s
+        <div className="small">
+          Some additional {tabPhrase}s are hiding here because of the limited width.<br/>Select to see the list.
+        </div>
       </Tooltip>
     }>
       <FontAwesomeIcon icon={faWindowRestore} width="12px"

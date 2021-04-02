@@ -254,9 +254,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           <br/>on {formatDateTime tab.archived}
         </i>
       }
-      <br/>
       {if authorized
-        <small>(Double click to rename.)</small>
+        <div className="small">
+          (Double click to rename.)
+        </div>
       }
     </Tooltip>
   onRenderTab = (node, renderState) ->
@@ -284,8 +285,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
            onTouchStart={(e) -> e.stopPropagation()}>
             <OverlayTrigger placement="bottom" overlay={(props) ->
               <Tooltip {...props}>
-                Open in separate browser tab<br/>
-                <small>Or right click for more browser options.</small>
+                Open in separate browser tab
+                <div className="small">
+                  Or right click for more browser options.
+                </div>
               </Tooltip>
             }>
               <a href={url} target="_blank" rel="noopener">
@@ -318,8 +321,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
          onTouchStart={(e) -> e.stopPropagation()}>
           <OverlayTrigger placement="bottom" overlay={(props) ->
             <Tooltip {...props}>
-              Reload Tab<br/>
-              <small>If it's not working, try rebooting.</small>
+              Reload Tab
+              <div className="small">
+                If it's not working, try rebooting.
+              </div>
             </Tooltip>
           }>
             <FontAwesomeIcon icon={faRedoAlt}/>
@@ -350,8 +355,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     buttons.push \
       <OverlayTrigger key="add" placement="bottom" overlay={(tipProps) ->
         <Tooltip {tipProps...}>
-          Add Tab<br/>
-          <small>Add shared tab to room: web page, whiteboard, video conference, etc.</small>
+          Add Tab
+          <div className="small">
+            Add shared tab to room: web page, whiteboard, video conference, etc.
+          </div>
         </Tooltip>
       }>
         <button className="flexlayout__tab_toolbar_button-fa"
@@ -407,8 +414,9 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     <OverlayTrigger placement="bottom" overlay={(props) ->
       <Tooltip {...props}>
         Leave this room
-        <br/>
-        <small>and any embedded calls</small>
+        <div className="small">
+          and any embedded calls
+        </div>
       </Tooltip>
     }>
       <div className="flexlayout__tab_button_#{position}"
@@ -433,8 +441,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
         label = "#{if showArchived then "Hide" else "Show"} Archived Tabs"
         <OverlayTrigger placement="bottom" overlay={(props) ->
           <Tooltip {...props}>
-            {label}<br/>
-            <small>Currently {unless showArchived then <b>not</b>} showing archived tabs.</small>
+            {label}
+            <div className="small">
+              Currently {unless showArchived then <b>not</b>} showing archived tabs.
+            </div>
           </Tooltip>
         }>
           <div aria-label={label} onClick={-> setShowArchived not showArchived}
@@ -567,9 +577,10 @@ export RoomTitle = React.memo ({room, roomId}) ->
             <br/>on {formatDateTime room.archived}
           </>
         }
-        <br/>
         {if authorized
-          <small>(Double click to rename.)</small>
+          <div className="small">
+            (Double click to rename.)
+          </div>
         }
       </Tooltip>
     }>

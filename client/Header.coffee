@@ -15,8 +15,10 @@ export Header = React.memo ->
     </OverlayTrigger>
     <OverlayTrigger placement="bottom" overlay={(props) ->
       <Tooltip {...props}>
-        Meeting title<br/>
-        <small>(change in Settings)</small>
+        Meeting title
+        <div className="small">
+          (change in Settings)
+        </div>
       </Tooltip>
     }>
       <div className="text-center text-break">

@@ -20,8 +20,8 @@ export ConfirmButton = React.memo ({className, action, prefix, suffix, icon, hel
     <Overlay target={buttonRef.current} placement="bottom"
      show={hover or click}>
       <Tooltip>
-        {prefix}{action}{suffix}<br/>
-        <small>{help}</small>
+        {prefix}{action}{suffix}
+        <div className="small">{help}</div>
         {if click
            <ButtonGroup className="mt-1">
              <Button variant="danger" size="sm"

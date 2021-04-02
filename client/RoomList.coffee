@@ -502,33 +502,39 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
           <>
             <Button variant="danger" onClick={onLeave}>
               <small className="mr-1"><FontAwesomeIcon icon={faTimes}/></small>
-              Leave Room<br/>
-              <small><b>Leaves</b> current call</small>
+              Leave Room
+              <div className="small">
+                <b>Leaves</b> current call
+              </div>
             </Button>
             <Button variant="primary" onClick={onSplit}>
               <small className="mr-1"><FontAwesomeIcon icon={faClone}/></small>
-              Split Room<br/>
-              <small><b>Duplicate</b> this room (forking discussion)</small>
+              Split Room
+              <div className="small">
+                <b>Duplicate</b> this room (forking discussion)
+              </div>
             </Button>
           </>
         else
           <Button variant="warning" onClick={onClick true}>
             <small className="mr-1"><FontAwesomeIcon icon={faDoorOpen}/></small>
-            Switch to Room<br/>
-            <small><b>Leaves</b> current call</small>
+            Switch to Room
+            <div className="small">
+              <b>Leaves</b> current call
+            </div>
           </Button>
         }
         {if room.archived
           <Button variant="success" onClick={onArchive}>
             <small className="mr-1"><FontAwesomeIcon icon={faTrashRestore}/></small>
-            Unarchive Room<br/>
-            {### <small><b>Restores</b> to available room list</small> ###}
+            Unarchive Room
+            {### <div className="small"><b>Restores</b> to available room list</div> ###}
           </Button>
         else if admin
           <Button variant="danger" onClick={onArchive}>
             <small className="mr-1"><FontAwesomeIcon icon={faTrash}/></small>
-            Archive Room<br/>
-            {### <small><b>Hides</b> from available room list</small> ###}
+            Archive Room
+            {### <div className="small"><b>Hides</b> from available room list</div> ###}
           </Button>
         }
       </ButtonGroup>
