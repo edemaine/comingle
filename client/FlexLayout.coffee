@@ -57,7 +57,7 @@ export icons = (tabPhrase) ->
       <Tooltip {props...}>
         Overflow {capitalize tabPhrase}s
         <div className="small">
-          Some additional {tabPhrase}s are hiding here because of the limited width.<br/>Select to see the list.
+          Some additional {tabPhrase}s are off-screen because of the limited width. Use this button to choose from a pop-up list, or scroll the {tabPhrase} bar.
         </div>
       </Tooltip>
     }>

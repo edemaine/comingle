@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useLayoutEffect, useRef} from 'react'
 import {Alert, Button, Card, Form, Nav} from 'react-bootstrap'
 
 import {addMeetingSecret} from './MeetingSecret'
@@ -31,8 +31,11 @@ do -> # avoid namespace pollution
     tabTypesByCategory[category] ?= {}
     tabTypesByCategory[category][tabType] = tabData
 
-export TabNew = React.memo ({node, meetingId, roomId, replaceTabNew, existingTabTypes}) ->
-  [url, setUrl] = useState ''
+export TabNew = React.memo ({initialUrl, node, meetingId, roomId, replaceTabNew, existingTabTypes}) ->
+  [url, setUrl] = useState initialUrl ? ''
+  useLayoutEffect ->
+    setUrl initialUrl if initialUrl? and not url
+  , [initialUrl]
   [mixed, setMixed] = useState false
   [title, setTitle] = useState ''
   [category, setCategory] = useState 'Web'

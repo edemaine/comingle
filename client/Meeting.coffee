@@ -280,10 +280,10 @@ export Meeting = React.memo ->
 
   <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop, starred, starredOld, starredHasOld, updateStarred}}>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-     onRenderTab={onRenderTab}
-     onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
-     ref={layoutRef}
-     tabPhrase="room"/>
+    onRenderTab={onRenderTab}
+    onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
+    ref={layoutRef}
+    tabPhrase="room"/>
   </MeetingContext.Provider>
 
 Meeting.displayName = 'Meeting'

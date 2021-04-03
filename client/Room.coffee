@@ -65,6 +65,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
   id2tab = useIdMap tabs
   existingTabTypes = useIdMap tabs, 'type'
   tabsetUsed = useRef {}
+  layoutRef = useRef()
 
   ## Initialize model according to saved layout
   [model, setModel] = useState()
@@ -199,7 +200,6 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           tabNew tabset
     undefined
   , [loading, model, tabs, authorized]
-  ## End of hooks
 
   tabNew = (parent) ->
     return unless model?
@@ -225,8 +225,8 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       when 'TabJitsi' then <TabJitsi tabId={node.getId()} room={room}/>
       when 'TabZoom' then <TabZoom tabId={node.getId()} room={room}/>
       when 'TabNew'
-        <TabNew {...{node, meetingId, roomId,
-                     replaceTabNew, existingTabTypes}}/>
+        <TabNew initialUrl={node.getConfig()?.url}
+         {...{node, meetingId, roomId, replaceTabNew, existingTabTypes}}/>
       when 'TabReload'
         model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
           component: tabComponent id2tab[node.getId()]
@@ -387,6 +387,35 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     if tabset = model.getActiveTabset()
       tabsetUsed.current[tabset.getId()] = (new Date).getTime()
 
+  ## Drag and drop of URLs
+  onExternalDrag = (e) ->
+    types = ['text/uri-list', 'text/html', 'text/plain']
+    for type in e.dataTransfer.types
+      if type in types
+        goodType = true
+        break
+    return unless goodType
+    e.dataTransfer.dropEffect = 'link'
+    dragText: 'Drag New Tab'
+    json:
+      type: 'tab'
+      name: 'New Tab'
+      component: 'TabNew'
+      enableRename: false
+    onDrop: (node, drop) ->
+      return unless node? and drop?  # canceled drag
+      for type in types
+        if (text = drop.dataTransfer.getData type)
+          if (match = /// <a\b [^<>]* \b href \s*=\s* ("[^"]*"|'[^']*')
+                          [^<>]*> ///i.exec text)?
+            url = match[1][1...-1]
+            break
+          if (match = /^\s*https?:\/\/\S+/.exec text)?
+            url = match[0]
+            break
+      model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
+        config: {url}
+
   ## Room button actions
   roomLink = ->
     navigator.clipboard.writeText \
@@ -490,9 +519,11 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           </ul>
         </Alert>
       else
-        <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
-        onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
-        onAction={onAction} onModelChange={onModelChange} tabPhrase="tab"/>
+        <FlexLayout.Layout model={model} ref={layoutRef}
+         factory={factory} iconFactory={iconFactory}
+         onRenderTab={onRenderTab} onRenderTabSet={onRenderTabSet}
+         onAction={onAction} onModelChange={onModelChange} tabPhrase="tab"
+         onExternalDrag={onExternalDrag}/>
       }
     </div>
   </div>

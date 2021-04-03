@@ -33,7 +33,7 @@
     "@use-it/interval": "^1.0.0",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.5.3",
-    "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#intercept-mouse-down",
+    "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#7b0f4905f92eba77a317c6e244722d4ac32827e2",
     "katex": "^0.12.0",
     "markdown-it": "^12.0.4",
     "markdown-it-texmath": "^0.8.0",
