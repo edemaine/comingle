@@ -34,7 +34,7 @@
     "@use-it/interval": "^1.0.0",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.5.3",
-    "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#external-drag-pointerevents",
+    "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#fix-splitter-drag",
     "katex": "^0.12.0",
     "markdown-it": "^12.0.4",
     "markdown-it-texmath": "^0.8.0",

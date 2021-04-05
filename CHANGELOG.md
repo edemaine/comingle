@@ -7,6 +7,10 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-04-05
+
+* Fix dragging of separators between tabsets.  (Needed to drag very slowly.)
+
 ## 2021-04-04
 
 * Dragging a link into Comingle now works better when dragging on top of an
