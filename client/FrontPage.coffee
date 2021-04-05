@@ -7,7 +7,7 @@ import {faGithub} from '@fortawesome/free-brands-svg-icons'
 import {Dark} from './Settings'
 import {setMeetingSecret} from './MeetingSecret'
 import {getUpdator} from './lib/presenceId'
-import {bugs, homepage, repository} from '/package.json'
+import {bugs, changelog, homepage, repository} from '/package.json'
 
 export FrontPage = React.memo ->
   history = useHistory()
@@ -48,11 +48,14 @@ export FrontPage = React.memo ->
       <Button variant="info" as="a" href={homepage}>
         Documentation
       </Button>
+      <Button variant="info" as="a" href={changelog}>
+        Recent Changes
+      </Button>
       <Button variant="dark" as="a" href={repository.url}>
-        Source Code on Github <FontAwesomeIcon icon={faGithub}/>
+        Source Code <FontAwesomeIcon icon={faGithub}/>
       </Button>
       <Button variant="danger" as="a" href={bugs.url}>
-        Report Bugs or Request Features
+        Suggestions/Bugs
       </Button>
     </ButtonGroup>
   </Jumbotron>

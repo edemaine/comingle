@@ -45,3 +45,6 @@ with the following key features:
 * Instantly create a new meeting and share the URL to meet with others.
   **No accounts required**.
 * **Free/open source** ([MIT license](LICENSE))
+
+To see what's changed in Comingle recently, check out the
+[Changelog](CHANGELOG.md).
