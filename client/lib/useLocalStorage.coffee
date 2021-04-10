@@ -2,6 +2,7 @@ import {useState} from 'react'
 import useEventListener from '@use-it/event-listener'
 import {ReactiveVar} from 'meteor/reactive-var'
 import {useTracker} from 'meteor/react-meteor-data'
+import {EJSON} from 'meteor/ejson'
 
 ## Based on https://usehooks.com/useLocalStorage/ and
 ## https://github.com/donavon/use-persisted-state/blob/develop/src/usePersistedState.js
@@ -34,7 +35,7 @@ export useStorage = (storage, key, initialValue, options) ->
     useEventListener 'storage', (e) ->
       if e.key == key
         try
-          val = JSON.parse e.newValue
+          val = EJSON.parse e.newValue
         catch error
           console.warn "Failed to sync storage key #{key}: #{error}"
         setStoredValue val
@@ -52,7 +53,7 @@ export getStorage = (storage, key, initialValue) ->
     # Parse stored json or if none return initialValue
     if item? and item != 'undefined'
       try
-        JSON.parse item
+        EJSON.parse item
       catch
         initial initialValue
     else
@@ -65,7 +66,7 @@ export getStorage = (storage, key, initialValue) ->
 setStorage = (storage, key, value) ->
   try
     # Save to local storage
-    storage.setItem key, JSON.stringify value
+    storage.setItem key, EJSON.stringify value
   catch error
     console.warn "Failed to set storage key #{key}: #{error}"
 
@@ -90,7 +91,7 @@ class StorageVar extends ReactiveVar
       window.addEventListener 'storage', @listener = (e) =>
         if e.key == @key
           try
-            val = JSON.parse e.newValue
+            val = EJSON.parse e.newValue
           catch error
             console.warn "Failed to sync storage key #{@key}: #{error}"
             return

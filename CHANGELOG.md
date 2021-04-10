@@ -7,6 +7,12 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-04-10
+
+* Comingle now remembers the meetings you've visited, and offers links to them
+  on the front page, reverse-sorted by the last time you visited them.
+  [[#159](https://github.com/edemaine/comingle/issues/159)]
+
 ## 2021-04-05
 
 * Fix dragging of separators between tabsets.  (Needed to drag very slowly.)

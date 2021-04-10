@@ -30,6 +30,11 @@ nav
   padding: 3px 0.25rem
   a, a:visited { color: inherit !important }
 
+.toggle.card-header
+  cursor: pointer
+  svg.float-right
+    margin-top: 0.25em
+
 .sidebar
   .card
     overflow: visible !important  // allow Sort By to spill out of card
@@ -38,8 +43,6 @@ nav
     text-align: center
     font-size: 80%
     font-weight: bold
-    &.toggle
-      cursor: pointer
     &.tight
       padding-bottom: 0
     .float-right
@@ -285,3 +288,19 @@ nav
 .text-help
   text-decoration: dotted underline gray
   cursor: help
+
+table.table.VisitedMeetings
+  width: 100%
+  margin-bottom: 0
+  tr
+    td
+      padding: 0  // move Bootstrap's padding of 0.3rem for link targeting
+      > a
+        padding: 0.3rem
+        display: block
+        color: inherit
+    &:hover td
+      background-color: #5cb85c
+      text-decoration: underline
+      /.dark &
+        background-color: #2c592c

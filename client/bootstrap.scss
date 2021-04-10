@@ -15,7 +15,7 @@ $code-color: #17a2b8; // $cyan
 //@import "{}/node_modules/bootstrap/scss/images";
 @import "{}/node_modules/bootstrap/scss/code";
 //@import "{}/node_modules/bootstrap/scss/grid";
-//@import "{}/node_modules/bootstrap/scss/tables";
+@import "{}/node_modules/bootstrap/scss/tables";
 @import "{}/node_modules/bootstrap/scss/forms";
 @import "{}/node_modules/bootstrap/scss/buttons";
 @import "{}/node_modules/bootstrap/scss/transitions";
@@ -97,8 +97,8 @@ $link-color: lighten($primary, 25%); // $primary
 $link-hover-color: lighten($link-color, 15%);
 
 $table-color:             $white;
-$table-accent-bg:         rgba($white, .05);
-$table-hover-bg:          rgba($white, .075);
+$table-accent-bg:         rgba($white, .075);
+$table-hover-bg:          rgba($white, .1);
 $table-border-color:      $gray-700;
 $table-dark-border-color: $gray-500;
 $table-dark-color:        darken($gray-500, 7.5%);
@@ -227,7 +227,7 @@ $pre-color: inherit;
   //UNUSED: @import "{}/node_modules/bootstrap/scss/images";
   @import "{}/node_modules/bootstrap/scss/code";
   //UNUSED: @import "{}/node_modules/bootstrap/scss/grid";
-  //UNUSED: @import "{}/node_modules/bootstrap/scss/tables";
+  @import "{}/node_modules/bootstrap/scss/tables";
   @import "{}/node_modules/bootstrap/scss/forms";
   @import "{}/node_modules/bootstrap/scss/buttons";
   //NO COLOR: @import "{}/node_modules/bootstrap/scss/transitions";

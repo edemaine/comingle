@@ -6,6 +6,7 @@ import {faGithub} from '@fortawesome/free-brands-svg-icons'
 
 import {Dark} from './Settings'
 import {setMeetingSecret} from './MeetingSecret'
+import {VisitedMeetings} from './VisitedMeetings'
 import {getUpdator} from './lib/presenceId'
 import {bugs, changelog, homepage, repository} from '/package.json'
 
@@ -24,12 +25,12 @@ export FrontPage = React.memo ->
       setMeetingSecret _id, secret
       history.push "/m/#{_id}"
 
-  <Jumbotron className="text-center">
+  <Jumbotron className="text-center h-100 overflow-auto">
     <h1 className="mb-3">
       Welcome to Comingle! <img src="/comingle.svg" style={{width: '64px'}}/>
     </h1>
     <p>
-      <b>Comingle</b> is an <a href={repository}>open-source</a> online
+      <b>Comingle</b> is an <a href={repository.url}>open-source</a> online
       meeting tool whose goal is to approximate the advantages of
       in-person meetings. <br/>
       It integrates web tools in an open multiroom environment.
@@ -42,9 +43,11 @@ export FrontPage = React.memo ->
        ref={titleRef}/>
     </Form>
     <p/>
+    <VisitedMeetings/>
+    <p/>
     <Dark/>
     <p/>
-    <ButtonGroup>
+    <ButtonGroup className="flex-wrap">
       <Button variant="info" as="a" href={homepage}>
         Documentation
       </Button>

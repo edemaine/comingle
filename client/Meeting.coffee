@@ -14,6 +14,7 @@ import {RoomList} from './RoomList'
 import {Room, setRoomTitle} from './Room'
 import {Settings} from './Settings'
 import {Welcome} from './Welcome'
+import {VisitMeeting} from './VisitedMeetings'
 import {useName} from './Name'
 import {Meetings} from '/lib/meetings'
 import {Rooms} from '/lib/rooms'
@@ -279,6 +280,7 @@ export Meeting = React.memo ->
       return ChatRoom.onRenderTab node, renderState
 
   <MeetingContext.Provider value={{openRoom, openRoomWithDragAndDrop, starred, starredOld, starredHasOld, updateStarred}}>
+    <VisitMeeting/>
     <FlexLayout.Layout model={model} factory={factory} iconFactory={iconFactory}
     onRenderTab={onRenderTab}
     onAction={onAction} onModelChange={-> setTimeout onModelChange, 0}
