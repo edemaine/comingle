@@ -1,7 +1,6 @@
 import React, {useState, useLayoutEffect} from 'react'
 import {useParams} from 'react-router-dom'
 import {Accordion, Button, Card, Form, OverlayTrigger, Tooltip} from 'react-bootstrap'
-import SelectableContext from 'react-bootstrap/SelectableContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faKey} from '@fortawesome/free-solid-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
@@ -83,18 +82,16 @@ export MeetingSecret = React.memo ->
         </OverlayTrigger>
       </CardToggle>
       <Accordion.Collapse eventKey="0">
-        <SelectableContext.Provider value={null}>
-          <Card.Body>
-            <Form.Control type="text" placeholder="(administrative access)"
-            value={secret} onChange={(e) -> setSecret e.target.value}
-            className={state}/>
-            <Button block
-             onClick={-> navigator.clipboard.writeText storedSecret}>
-              Copy to clipboard
-              <FontAwesomeIcon icon={clipboardLink} className="ml-1"/>
-            </Button>
-          </Card.Body>
-        </SelectableContext.Provider>
+        <Card.Body>
+          <Form.Control type="text" placeholder="(administrative access)"
+           value={secret} onChange={(e) -> setSecret e.target.value}
+           className={state}/>
+          <Button block
+           onClick={-> navigator.clipboard.writeText storedSecret}>
+            Copy to clipboard
+            <FontAwesomeIcon icon={clipboardLink} className="ml-1"/>
+          </Button>
+        </Card.Body>
       </Accordion.Collapse>
     </Card>
   </Accordion>
