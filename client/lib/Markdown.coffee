@@ -5,6 +5,8 @@ import {Session} from 'meteor/session'
 globalMarkdown = null  # eventually set to MarkdownIt instance
 globalTexLoaded = false
 Session.set 'markdownLoading', false
+Session.set 'texLoading', false
+Session.set 'texLoaded', false
 
 export Markdown = React.memo ({body, ...props}) ->
   {markdown, tex} = useTracker ->
@@ -30,10 +32,12 @@ export Markdown = React.memo ({body, ...props}) ->
             style.setAttribute 'crossorigin', 'anonymous'
             style.setAttribute 'href', "https://cdn.jsdelivr.net/npm/katex@#{katex.version}/dist/katex.min.css"
             document.head.appendChild style
-            ## Add LaTeX plugin to globalMarkdown
-            globalMarkdown.use texmath, engine: katex
-            globalTexLoaded = true
-            Session.set 'texLoading', false  # triggers reading globalMarkdown
+            style.onload = ->
+              ## Add LaTeX plugin to globalMarkdown
+              globalMarkdown.use texmath, engine: katex
+              globalTexLoaded = true
+              Session.set 'texLoading', false  # triggers reading globalMarkdown
+              Session.set 'texLoaded', true
     markdown: globalMarkdown
     tex: globalTexLoaded
   , [body]

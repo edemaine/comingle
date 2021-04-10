@@ -12,6 +12,7 @@ instead of version numbers.
 * Comingle now remembers the meetings you've visited, and offers links to them
   on the front page, reverse-sorted by the last time you visited them.
   [[#159](https://github.com/edemaine/comingle/issues/159)]
+* Correct scrolling to bottom of chat when it has math
 
 ## 2021-04-05
 

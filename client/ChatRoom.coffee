@@ -1,4 +1,4 @@
-import React, {useState, useLayoutEffect} from 'react'
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {Alert, Badge, Button, Form, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faComment} from '@fortawesome/free-solid-svg-icons'
@@ -56,9 +56,18 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
       body: body
     setBody ''
 
+  ## Scroll to bottom when TeX loads
+  scrollableRef = useRef()
+  texLoaded = useTracker ->
+    Session.get 'texLoaded'
+  , []
+  useEffect ->
+    scrollableRef.current?.scrollToBottom()
+  , [texLoaded]
+
   return null unless visible
   <div className="chat">
-    <ScrollableFeed className="messages">
+    <ScrollableFeed className="messages" ref={scrollableRef}>
       {for message in messages
         date = formatDate message.sent
         <React.Fragment key={message._id}>
