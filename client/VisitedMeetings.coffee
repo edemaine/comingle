@@ -22,8 +22,9 @@ visitedMeetings = new LocalStorageVar 'visitedMeetings', {}, sync: true
 export VisitMeeting = React.memo ->
   {meetingId} = useParams()
   ## Remember when we joined the meeting, not when last variable updated.
-  visited = useMemo ->
-    new Date
+  {visited, visits} = useMemo ->
+    visited: new Date
+    visits: (visitedMeetings.get()[meetingId]?.visits ? 0) + 1
   , [meetingId]
   name = useName()
   admin = useMeetingAdmin()
@@ -40,13 +41,15 @@ export VisitMeeting = React.memo ->
       room = undefined
     current = Tracker.nonreactive -> visitedMeetings.get()
     old = current[meetingId]
-    unless old? and old.visited == visited and old.title == title and
-           old.room == room and old.name == name and old.admin == admin
+    unless old? and old.visited == visited and old.visits == visits and
+           old.title == title and old.created == created and
+           old.room?._id == room?._id and old.room?.title == room?.title and
+           old.name == name and old.admin == admin
       firstVisited = old?.firstVisited ? visited
       visitedMeetings.set Object.assign current,
         [meetingId]:
           {_id: meetingId, title, created,
-           visited, firstVisited,
+           visited, firstVisited, visits,
            room, name, admin}
   null
 VisitMeeting.displayName = 'VisitMeeting'
