@@ -3,6 +3,7 @@ import {Alert, Badge, Button, Form, InputGroup, Tooltip, OverlayTrigger} from 'r
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faComment} from '@fortawesome/free-solid-svg-icons'
 import {useTracker} from 'meteor/react-meteor-data'
+import {Session} from 'meteor/session'
 import ScrollableFeed from 'react-scrollable-feed'
 
 import {Loading} from './Loading'
