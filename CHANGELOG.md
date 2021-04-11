@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-04-11
+
+* API call `/log/get` now supports specifying the final date via
+  the more common `end` in addition to `finish`.
+
 ## 2021-04-10
 
 * Comingle now remembers the meetings you've visited, and offers links to them

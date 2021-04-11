@@ -73,7 +73,11 @@ apiMethods =
   '/tab/edit': apiEdit 'tab'
   '/log/get': (options) ->
     delete options.updator  # for consistency across different API calls
-    for key in ['start', 'finish']
+    ## Allow `finish` as an alternative to `end`
+    if options.finish?
+      options.end ?= options.finish
+      delete options.finish
+    for key in ['start', 'end']
       if isDate options[key]
         options[key] = new Date options[key]
     logs: Meteor.call 'logGet', options

@@ -196,7 +196,7 @@ Request fields:
 * `meeting` (required string): ID of meeting to get logs for
 * `secret` (required string): The meeting secret
 * `start` (optional date): Restrict to logs &ge; this date
-* `finish` (optional date): Restrict to logs &le; this date
+* `end` or `finish` (optional date): Restrict to logs &le; this date
 
 Response fields (when `ok` is `true`):
 

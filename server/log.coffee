@@ -53,12 +53,12 @@ Meteor.methods
       meeting: Match.Where validId
       secret: String
       start: Match.Optional Date
-      finish: Match.Optional Date
+      end: Match.Optional Date
     checkMeetingSecret spec.meeting, spec.secret
     query = meeting: spec.meeting
     query.updated = {} if spec.start? or spec.to?
     query.updated.$gte = spec.start if spec.start?
-    query.updated.$lte = spec.finish if spec.finish?
+    query.updated.$lte = spec.end if spec.end?
     Log.find query,
       sort: updated: 1
       fields:
