@@ -49,6 +49,9 @@ Also, in queries involving dates, you can use
 as an alternative to the EJSON encoding of `Date`s.
 But the output (e.g. `updated` field) will still use EJSON encoding.
 
+If you're writing a JavaScript app outside of the Meteor framework, you can
+use the [`ejson` NPM module](https://www.npmjs.com/package/ejson).
+
 ## Response Format
 
 The response consists of an
