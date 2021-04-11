@@ -44,6 +44,9 @@ with the following key features:
   to supported apps (Cocreate and Coauthor).
 * Instantly create a new meeting and share the URL to meet with others.
   **No accounts required**.
+* [**API**](https://github.com/edemaine/comingle/blob/master/doc/api.md)
+  for querying and manipulating Comingle meetings, rooms, tabs, and logs
+  from your own software.
 * **Free/open source** ([MIT license](LICENSE))
 
 To see what's changed in Comingle recently, check out the
