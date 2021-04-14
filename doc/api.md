@@ -207,6 +207,8 @@ Response fields (when `ok` is `true`):
       all presence fields included
     * `"presenceUpdate"`: User updated their presence information;
       changed presence fields included
+    * `"presencePulse"`: User connected for a set interval (default 4 hours);
+      all presence fields included
     * `"presenceLeave"`: User left meeting; no presence fields included
   * `id` (optional string): Presence ID
   * `name` (optional string): Name of user
@@ -215,6 +217,14 @@ Response fields (when `ok` is `true`):
       Array of IDs of rooms that the user has joined (typically length 1)
     * `starred` (optional array of strings):
       Array of IDs of rooms that the user has starred
+
+To look at presence within an interval [*a*, *b*], it suffices to fetch all logs
+in the interval [*a* &minus; `pulseFrequency`, *b*] where `pulseFrequency`
+(defined in [`server/presence.coffee`](https://github.com/edemaine/comingle/blob/master/server/presence.coffee))
+defaults to 4 hours.  Then you're guaranteed to see either a
+`"presenceJoin"` or `"presencePulse"` event for every user that joined before
+time *a*, giving you their full presence information,
+possibly followed by `"presenceUpdate"` diffs.
 
 ## Edit Operations
 

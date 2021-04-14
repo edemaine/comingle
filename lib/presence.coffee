@@ -5,15 +5,14 @@ import {validId, checkId} from './id'
 import {checkMeeting} from './meetings'
 import {roomJoin, roomChange, roomLeave} from './rooms'
 
-## Load log code on server only
-if Meteor.server
-  log = require '/server/log.coffee'
+## Load code on server only
+logPresence = logPresenceRemove = setConnection = null
+if Meteor.isServer
+  Meteor.defer -> # avoid import cycle
+    {logPresence, logPresenceRemove} = require '/server/log.coffee'
+    {setConnection} = require '/server/presence.coffee'
 
 export Presence = new Mongo.Collection 'presence'
-
-## Mapping from Meteor connection id to presenceId [server only]
-## Used in server/presence.coffee to destroy presence upon disconnect.
-export connections = {}
 
 Meteor.methods
   presenceUpdate: (presence) ->
@@ -32,9 +31,9 @@ Meteor.methods
       presence.admin = (presence.secret == meeting.secret)  # for log
       setAdmin = admin: presence.admin
       ## Maintain connection -> presence mapping
-      connections[@connection.id] = presence.id
+      setConnection @connection.id, presence.id
       ## Log the changes
-      {old, diff} = log.logPresence presence
+      {old, diff} = logPresence presence
       return unless diff  # no changes
       ## Update room joined lists
       newJoined = {}
@@ -61,7 +60,7 @@ Meteor.methods
   presenceRemove: (presenceId) ->
     checkId presenceId
     return if @isSimulation
-    {old} = log.logPresenceRemove presenceId
+    {old} = logPresenceRemove presenceId
     for roomId in old?.rooms.joined ? []
       roomLeave roomId, (old ? id: presenceId)
     Presence.remove id: presenceId

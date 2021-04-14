@@ -13,6 +13,9 @@ instead of version numbers.
   horizontally, providing better line breaks for room titles.
   [[#168](https://github.com/edemaine/comingle/issues/168) and
   [#113](https://github.com/edemaine/comingle/issues/113)]
+* Logs now include `"presencePulse"` events for users who stay in the same
+  meeting for a long time (default 4 hours), to make log processing easier.
+  [[#169](https://github.com/edemaine/comingle/issues/169)]
 
 ## 2021-04-11
 

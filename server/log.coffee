@@ -8,6 +8,11 @@ import {sameSorted} from '/lib/sort'
 
 export Log = new Mongo.Collection 'log'
 
+## How often to write "pulse" log messages that record the full state of
+## a user, so that log readers can figure out user's state by looking at
+## most this early.
+export pulseFrequency = 4 * 60 * 60 * 1000  # 4 hours
+
 ## Returns an object with up to two keys
 ## * `old` is the fetched old presence with the same ID.
 ## * `diff` is an object with changed presence keys, missing if no changes.
@@ -36,6 +41,14 @@ export logPresence = (presence) ->
   ## which guarantees no conflict.
   Log.rawCollection().insert diff
   {old, diff}
+
+export logPresencePulse = (id) ->
+  pulse = Presence.findOne {id}
+  return unless pulse?
+  delete pulse._id
+  pulse.type = 'presencePulse'
+  pulse.updated = new Date
+  Log.rawCollection().insert pulse
 
 export logPresenceRemove = (presenceId) ->
   now = new Date
