@@ -270,6 +270,32 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   </div>
 RoomList.displayName = 'RoomList'
 
+RoomList.onRenderTab = (node, renderState) ->
+  if raisedCount = node.getExtraData().raisedCount
+    help = "#{raisedCount} raised hand#{if raisedCount > 1 then 's' else ''}"
+    hand = null
+    showHand = (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      hands = document.querySelectorAll '.RoomList .accordion:not(.starred) .raise-hand.active'
+      hands = (elt for elt in hands)  # convert to Array
+      return unless hands.length
+      index = hands.indexOf hand
+      hand = hands[(index + 1) % hands.length]
+      hand.parentNode.scrollIntoView
+        behavior: 'smooth'
+    renderState.buttons.push \
+      <OverlayTrigger key="handCount" placement="right" overlay={(props) ->
+        <Tooltip {...props}>{help}</Tooltip>
+      }>
+        <Badge variant="danger" className="ml-1 hand-count" onClick={showHand}
+         onMouseDown={(e) -> e.stopPropagation()}
+         onTouchStart={(e) -> e.stopPropagation()}>
+          {raisedCount}
+          <FontAwesomeIcon aria-label={help} icon={faHandPaper} className="ml-1"/>
+        </Badge>
+      </OverlayTrigger>
+
 searchMatches = (search, text) ->
   0 <= text.toLowerCase().indexOf search.toLowerCase()
 
@@ -316,32 +342,6 @@ Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model,
     </Card>
   </Accordion>
 Sublist.displayName = 'Sublist'
-
-RoomList.onRenderTab = (node, renderState) ->
-  if raisedCount = node.getExtraData().raisedCount
-    help = "#{raisedCount} raised hand#{if raisedCount > 1 then 's' else ''}"
-    hand = null
-    showHand = (e) ->
-      e.preventDefault()
-      e.stopPropagation()
-      hands = document.querySelectorAll '.RoomList .accordion:not(.starred) .raise-hand.active'
-      hands = (elt for elt in hands)  # convert to Array
-      return unless hands.length
-      index = hands.indexOf hand
-      hand = hands[(index + 1) % hands.length]
-      hand.parentNode.scrollIntoView
-        behavior: 'smooth'
-    renderState.buttons.push \
-      <OverlayTrigger key="handCount" placement="right" overlay={(props) ->
-        <Tooltip {...props}>{help}</Tooltip>
-      }>
-        <Badge variant="danger" className="ml-1 hand-count" onClick={showHand}
-         onMouseDown={(e) -> e.stopPropagation()}
-         onTouchStart={(e) -> e.stopPropagation()}>
-          {raisedCount}
-          <FontAwesomeIcon aria-label={help} icon={faHandPaper} className="ml-1"/>
-        </Badge>
-      </OverlayTrigger>
 
 export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, leave}) ->
   {meetingId} = useParams()
