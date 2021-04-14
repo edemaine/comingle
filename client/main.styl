@@ -97,6 +97,10 @@ nav
       .room-title
         color: var(--danger-fg)
 
+  .room-title
+    // Break words in room names if too big for sidebar
+    overflow-wrap: anywhere
+
   .raise-hand
     float: right
     clear: right
@@ -143,7 +147,7 @@ nav
         margin-left: 0.1em
         //font-size: 0.77em
         &[data-icon="star"]
-          margin-right: -0.09em // better alignment with hand icon
+          margin-right: -0.13em // better alignment with hand icon
 
   .adminVisit
     float: right

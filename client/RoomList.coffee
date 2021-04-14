@@ -414,12 +414,6 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
     <div className="presence-count">
-      {if presence.joined?.length
-        <PresenceCount type="joined" presence={presence.joined}
-         presenceClusters={presenceClusters.joined}>
-          <FontAwesomeIcon icon={faUser}/>
-        </PresenceCount>
-      }
       <PresenceCount type="starred" presence={presence.starred}
        presenceClusters={presenceClusters.starred} onClick={toggleStar}
        heading={<b>{if myPresence.starred then 'Unstar' else 'Star'} This Room</b>}>
@@ -430,6 +424,14 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
         }
       </PresenceCount>
     </div>
+    {if presence.joined?.length
+      <div className="presence-count">
+        <PresenceCount type="joined" presence={presence.joined}
+         presenceClusters={presenceClusters.joined}>
+          <FontAwesomeIcon icon={faUser}/>
+        </PresenceCount>
+      </div>
+    }
     {if room.raised or myPresence.joined
       if room.raised
         label = 'Lower Hand'

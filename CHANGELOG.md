@@ -7,6 +7,13 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-04-14
+
+* Revised room-list design stacking stars and people vertically instead of
+  horizontally, providing better line breaks for room titles.
+  [[#168](https://github.com/edemaine/comingle/issues/168) and
+  [#113](https://github.com/edemaine/comingle/issues/113)]
+
 ## 2021-04-11
 
 * API call `/log/get` now supports specifying the final date via
