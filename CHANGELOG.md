@@ -7,6 +7,12 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-04-15
+
+* There's now a
+  [command-line tool for Comingle attendance tracking](https://github.com/edemaine/comingle-attendance),
+  e.g. to measure which students showed up to which classes.
+
 ## 2021-04-14
 
 * Revised room-list design stacking stars and people vertically instead of

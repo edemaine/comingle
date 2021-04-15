@@ -44,6 +44,8 @@ with the following key features:
   to supported apps (Cocreate and Coauthor).
 * Instantly create a new meeting and share the URL to meet with others.
   **No accounts required**.
+* Automatic **logs** of user actions (accessible only to admins) that enables
+  [attendance tracking](https://github.com/edemaine/comingle-attendance).
 * [**API**](https://github.com/edemaine/comingle/blob/master/doc/api.md)
   for querying and manipulating Comingle meetings, rooms, tabs, and logs
   from your own software.
