@@ -18,8 +18,10 @@ Operation parameters can be specified in two different ways,
 or a mixture thereof:
 
 1. The request body can contain an
-   [EJSON](https://docs.meteor.com/api/ejson.html)-encoded object with
-   key/value pairs specifying parameters.
+   [EJSON](https://docs.meteor.com/api/ejson.html)-encoded (seel below)
+   object with key/value pairs specifying parameters.
+   In this case, you must also provide the header
+   `Content-Type: application/json` so that the body can be decoded.
 2. The query URL can have a
    [query string](https://en.wikipedia.org/wiki/Query_string)
    specifying key/value pairs as parameters.
