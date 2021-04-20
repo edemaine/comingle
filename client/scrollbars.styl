@@ -2,7 +2,10 @@
 // (from Coauthor)
 
 :root
+  --scrollbar-size: 15px
   --scrollbar-bar: #aaa
+  --scrollbar-bar-hover: #888
+  --scrollbar-bar-active: #666
   --scrollbar-track: #ddd
   --scrollbar-button: #aaa
   --scrollbar-button-hover: #888
@@ -10,6 +13,8 @@
 
 .dark
   --scrollbar-bar: #333
+  --scrollbar-bar-hover: #555
+  --scrollbar-bar-active: #999
   --scrollbar-track: #777
   --scrollbar-button: #999
   --scrollbar-button-hover: #bbb
@@ -22,9 +27,9 @@
   scrollbar-color: var(--scrollbar-bar) var(--scrollbar-track)
 
   // Webkit/Blink browsers support more detailed customization:
-  &::-webkit-scrollbar
-    width: 15px
-    height: 15px
+  &::-webkit-scrollbar, &::-webkit-scrollbar-button
+    width: var(--scrollbar-size)
+    height: var(--scrollbar-size)
   &::-webkit-scrollbar-track,
   &::-webkit-scrollbar-piece,
   &::-webkit-scrollbar-corner
@@ -34,6 +39,10 @@
     border-radius: 6px
     background-color: var(--scrollbar-bar)
     border: 3px solid var(--scrollbar-track)
+    &:hover
+      --scrollbar-bar: var(--scrollbar-bar-hover)
+    &:active
+      --scrollbar-bar: var(--scrollbar-bar-active)
   &::-webkit-scrollbar-button
     background-color: var(--scrollbar-bar)
     &:hover

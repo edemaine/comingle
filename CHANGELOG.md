@@ -7,7 +7,7 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
-## 2021-04-19
+## 2021-04-20
 
 * Custom scrollbars should look nicer especially in dark mode.
 
