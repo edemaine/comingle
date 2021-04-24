@@ -223,7 +223,7 @@ export Meeting = React.memo ->
     document.title = parts.reverse().join ' - '
   , []
   
-  factory = (node) -> # eslint-disable-line react/display-name
+  factory = (node) ->
     updateTab = -> FlexLayout.updateNode model, node.getId()
     switch node.getComponent()
       when 'RoomList'
@@ -248,7 +248,7 @@ export Meeting = React.memo ->
          onMaximize={-> model.doAction FlexLayout.Actions.maximizeToggle \
            node.getParent().getId()}
          {...node.getConfig()}/>
-  iconFactory = (node) -> # eslint-disable-line react/display-name
+  iconFactory = (node) ->
     if node.getComponent() == 'ChatRoom'
       <FontAwesomeIcon icon={faComment}/>
     else if node.getComponent() == 'Settings'

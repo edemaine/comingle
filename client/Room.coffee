@@ -35,7 +35,7 @@ tabComponent = (tab) ->
       'TabZoom'
     else # iframe, cocreate, youtube -- for now
       'TabIFrame'
-tabIcon = (tab) -> # eslint-disable-line react/display-name
+tabIcon = (tab) ->
   switch tab?.type  # undefined for TabNew
     when 'jitsi'
       <FontAwesomeIcon icon={faVideo}/>
@@ -215,7 +215,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       component: 'TabNew'
       enableRename: false
     , ...location
-  factory = (node) -> # eslint-disable-line react/display-name
+  factory = (node) ->
     switch node.getComponent()
       when 'ChatRoom'
         <ChatRoom channel={roomId} audience="room"
@@ -231,7 +231,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
         model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
           component: tabComponent id2tab[node.getId()]
         <Loading/>
-  iconFactory = (node) -> # eslint-disable-line react/display-name
+  iconFactory = (node) ->
     if node.getComponent() == 'ChatRoom'
       icon = <FontAwesomeIcon icon={faComment}/>
     else
@@ -439,7 +439,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       protected: not room.protected
       updator: getUpdator()
 
-  leaveRoom = (position) -> # eslint-disable-line react/display-name
+  leaveRoom = (position) ->
     <OverlayTrigger placement="bottom" overlay={(props) ->
       <Tooltip {...props}>
         Leave this room
