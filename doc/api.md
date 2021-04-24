@@ -222,7 +222,7 @@ Response fields (when `ok` is `true`):
 
 To look at presence within an interval [*a*, *b*], it suffices to fetch all logs
 in the interval [*a* &minus; `pulseFrequency`, *b*] where `pulseFrequency`
-(defined in [`server/presence.coffee`](https://github.com/edemaine/comingle/blob/master/server/presence.coffee))
+(defined in [`server/presence.coffee`](https://github.com/edemaine/comingle/blob/main/server/presence.coffee))
 defaults to 4 hours.  Then you're guaranteed to see either a
 `"presenceJoin"` or `"presencePulse"` event for every user that joined before
 time *a*, giving you their full presence information,

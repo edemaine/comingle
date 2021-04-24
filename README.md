@@ -46,7 +46,7 @@ with the following key features:
   **No accounts required**.
 * Automatic **logs** of user actions (accessible only to admins) that enables
   [attendance tracking](https://github.com/edemaine/comingle-attendance).
-* [**API**](https://github.com/edemaine/comingle/blob/master/doc/api.md)
+* [**API**](https://github.com/edemaine/comingle/blob/main/doc/api.md)
   for querying and manipulating Comingle meetings, rooms, tabs, and logs
   from your own software.
 * **Free/open source** ([MIT license](LICENSE))

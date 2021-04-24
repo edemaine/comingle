@@ -3,9 +3,14 @@
 This file describes significant changes to Comingle to an audience of
 both everyday users and administrators running their own Comingle server.
 To see every change with descriptions aimed at developers, see
-[the Git log](https://github.com/edemaine/comingle/commits/master).
+[the Git log](https://github.com/edemaine/comingle/commits/main).
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
+
+## 2021-04-24
+
+* Rename main branch from `master` to `main`.
+  The link to this Changelog has changed (but the old link redirects).
 
 ## 2021-04-20
 
@@ -103,7 +108,7 @@ instead of version numbers.
 ## 2021-03-08
 
 * Comingle now has
-  [an API](https://github.com/edemaine/comingle/blob/master/doc/api.md)
+  [an API](https://github.com/edemaine/comingle/blob/main/doc/api.md)
   for querying and manipulating Comingle meetings, rooms, tabs, and logs
   from your own software (or via `curl`).
   Queries can run without any special permissions, just like they would in
@@ -131,5 +136,5 @@ instead of version numbers.
 
 ## Older Changes
 
-Refer to [the Git log](https://github.com/edemaine/comingle/commits/master)
+Refer to [the Git log](https://github.com/edemaine/comingle/commits/main)
 for changes older than listed in this document.

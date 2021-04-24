@@ -14,7 +14,7 @@
     "url": "https://github.com/edemaine/comingle/issues"
   },
   "homepage": "https://github.com/edemaine/comingle#comingle",
-  "changelog": "https://github.com/edemaine/comingle/blob/master/CHANGELOG.md",
+  "changelog": "https://github.com/edemaine/comingle/blob/main/CHANGELOG.md",
   "scripts": {
     "start": "meteor run",
     "visualize": "meteor --production --extra-packages bundle-visualizer",
