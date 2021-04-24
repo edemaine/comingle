@@ -35,8 +35,8 @@
     "body-parser": "^1.19.0",
     "bootstrap": "^4.6.0",
     "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#fix-splitter-drag",
-    "katex": "^0.13.2",
-    "markdown-it": "^12.0.4",
+    "katex": "^0.13.3",
+    "markdown-it": "^12.0.6",
     "markdown-it-texmath": "^0.8.0",
     "meteor-node-stubs": "^1.0.1",
     "pug": "^3.0.2",
@@ -59,7 +59,7 @@
     }
   },
   "devDependencies": {
-    "eslint": "^7.24.0",
+    "eslint": "^7.25.0",
     "eslint-plugin-coffeescript": "^1.0.0",
     "eslint-plugin-meteor": "^7.3.0",
     "eslint-plugin-react": "^7.23.2",

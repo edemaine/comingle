@@ -116,7 +116,7 @@ export TabNew = React.memo ({initialUrl, node, meetingId, roomId, replaceTabNew,
       <Card className="form-group">
         <Card.Header>
           <Nav variant="tabs">
-            {for categoryName, categoryTabTypes of tabTypesByCategory
+            {for categoryName of tabTypesByCategory
               selected = (category == categoryName)
               <li key={categoryName} className="nav-item" role="presentation">
                 <a className="nav-link #{if selected then 'active'}"
