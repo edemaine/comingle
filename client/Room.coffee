@@ -169,7 +169,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       enableRenderOnDemand: not tabTypes[tab.type]?.alwaysRender
     model.visitNodes (node) ->
       if node.getType() == 'tab'
-        if tab = id2tab[node.getId()]
+        if (tab = id2tab[node.getId()])?
           ## Update tabs in both layout and room
           actions.push FlexLayout.Actions.updateNodeAttributes node.getId(),
             tabSettings tab
@@ -240,7 +240,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     <OverlayTrigger placement="bottom" overlay={tooltip node}>
       {icon}
     </OverlayTrigger>
-  tooltip = (node) -> (props) -> # eslint-disable-line react/display-name
+  tooltip = (node) -> (props) -> # eslint-disable-line coffee/display-name
     tab = id2tab[node.getId()]
     return <span/> unless tab
     <Tooltip {...props}>
@@ -275,7 +275,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     if node.isVisible()  # special buttons for visible tabs
       buttons = renderState.buttons
       type = if node.getParent().getType() == 'border' then 'border' else 'tab'
-      if url = tab.url
+      if (url = tab.url)
         buttons?.push \
           <div key="link"
            className="flexlayout__#{type}_button_trailing"
@@ -384,7 +384,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     ## Update localstorage saved layout whenever layout changes.
     setLayout model.toJson().layout
     ## Track when each tabset was active.
-    if tabset = model.getActiveTabset()
+    if (tabset = model.getActiveTabset())
       tabsetUsed.current[tabset.getId()] = (new Date).getTime()
 
   ## Drag and drop of URLs

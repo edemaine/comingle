@@ -121,13 +121,13 @@ export Meeting = React.memo ->
   , [model]
   openRoomWithDragAndDrop = (id, verb) ->
     json = makeRoomTabJson id
-    if move = (model.getNodeById id)?
+    if (move = (model.getNodeById id)?)
       json.id = 'placeholder'
       json.component = 'Welcome'
     layoutRef.current.addTabWithDragAndDrop \
       "#{verb} &ldquo;#{json.name}&rdquo; (drag to location)", json,
       ->
-        return unless newNode = model.getNodeById json.id
+        return unless (newNode = model.getNodeById json.id)?
         tabset = newNode.getParent()
         ## In move case, replace placeholder tab with actual tab
         if move

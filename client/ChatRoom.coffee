@@ -110,7 +110,7 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
   </div>
 
 ChatRoom.onRenderTab = (node, renderState) ->
-  if unseen = node.getExtraData().unseen
+  if (unseen = node.getExtraData().unseen)
     if node.getExtraData().fresh
       variant = 'danger'
     else

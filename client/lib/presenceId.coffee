@@ -4,7 +4,7 @@ import {getName} from '../Name'
 
 ## Modeled after Cocreate's remoteId mechanism
 
-unless presenceId = window?.sessionStorage?.getItem? 'presenceId'
+unless (presenceId = window?.sessionStorage?.getItem? 'presenceId')
   window?.sessionStorage?.setItem? 'presenceId', presenceId = Random.id()
 export getPresenceId = -> presenceId
 

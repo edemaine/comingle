@@ -29,7 +29,7 @@ export Header = React.memo ->
 Header.displayName = 'Header'
 
 export LinkToFrontPage = React.memo (props) ->
-  <a href={Meteor.absoluteUrl()} target="_blank" {...props}> {### eslint-disable-line react/jsx-no-target-blank ###}
+  <a href={Meteor.absoluteUrl()} target="_blank" {...props}> {### eslint-disable-line coffee/jsx-no-target-blank ###}
     {props.children}
   </a>
 LinkToFrontPage.displayName = 'LinkToFrontPage'

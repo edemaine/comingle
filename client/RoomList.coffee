@@ -33,7 +33,7 @@ findMyPresence = (presence) ->
   myPresence = {}
   presenceId = getPresenceId()
   for type, presenceList of presence
-    if me = presenceList?.find (p) -> p.id == presenceId
+    if (me = presenceList?.find (p) -> p.id == presenceId)?
       myPresence[type] = me
   myPresence
 
@@ -108,7 +108,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
     starred: (room) ->
       titleKey "#{presenceByRoom[room._id]?.starred?.length ? 0}.#{room.title}"
     raised: (room) ->
-      if raised = room.raised
+      if (raised = room.raised)
         ## room.raised will briefly be true instead of a time
         raised = new Date if typeof raised == 'boolean'
         -raised.getTime()
@@ -271,7 +271,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
 RoomList.displayName = 'RoomList'
 
 RoomList.onRenderTab = (node, renderState) ->
-  if raisedCount = node.getExtraData().raisedCount
+  if (raisedCount = node.getExtraData().raisedCount)
     help = "#{raisedCount} raised hand#{if raisedCount > 1 then 's' else ''}"
     hand = null
     showHand = (e) ->

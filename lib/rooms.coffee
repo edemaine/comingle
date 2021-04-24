@@ -213,7 +213,7 @@ export roomDuplicate = (room, updator) ->
   ## Duplicate tabs, calling createNew method if desired to avoid e.g.
   ## identical Cocreate boards or identical Jitsi meeting rooms.
   for tab in tabs
-    if createNew = tabTypes[tab.type]?.createNew
+    if (createNew = tabTypes[tab.type]?.createNew)?
       url = createNew()
       url = await url if url.then?
     else

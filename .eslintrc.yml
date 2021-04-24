@@ -3,39 +3,42 @@ env:
   es2020: true
   node: true
 extends:
-  - 'eslint:recommended'
-  - 'plugin:meteor/recommended'
-  - 'plugin:react/recommended'
+  - plugin:coffee/eslint-recommended
+  - plugin:coffee/import
+  #- plugin:import/recommended
+  - plugin:meteor/recommended
+  - plugin:coffee/react-recommended
+  - plugin:coffee/disable-incompatible
 globals:
   Meteor: readonly
   WebApp: readonly
+ignorePatterns:
+  - .meteor
+parser: eslint-plugin-coffee
 parserOptions:
   ecmaFeatures:
     jsx: true
   ecmaVersion: 11
   sourceType: module
 plugins:
-  - coffeescript
+  - coffee
+  - import
   - meteor
   - react
 rules:
-  indent: off  # incompatible with CoffeeScript
-    #- error
-    #- 2
   linebreak-style:
     - error
     - unix
-  no-unreachable: off  # currently incompatible with CoffeeScript's switch
-  no-useless-escape: off  # incompatible with CoffeeScript's ///
-  quotes:
-    - error
-    - single
-  semi:
-    - error
-    - always
-  react/jsx-no-target-blank:
+  coffee/jsx-no-target-blank:
     - error
     - allowReferrer: true
+  coffee/no-inner-declarations: off
+  coffee/no-unused-vars:
+    - error
+    - args: none  # allow callbacks of the form (e) -> ...not using e...
+  coffee/no-useless-escape: off
+  import/no-unresolved: error
+  import/named: error
   react/no-unescaped-entities:
     - warn
     - forbid: ['>', '"', '}']
@@ -47,5 +50,13 @@ rules:
       - checkId
       - checkMeeting
 settings:
+  import/ignore:
+    - node_modules
+  import/resolver:
+    meteor:
+      extensions:
+        - .coffee
+        - .js
+        - .ts
   react:
     version: detect
