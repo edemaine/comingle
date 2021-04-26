@@ -27,7 +27,7 @@
   scrollbar-color: var(--scrollbar-bar) var(--scrollbar-track)
 
   // Webkit/Blink browsers support more detailed customization:
-  &::-webkit-scrollbar, &::-webkit-scrollbar-button
+  &::-webkit-scrollbar, &::-webkit-scrollbar-button:single-button
     width: var(--scrollbar-size)
     height: var(--scrollbar-size)
   &::-webkit-scrollbar-track,
@@ -35,7 +35,10 @@
   &::-webkit-scrollbar-corner
     background: var(--scrollbar-track)
   &::-webkit-scrollbar-thumb
-    min-height: 50px
+    &:horizontal
+      min-width: 50px
+    &:vertical
+      min-height: 50px
     border-radius: 6px
     background-color: var(--scrollbar-bar)
     border: 3px solid var(--scrollbar-track)
@@ -43,7 +46,7 @@
       --scrollbar-bar: var(--scrollbar-bar-hover)
     &:active
       --scrollbar-bar: var(--scrollbar-bar-active)
-  &::-webkit-scrollbar-button
+  &::-webkit-scrollbar-button:single-button
     background-color: var(--scrollbar-bar)
     &:hover
       --scrollbar-button: var(--scrollbar-button-hover)
