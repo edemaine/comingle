@@ -1,10 +1,10 @@
 import React from 'react'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 
-import {useMeetingTitle} from './MeetingTitle'
+import {useMeetingSetting} from './MeetingSetting'
 
 export Header = React.memo ->
-  title = useMeetingTitle()
+  title = useMeetingSetting('title')
   <nav>
     <OverlayTrigger placement="bottom" overlay={(props) ->
       <Tooltip {...props}>Comingle</Tooltip>

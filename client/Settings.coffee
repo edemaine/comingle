@@ -3,7 +3,7 @@ import {useParams} from 'react-router-dom'
 import {Card, Form} from 'react-bootstrap'
 
 import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
-import {MeetingTitle} from './MeetingTitle'
+import {MeetingSetting} from './MeetingSetting'
 import {MeetingSecret, useMeetingAdmin} from './MeetingSecret'
 
 export Settings = React.memo ->
@@ -18,7 +18,7 @@ export Settings = React.memo ->
       </Card.Body>
     </Card>
     <div className="sidebar">
-      <MeetingTitle/>
+      <MeetingSetting setting="title" alt="Meeting Title"/>
       <MeetingSecret/>
     </div>
     {if admin

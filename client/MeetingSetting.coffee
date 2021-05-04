@@ -7,48 +7,48 @@ import {Meetings} from '/lib/meetings'
 import {getUpdator} from './lib/presenceId'
 import {useDebounce} from './lib/useDebounce'
 
-export useMeetingTitle = ->
+export useMeetingSetting = (setting) ->
   {meetingId} = useParams()
   meeting = useTracker ->
     Meetings.findOne meetingId
   , [meetingId]
-  meeting?.title
+  meeting?[setting]
 
-export MeetingTitle = React.memo ->
+export MeetingSetting = React.memo ({setting, alt}) ->
   {meetingId} = useParams()
   meeting = useTracker ->
     Meetings.findOne meetingId
   , [meetingId]
-  [title, setTitle] = useState ''
+  [value, setValue] = useState ''
   [changed, setChanged] = useState null
-  ## Synchronize text box to title from database whenever it changes
+  ## Synchronize text box to setting from database whenever it changes
   useLayoutEffect ->
-    return unless meeting?.title?
-    setTitle meeting.title
+    return unless meeting?[setting]?
+    setValue meeting[setting]
     setChanged false
-  , [meeting?.title]
-  ## When text box stabilizes for half a second, update database title
+  , [meeting?[setting]]
+  ## When text box stabilizes for half a second, update database setting
   changedDebounce = useDebounce changed, 500
   useLayoutEffect ->
     return unless changedDebounce?
-    unless title == meeting.title
+    unless value == meeting[setting]
       Meteor.call 'meetingEdit',
         id: meetingId
-        title: title
+        "#{setting}": value
         updator: getUpdator()
     setChanged null
   , [changedDebounce]
 
   <Card>
     <Card.Header className="tight">
-      Meeting Title:
+      {alt}:
     </Card.Header>
     <Card.Body>
       <Form.Control type="text" placeholder="Comingle Meeting"
-       value={title} onChange={(e) ->
-         setTitle e.target.value
+       value={value} onChange={(e) ->
+         setValue e.target.value
          setChanged e.target.value # ensure `change` different for each update
       }/>
     </Card.Body>
   </Card>
-MeetingTitle.displayName = 'MeetingTitle'
+MeetingSetting.displayName = 'MeetingSetting'
