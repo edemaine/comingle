@@ -47,6 +47,7 @@ Meteor.methods
     check diff,
       id: String
       title: Match.Optional String
+      welcome: Match.Optional String
       updator: updatorPattern
       secret: Match.Optional String
     unless @isSimulation

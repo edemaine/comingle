@@ -18,18 +18,23 @@ export Settings = React.memo ->
       </Card.Body>
     </Card>
     <div className="sidebar">
-      <MeetingSetting setting="title" alt="Meeting Title"/>
+      <MeetingSetting setting="title" alt="Meeting Title" placeholder="Comingle Meeting"/>
       <MeetingSecret/>
     </div>
     {if admin
-      <Card>
-        <Card.Body>
-          <Card.Title as="h3">Admin</Card.Title>
-          <Form>
-            <AdminVisit/>
-          </Form>
-        </Card.Body>
-      </Card>
+      <>
+        <Card>
+          <Card.Body>
+            <Card.Title as="h3">Admin</Card.Title>
+            <Form>
+              <AdminVisit/>
+            </Form>
+          </Card.Body>
+        </Card>
+        <div className="sidebar">
+          <MeetingSetting setting="welcome" alt="Welcome URL (https only)" placeholder="(default)"/>
+        </div>
+      </>
     }
   </>
 Settings.displayName = 'Settings'

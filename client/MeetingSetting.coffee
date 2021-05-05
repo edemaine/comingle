@@ -14,7 +14,7 @@ export useMeetingSetting = (setting) ->
   , [meetingId]
   meeting?[setting]
 
-export MeetingSetting = React.memo ({setting, alt}) ->
+export MeetingSetting = React.memo ({setting, alt, placeholder}) ->
   {meetingId} = useParams()
   meeting = useTracker ->
     Meetings.findOne meetingId
@@ -44,7 +44,7 @@ export MeetingSetting = React.memo ({setting, alt}) ->
       {alt}:
     </Card.Header>
     <Card.Body>
-      <Form.Control type="text" placeholder="Comingle Meeting"
+      <Form.Control type="text" placeholder={placeholder}
        value={value} onChange={(e) ->
          setValue e.target.value
          setChanged e.target.value # ensure `change` different for each update
