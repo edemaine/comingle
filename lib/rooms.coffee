@@ -51,6 +51,7 @@ Meteor.methods
       protected: Match.Optional Boolean
       updator: updatorPattern
       secret: Match.Optional String
+      tags: Match.Optional Object
       tabs: Match.Optional [
         type: Match.Optional String
         title: Match.Optional String
@@ -91,11 +92,14 @@ Meteor.methods
       protected: Match.Optional Boolean
       updator: updatorPattern
       secret: Match.Optional String
+      tags: Match.Optional Object
     room = checkRoom diff.id
     roomCheckSecret diff, room
     set = {}
-    for key, value of diff when key != 'id'
+    for key, value of diff when key != 'id' and key != 'tags'
       set[key] = value unless room[key] == value
+    for key, value of diff.tags ? {}
+      set["tags."+key] = value
     return unless (key for key of set).length  # nothing to update
     unless @isSimulation
       setUpdated set
