@@ -48,6 +48,7 @@ Meteor.methods
       id: String
       title: Match.Optional String
       welcome: Match.Optional String
+      css: Match.Optional String
       updator: updatorPattern
       secret: Match.Optional String
     unless @isSimulation

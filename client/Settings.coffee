@@ -33,6 +33,7 @@ export Settings = React.memo ->
         </Card>
         <div className="sidebar">
           <MeetingSetting setting="welcome" alt="Welcome URL (https only)" placeholder="(default)"/>
+          <MeetingSetting setting="css" alt="Custom CSS (https only)" placeholder="(none)"/>
         </div>
       </>
     }

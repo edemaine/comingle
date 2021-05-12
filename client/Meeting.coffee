@@ -222,6 +222,23 @@ export Meeting = React.memo ->
     parts.push room.title if room?.title
     document.title = parts.reverse().join ' - '
   , []
+  ## Add custom CSS stylesheet
+  useTracker ->
+    meeting = Meetings.findOne meetingId
+    stylePath = meeting?.css
+    if stylePath and /^https:\/\/[^ "]+$/.exec stylePath
+      link = document.getElementById "customCss"
+      if link
+        link.href = stylePath
+      else
+        head = document.head
+        link = document.createElement "link"
+        link.type = "text/css"
+        link.rel = "stylesheet"
+        link.href = stylePath
+        link.id = "customCss"
+        head.appendChild link
+  , []
   
   factory = (node) ->
     updateTab = -> FlexLayout.updateNode model, node.getId()
