@@ -333,6 +333,7 @@ Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model,
         include
     matching
   , [sortedRooms, filter, search, (if search then presenceByRoom)]
+  return null unless subrooms.length
 
   <Accordion defaultActiveKey={unless startClosed then '0'}
    className={className}>
