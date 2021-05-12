@@ -58,11 +58,13 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   admin = useMeetingAdmin()
   [sortKey, setSortKey] = useState null  # null means "use default"
   [reverse, setReverse] = useState null  # null means "use default"
+  [gatherTag, setGatherTag] = useState null  # null means "use default"
   meeting = useTracker ->
     Meetings.findOne meetingId
   , [meetingId]
   sortKey ?= meeting?.defaultSort?.key ? defaultSort.key
   reverse ?= meeting?.defaultSort?.reverse ? defaultSort.reverse
+  gatherTag ?= meeting?.defaultSort?.gather ? defaultSort.gather
   [search, setSearch] = useState ''
   searchDebounce = useDebounce search, 200
   [nonempty, setNonempty] = useState false
@@ -70,6 +72,12 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   rooms = useTracker ->
     Rooms.find(meeting: meetingId).fetch()
   , [meetingId]
+  if gatherTag
+    halls = (item.tags?[gatherTag] for item in rooms when item.tags?[gatherTag]).filter((value, index, array) ->
+      array.indexOf(value, index + 1) < 0
+    ) # Get list of unique values for tags key gatherTag
+  else
+    halls = []
   useEffect ->
     raisedCount = 0
     for room in rooms
@@ -265,7 +273,17 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Available Rooms:" search={searchDebounce} className="available"
        filter={(room) -> not room.archived and
+                         not room.tags?[gatherTag] and
                          (not nonempty or hasJoined(room) or selected == room._id)}/>
+      {for hall in halls
+        filt = (t) =>
+          (room) -> not room.archived and
+                        (room.tags?[gatherTag] == t) and
+                        (not nonempty or hasJoined(room) or selected == room._id)
+        <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+         heading={hall} key={hall} search={searchDebounce} className="available"
+         filter={filt(hall)}/>
+      }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Archived Rooms:" startClosed search={searchDebounce}
        className="archived"
