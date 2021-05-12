@@ -53,6 +53,9 @@ defaultSort = Config.defaultSort ?
   key: 'title'
   reverse: false
 
+tagClass = (key, value) ->
+  "tag-" + key + "-" + value
+
 export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   {meetingId} = useParams()
   admin = useMeetingAdmin()
@@ -275,7 +278,8 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
                         (room.tags?[gatherTag] == t) and
                         (not nonempty or hasJoined(room) or selected == room._id)
         <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
-         heading={hall} key={hall} search={searchDebounce} className="available"
+         heading={hall} key={hall} search={searchDebounce}
+         className={"available " + tagClass(gatherTag,hall)}
          filter={filt(hall)}/>
       }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
@@ -426,10 +430,11 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
       updateStarred (star for star in starred when star != room._id)
     else
       updateStarred starred.concat [room._id]
+  tagClasses = (tagClass(k,v) for k,v of room.tags when v).join(' ')
 
   <Link ref={link} to="/m/#{meetingId}##{room._id}"
    onClick={onClick()} onDragStart={onDragStart}
-   className="list-group-item list-group-item-action room-info#{roomInfoClass}"
+   className={"list-group-item list-group-item-action room-info#{roomInfoClass} " + tagClasses}
    data-room={room._id}>
     <div className="presence-count">
       <PresenceCount type="starred" presence={presence.starred}
