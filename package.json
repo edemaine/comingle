@@ -35,16 +35,16 @@
     "body-parser": "^1.19.0",
     "bootstrap": "^4.6.0",
     "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#fix-splitter-drag",
-    "katex": "^0.13.3",
+    "katex": "^0.13.11",
     "markdown-it": "^12.0.6",
     "markdown-it-texmath": "^0.8.0",
     "meteor-node-stubs": "^1.0.1",
     "pug": "^3.0.2",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.5.2",
+    "react-bootstrap": "^1.6.0",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
-    "react-scrollable-feed": "^1.3.0",
+    "react-scrollable-feed": "^1.3.1",
     "ua-parser-js": "^0.7.28"
   },
   "meteor": {
@@ -59,10 +59,10 @@
     }
   },
   "devDependencies": {
-    "eslint": "^7.25.0",
+    "eslint": "^7.26.0",
     "eslint-import-resolver-meteor": "^0.4.0",
     "eslint-plugin-coffee": "github:helixbass/eslint-plugin-coffee#eslint-plugin-coffee-v0.1.15-dev.8-gitpkg",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.2",
     "eslint-plugin-meteor": "^7.3.0",
     "eslint-plugin-react": "^7.23.2",
     "markdownlint-cli": "^0.27.1",
