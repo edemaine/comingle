@@ -416,6 +416,13 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
         config: {url}
 
+  ## Escape key capture
+  onKeyDown = (e) ->
+    tabset = model.getActiveTabset()
+    node = tabset?.getSelectedNode()
+    if e.key == 'Escape' and node?.getComponent() == 'TabNew'
+      model.doAction FlexLayout.Actions.deleteTab node.getId()
+
   ## Room button actions
   roomLink = ->
     navigator.clipboard.writeText \
@@ -454,7 +461,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       </div>
     </OverlayTrigger>
 
-  <div className="Room">
+  <div className="Room" onKeyDown={onKeyDown}>
     <div className="header">
       {leaveRoom 'leading icon-button'}
       <RoomTitle room={room} roomId={roomId}/>
@@ -569,9 +576,11 @@ export RoomTitle = React.memo ({room, roomId}) ->
     switch e.key
       when 'Escape'
         e.preventDefault()
+        e.stopPropagation()
         setEditing false
       when 'Enter'
         e.preventDefault()
+        e.stopPropagation()
         setRoomTitle meetingId, roomId, inputRef.current.value
         setEditing false
   onDragStart = (e) ->

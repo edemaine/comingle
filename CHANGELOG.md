@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-05-30
+
+* <kbd>Escape</kbd> key now closes a New Tab (if one of the inputs has focus).
+  [[#173](https://github.com/edemaine/comingle/issues/173)]
+
 ## 2021-04-24
 
 * Rename main branch from `master` to `main`.
