@@ -138,12 +138,18 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           block: 'nearest'
       , 0
   , []
+  onKeyDown = useCallback (e) ->
+    if e.key == 'Escape'
+      e.preventDefault()
+      e.stopPropagation()
+      setSelected null
+  , []
   {updateStarred, starredOld, starredHasOld} = useContext MeetingContext
   clearStars = useCallback ->
     updateStarred []
   , [updateStarred]
 
-  <div className="d-flex flex-column h-100 RoomList">
+  <div className="d-flex flex-column h-100 RoomList" onKeyDown={onKeyDown}>
     <div className="sidebar flex-grow-1 overflow-auto pb-2" ref={roomList}>
       <Header/>
       <Warnings/>

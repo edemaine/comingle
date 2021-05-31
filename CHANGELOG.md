@@ -9,8 +9,9 @@ instead of version numbers.
 
 ## 2021-05-30
 
-* <kbd>Escape</kbd> key now closes a New Tab (if one of the inputs has focus).
+* <kbd>Escape</kbd> key now closes a New Tab (if one of the inputs has focus)
   [[#173](https://github.com/edemaine/comingle/issues/173)]
+  or closes the buttons for a room in the room list (if one is selected).
 
 ## 2021-04-24
 
