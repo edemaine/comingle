@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-06-01
+
+* Archived rooms' and tabs' titles are italicized in addition to
+  being colored red, for further emphasis
+
 ## 2021-05-30
 
 * <kbd>Escape</kbd> key now closes a New Tab (if one of the inputs has focus)

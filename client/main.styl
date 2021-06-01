@@ -69,7 +69,8 @@ nav
 
 .room-title, .tab-title
   &.archived
-    color: var(--danger-fg)  // danger color
+    color: var(--danger-fg)
+    font-style: italic
 
 .room-info
   color: black
@@ -96,6 +97,7 @@ nav
     &, &:hover, &:focus
       .room-title
         color: var(--danger-fg)
+        font-style: italic
 
   .room-title
     // Break words in room names if too big for sidebar
