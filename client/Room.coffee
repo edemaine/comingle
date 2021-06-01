@@ -192,8 +192,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           tabNews[id].getId(), tabLayout
         delete tabNews[id]
       else
-        node = model.doAction FlexLayout.Actions.addNode \
-          tabLayout, ...location, false
+        model.doAction FlexLayout.Actions.addNode tabLayout, ...location, false
         if tabTypes[tab.type]?.alwaysRender
           FlexLayout.forceSelectTab model, tabLayout.id
         model.doAction FlexLayout.Actions.setActiveTabset location
