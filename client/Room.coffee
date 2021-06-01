@@ -162,6 +162,8 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     actions = []  # don't modify model while traversing
     laidOut = {}
     tabSettings = (tab) ->
+      ## Settings for new/modified tab, given to either
+      ## Actions.updateNodeAttributes or Actions.addNode (with more fields).
       name: tabTitle tab
       component: tabComponent tab
       enableRename: authorized  # override TabNew
@@ -183,13 +185,15 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       tabLayout = tabSettings tab
       tabLayout.id = tab._id
       tabLayout.type = 'tab'
+      tabLayout.config = new: true
       location = tabDefaultLocation tab, tabNews[id]
       if tabNews[id]?  # replace TabNew
         model.doAction FlexLayout.Actions.updateNodeAttributes \
           tabNews[id].getId(), tabLayout
         delete tabNews[id]
       else
-        model.doAction FlexLayout.Actions.addNode tabLayout, ...location
+        node = model.doAction FlexLayout.Actions.addNode \
+          tabLayout, ...location, false
         if tabTypes[tab.type]?.alwaysRender
           FlexLayout.forceSelectTab model, tabLayout.id
         model.doAction FlexLayout.Actions.setActiveTabset location
@@ -216,6 +220,14 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       enableRename: false
     , ...location
   factory = (node) ->
+    config = node.getConfig()
+    ## Factory called when rendering tab, so mark as no longer "new".
+    if config?.new
+      Meteor.defer ->
+        config = node.getConfig()
+        delete config.new
+        model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
+          {config}
     switch node.getComponent()
       when 'ChatRoom'
         <ChatRoom channel={roomId} audience="room"
@@ -225,7 +237,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       when 'TabJitsi' then <TabJitsi tabId={node.getId()} room={room}/>
       when 'TabZoom' then <TabZoom tabId={node.getId()} room={room}/>
       when 'TabNew'
-        <TabNew initialUrl={node.getConfig()?.url}
+        <TabNew initialUrl={config?.url}
          {...{node, meetingId, roomId, replaceTabNew, existingTabTypes}}/>
       when 'TabReload'
         model.doAction FlexLayout.Actions.updateNodeAttributes node.getId(),
@@ -266,8 +278,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       return ChatRoom.onRenderTab node, renderState
     tab = id2tab[node.getId()]
     return unless tab
+    # xxx This can probably be done with new titleFactory feature of FlexLayout
     className = 'tab-title'
     className += ' archived' if tab.archived
+    className += ' new' if node.getConfig()?.new
     renderState.content =
       <OverlayTrigger placement="bottom" overlay={tooltip node}>
         <span className={className}>{renderState.content}</span>

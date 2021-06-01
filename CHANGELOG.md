@@ -9,6 +9,10 @@ instead of version numbers.
 
 ## 2021-06-01
 
+* Tabs you've never seen now have yellow and bold titles.
+  Newly shared tabs are created (in this state) without selecting/opening them,
+  so you're not interrupted from whatever you were working on.
+  [[#5](https://github.com/edemaine/comingle/issues/5)]
 * Archived rooms' and tabs' titles are italicized in addition to
   being colored red, for further emphasis
 
