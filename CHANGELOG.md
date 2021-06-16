@@ -12,6 +12,11 @@ instead of version numbers.
 * Move "new tab" button (plus sign) next to last tab (instead of the far right
   of the tabset).  This makes the button easier to discover, and matches Chrome.
   [[#188](https://github.com/edemaine/comingle/issues/188)]
+* People and star counts now count only once per unique name, so if you have
+  multiple browser tabs open to the same Comingle, you only count once.
+  [[#181](https://github.com/edemaine/comingle/issues/181)]
+* People with an empty name no longer cluster together, as they're reasonably
+  likely to be separate people.
 * Fix color of archived new tabs (red instead of yellow)
   [[#187](https://github.com/edemaine/comingle/issues/187)]
 

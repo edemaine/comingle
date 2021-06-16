@@ -356,9 +356,11 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   link = useRef()
   {myPresence, presenceClusters} = useMemo ->
     clusters = {}
+    emptyCount = 0
     for type, presenceList of presence
       sortNames presenceList, (p) -> p.name
-      clusters[type] = uniqCountNames presenceList, (p) -> p.name
+      clusters[type] = uniqCountNames presenceList, ((p) -> p.name),
+        (p) -> emptyCount++ unless p.name?.trim()
     myPresence: findMyPresence presence
     presenceClusters: clusters
   , [presence]
@@ -420,8 +422,8 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
     <div className="presence-count">
-      <PresenceCount type="starred" presence={presence.starred}
-       presenceClusters={presenceClusters.starred} onClick={toggleStar}
+      <PresenceCount type="starred" presenceClusters={presenceClusters.starred}
+       onClick={toggleStar}
        heading={<b>{if myPresence.starred then 'Unstar' else 'Star'} This Room</b>}>
         {if myPresence.starred
           <FontAwesomeIcon icon={faStar}/>
@@ -432,8 +434,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     </div>
     {if presence.joined?.length
       <div className="presence-count">
-        <PresenceCount type="joined" presence={presence.joined}
-         presenceClusters={presenceClusters.joined}>
+        <PresenceCount type="joined" presenceClusters={presenceClusters.joined}>
           <FontAwesomeIcon icon={faUser}/>
         </PresenceCount>
       </div>
@@ -554,20 +555,20 @@ presencePhrasing =
     singular: 'person in this room'
     plural: 'people in this room'
 
-export PresenceCount = React.memo ({type, presence, presenceClusters, heading, children, onClick}) ->
+export PresenceCount = React.memo ({type, presenceClusters, heading, children, onClick}) ->
   phrasing = presencePhrasing[type]
-  presence ?= []
-  <OverlayTrigger placement="top" overlay={(props) -> # xxlint-disable-line react/display-name
+  presenceClusters ?= []
+  <OverlayTrigger placement="top" overlay={(props) -> # eslint-disable-line react/display-name
     <Tooltip {...props}>
       {heading}
       {<br/> if heading}
-      {presence.length} {if presence.length == 1 then phrasing.singular else phrasing.plural}{':' if presence.length}
-      <PresenceList presenceClusters={presenceClusters ? []}/>
+      {presenceClusters.length} {if presenceClusters.length == 1 then phrasing.singular else phrasing.plural}{':' if presenceClusters.length}
+      <PresenceList presenceClusters={presenceClusters}/>
     </Tooltip>
   }>
     <span className="presence-#{type}" onClick={onClick}
-     aria-label="#{presence.length} #{if presence.length == 1 then phrasing.singular else phrasing.plural}">
-      {presence.length or null}
+     aria-label="#{presenceClusters.length} #{if presenceClusters.length == 1 then phrasing.singular else phrasing.plural}">
+      {presenceClusters.length or null}
       {children}
     </span>
   </OverlayTrigger>
