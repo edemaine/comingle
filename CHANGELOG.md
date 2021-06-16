@@ -7,6 +7,12 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-06-16
+
+* Move "new tab" button (plus sign) next to last tab (instead of the far right
+  of the tabset).  This makes the button easier to discover, and matches Chrome.
+  [[#188](https://github.com/edemaine/comingle/issues/188)]
+
 ## 2021-06-01
 
 * Tabs you've never seen now have yellow and bold titles.

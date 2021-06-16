@@ -362,10 +362,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       if admin
         buttons?.push <DeleteButton key="delete" noun="tab" onClick={deleteTab}
           className="flexlayout__tab_button_trailing admin"/>
-  onRenderTabSet = (node, {buttons}) ->
+  onRenderTabSet = (node, {stickyButtons}) ->
     return if node.getType() == 'border'
     return unless authorized
-    buttons.push \
+    stickyButtons.push \
       <OverlayTrigger key="add" placement="bottom" overlay={(tipProps) ->
         <Tooltip {tipProps...}>
           Add Tab
