@@ -17,6 +17,9 @@ instead of version numbers.
   [[#181](https://github.com/edemaine/comingle/issues/181)]
 * People with an empty name no longer cluster together, as they're reasonably
   likely to be separate people.
+* Support YouTube URLs with start times (`t=...` or `start=...`) and/or
+  playlists (`list=...`).
+  [[#170](https://github.com/edemaine/comingle/issues/170)]
 * Fix color of archived new tabs (red instead of yellow)
   [[#187](https://github.com/edemaine/comingle/issues/187)]
 
