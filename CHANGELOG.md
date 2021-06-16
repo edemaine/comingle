@@ -12,6 +12,8 @@ instead of version numbers.
 * Move "new tab" button (plus sign) next to last tab (instead of the far right
   of the tabset).  This makes the button easier to discover, and matches Chrome.
   [[#188](https://github.com/edemaine/comingle/issues/188)]
+* Fix color of archived new tabs (red instead of yellow)
+  [[#187](https://github.com/edemaine/comingle/issues/187)]
 
 ## 2021-06-01
 
