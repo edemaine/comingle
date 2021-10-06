@@ -53,7 +53,7 @@ export tabTypes =
     keepVisible: true
     createNew: ->
       server = Config.defaultServers.jitsi ? 'https://meet.jit.si'
-      "#{trimURL server}/comingle/#{Random.id()}"
+      "#{trimURL server}/comingle_#{Random.id()}"
   youtube:
     title: 'YouTube'
   zoom:
