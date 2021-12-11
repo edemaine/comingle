@@ -11,6 +11,9 @@ instead of version numbers.
 
 * Jitsi user and room names are now synchronized with Comingle updates.
   [[#39](https://github.com/edemaine/comingle/issues/39)]
+* When switching from room to room with Jitsi calls, Comingle preserves your
+  audio and video mute status.
+  [[#76](https://github.com/edemaine/comingle/issues/76)]
 
 ## 2021-06-16
 
