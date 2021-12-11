@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-12-11
+
+* Jitsi user and room names are now synchronized with Comingle updates.
+  [[#39](https://github.com/edemaine/comingle/issues/39)]
+
 ## 2021-06-16
 
 * Move "new tab" button (plus sign) next to last tab (instead of the far right
