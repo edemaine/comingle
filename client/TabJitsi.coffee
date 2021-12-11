@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 import useScript from 'react-script-hook'
-import {Alert} from 'react-bootstrap'
+import {Alert, Button, Card} from 'react-bootstrap'
 
 import {Loading} from './Loading'
 import {useName} from './Name'
@@ -10,13 +10,14 @@ import {Tabs} from '/lib/tabs'
 
 ## Remember the state of the last Jitsi call, except when there are no calls
 ## and resetJitsiStatusAfter seconds elapse; then reset to default state.
-resetJitsiStatusAfter = undefined  # 30  # seconds
+resetJitsiStatusAfter = 30  # seconds
 defaultJitsiStatus = ->
+  joined: false
   audioMuted: false
   videoMuted: false
 lastJitsiStatus = defaultJitsiStatus()
 timeoutJitsiStatus = null
-numJitsi = 0  # number of open Jitsi tabs
+numJitsi = 0  # number of joined Jitsi calls
 
 parseJitsiUrl = (url) ->
   return {} unless url?
@@ -38,7 +39,7 @@ export TabJitsi = React.memo ({tabId, room}) ->
     checkForExisting: true
 
   ref = useRef()  # div container for Jitsi iframe
-  #[joined, setJoined] = useState false  # joined call?
+  [joined, setJoined] = useState lastJitsiStatus.joined  # joined call?
   [api, setApi] = useState()  # JitsiMeetExternalAPI object
   name = useName()
 
@@ -46,9 +47,7 @@ export TabJitsi = React.memo ({tabId, room}) ->
   useEffect ->
     return unless tab?
     return if loading or error
-    if timeoutJitsiStatus?
-      clearTimeout timeoutJitsiStatus
-      timeoutJitsiStatus = null
+    return unless joined
 
     Jitsi = window.exports?.JitsiMeetExternalAPI ? window.JitsiMeetExternalAPI
     setApi jitsi = new Jitsi host,
@@ -81,23 +80,21 @@ export TabJitsi = React.memo ({tabId, room}) ->
         SHOW_CHROME_EXTENSION_BANNER: false
         HIDE_INVITE_MORE_HEADER: true
         RECENT_LIST_ENABLED: false
+        SHOW_PROMOTIONAL_CLOSE_PAGE: false  # if supported by server
       userInfo:
         displayName: name
     jitsi.addListener 'audioMuteStatusChanged', ({muted}) ->
       lastJitsiStatus.audioMuted = muted
     jitsi.addListener 'videoMuteStatusChanged', ({muted}) ->
       lastJitsiStatus.videoMuted = muted
-    numJitsi++
+    jitsi.addListener 'readyToClose', ->  # hangup call
+      setJoined false
+      ## Before hanging up, Jitsi mutes the video and emits an event, so we no
+      ## longer know the correct Jitsi status.  So reset to default upon hangup.
+      lastJitsiStatus = defaultJitsiStatus()
     ->  # cleanup
-      numJitsi--
       jitsi?.dispose()
-      if numJitsi == 0 and resetJitsiStatusAfter?
-        clearTimeout timeoutJitsiStatus if timeoutJitsiStatus?
-        timeoutJitsiStatus = setTimeout ->
-          timeoutJitsiStatus = null
-          lastJitsiStatus = defaultJitsiStatus()
-        , resetJitsiStatusAfter * 1000
-  , [tab?.url, loading, error]
+  , [tab?.url, loading, error, joined]
 
   ## Keep settings up-to-date
   useEffect ->
@@ -109,6 +106,23 @@ export TabJitsi = React.memo ({tabId, room}) ->
     undefined
   , [room.title]
 
+  ## Maintain number of joined Jitsi calls, and reset state if zero and timeout.
+  useEffect ->
+    numJitsi++ if joined
+    lastJitsiStatus.joined = (numJitsi > 0)
+    if timeoutJitsiStatus?
+      clearTimeout timeoutJitsiStatus
+      timeoutJitsiStatus = null
+    ->
+      numJitsi-- if joined
+      if numJitsi == 0 and resetJitsiStatusAfter?
+        timeoutJitsiStatus = setTimeout ->
+          timeoutJitsiStatus = null
+          #lastJitsiStatus = defaultJitsiStatus()
+          lastJitsiStatus.joined = defaultJitsiStatus().joined
+        , resetJitsiStatusAfter * 1000
+  , [joined]
+
   return null unless tab
   <div ref={ref}>
     {if error
@@ -116,6 +130,19 @@ export TabJitsi = React.memo ({tabId, room}) ->
         Failed to load <a href={script} target="_blank" rel="noopener">Jitsi external API script</a>.
         Is <a href={'https://' + host} target="_blank" rel="noopener">{host}</a> a valid Jitsi server?
       </Alert>
+    else if not joined
+      <Card>
+        <Card.Body>
+          <Card.Title>Jitsi Meeting</Card.Title>
+          <p>
+            <b>Server:</b> <a href={'https://' + host} target="_blank" rel="noopener"><code>{host}</code></a><br/>
+            <b>Room ID:</b> <code>{roomName}</code>
+          </p>
+          <Button block onClick={-> setJoined true}>Join Call</Button>
+          <p>When joining, you may need to grant access to your microphone and/or camera. If you want to try again, select the &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
+          <p>If you hang up on the call and receive an ad, click the X button (at the top right of the ad) to fully leave the call, and prevent Comingle from automatically joining future Jitsi calls.</p>
+        </Card.Body>
+      </Card>
     else if loading
       <Loading/>
     }

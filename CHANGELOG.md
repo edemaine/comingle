@@ -9,6 +9,13 @@ instead of version numbers.
 
 ## 2021-12-11
 
+* For less surprises, improved privacy, and easier in-person usage, Jitsi calls
+  are no longer automatically joined at the beginning of a Comingle session.
+  You need to click the "Join Call" button to join your first Jitsi call.
+  Afterward, you can switch between rooms and automatically switch calls
+  (as before).  This "autojoin" state resets when you've been out of all
+  Jitsi calls for 30 seconds.
+  [[#191](https://github.com/edemaine/comingle/issues/191)]
 * Jitsi user and room names are now synchronized with Comingle updates.
   [[#39](https://github.com/edemaine/comingle/issues/39)]
 * When switching from room to room with Jitsi calls, Comingle preserves your
