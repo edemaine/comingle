@@ -1,6 +1,6 @@
 import React, {useState, useMemo} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
-import {Alert, Button, Row, Col} from 'react-bootstrap'
+import {Alert, Button, Card, Row, Col} from 'react-bootstrap'
 
 import {allow} from './TabIFrame'
 import {getName} from './Name'
@@ -50,9 +50,9 @@ export TabZoom = React.memo ({tabId}) ->
     setEmbedUrl "/zoom.html?name=#{base64 getName() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&apiKey=#{apiKey}"
   return <iframe src={embedUrl} allow={allow}/> if embedUrl
 
-  <div className="card">
-    <div className="card-body">
-      <h3 className="card-title">Zoom Meeting</h3>
+  <Card>
+    <Card.Body>
+      <Card.Title>Zoom Meeting</Card.Title>
       <p>
         <b>Meeting ID:</b> <code>{zoomID}</code><br/>
         <b>Meeting Password:</b> <code>{zoomPwd}</code>
@@ -81,6 +81,6 @@ export TabZoom = React.memo ({tabId}) ->
         </Col>
       </Row>
       <p>If you want to make this decision again, select the &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
-    </div>
-  </div>
+    </Card.Body>
+  </Card>
 TabZoom.displayName = 'TabZoom'
