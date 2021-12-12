@@ -7,6 +7,10 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-12-12
+
+* Fix bug with multiple Jitsi calls in a single room
+
 ## 2021-12-11
 
 * For less surprises, improved privacy, and easier in-person usage, Jitsi calls
