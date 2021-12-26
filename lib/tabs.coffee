@@ -53,7 +53,7 @@ export tabTypes =
     keepVisible: true
     createNew: ->
       server = Config.defaultServers.jitsi ? 'https://meet.jit.si'
-      "#{trimURL server}/comingle/#{Random.id()}"
+      "#{trimURL server}/comingle_#{Random.id()}"
   youtube:
     title: 'YouTube'
   zoom:
@@ -197,14 +197,31 @@ export mangleTab = (tab, dropManualTitle) ->
   tab.url = tab.url.replace ///
     ^ (?: http s? : )? //
     (?: youtu\.be/ |
-      (?: www\. | m\. )? youtube (-nocookie)? .com /
+      (?: www\. | m\. )? youtube (-nocookie)? .com /  # nocookie
         (?: v/ | vi/ | e/ | embed/ |
           (?: watch )? \? (?: feature=[^&]* & )? v i? = )
     )
-    ( [\w\-]+ ) [^]*
-  ///i, (match, nocookie, video) ->
+    ( [\w\-]+ )  # video
+    ( [^]* ) $   # options
+  ///i, (match, nocookie, video, options) ->
     tab.type = 'youtube'
-    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}"
+    query = []
+    if (option = /[?&#;]list=([\w\-]+)/.exec options)?
+      query.push "list=#{option[1]}"
+    ## Start timestamp: watch supports start= and t=, and times such as
+    ## 1m30s; embed supports only start= and integer times.
+    if (option = /[?&#;](?:start|t)=(\w+)/.exec options)?
+      start = 0
+      option[1].replace /([0-9]+)(s|m|h|$)/g, (part, value, unit) ->
+        start += value *
+          switch unit
+            when 's', '' then 1
+            when 'm' then 60
+            when 'h' then 60*60
+      query.push "start=#{start}"
+    query = query.join '&'
+    query = "?#{query}" if query
+    "https://www.youtube#{nocookie ? ''}.com/embed/#{video}#{query}"
 
   ## Zoom URL detection
   if ///^https://[^/]*zoom.us/ ///.test tab.url

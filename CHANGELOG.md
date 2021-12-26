@@ -7,6 +7,56 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2021-12-12
+
+* Fix bug with multiple Jitsi calls in a single room
+
+## 2021-12-11
+
+* For less surprises, improved privacy, and easier in-person usage, Jitsi calls
+  are no longer automatically joined at the beginning of a Comingle session.
+  You need to click the "Join Call" button to join your first Jitsi call.
+  Afterward, you can switch between rooms and automatically switch calls
+  (as before).  This "autojoin" state resets when you've been out of all
+  Jitsi calls for 30 seconds.
+  [[#191](https://github.com/edemaine/comingle/issues/191)]
+* Jitsi user and room names are now synchronized with Comingle updates.
+  [[#39](https://github.com/edemaine/comingle/issues/39)]
+* When switching from room to room with Jitsi calls, Comingle preserves your
+  audio and video mute status.
+  [[#76](https://github.com/edemaine/comingle/issues/76)]
+
+## 2021-06-16
+
+* Move "new tab" button (plus sign) next to last tab (instead of the far right
+  of the tabset).  This makes the button easier to discover, and matches Chrome.
+  [[#188](https://github.com/edemaine/comingle/issues/188)]
+* People and star counts now count only once per unique name, so if you have
+  multiple browser tabs open to the same Comingle, you only count once.
+  [[#181](https://github.com/edemaine/comingle/issues/181)]
+* People with an empty name no longer cluster together, as they're reasonably
+  likely to be separate people.
+* Support YouTube URLs with start times (`t=...` or `start=...`) and/or
+  playlists (`list=...`).
+  [[#170](https://github.com/edemaine/comingle/issues/170)]
+* Fix color of archived new tabs (red instead of yellow)
+  [[#187](https://github.com/edemaine/comingle/issues/187)]
+
+## 2021-06-01
+
+* Tabs you've never seen now have yellow and bold titles.
+  Newly shared tabs are created (in this state) without selecting/opening them,
+  so you're not interrupted from whatever you were working on.
+  [[#5](https://github.com/edemaine/comingle/issues/5)]
+* Archived rooms' and tabs' titles are italicized in addition to
+  being colored red, for further emphasis
+
+## 2021-05-30
+
+* <kbd>Escape</kbd> key now closes a New Tab (if one of the inputs has focus)
+  [[#173](https://github.com/edemaine/comingle/issues/173)]
+  or closes the buttons for a room in the room list (if one is selected).
+
 ## 2021-04-24
 
 * Rename main branch from `master` to `main`.

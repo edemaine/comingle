@@ -30,21 +30,22 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
-    "@use-it/event-listener": "^0.1.6",
+    "@use-it/event-listener": "^0.1.7",
     "@use-it/interval": "^1.0.0",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.6.0",
-    "flexlayout-react": "git+https://github.com/edemaine/FlexLayout.git#fix-splitter-drag",
-    "katex": "^0.13.3",
+    "flexlayout-react": "^0.5.12",
+    "katex": "^0.15.1",
     "markdown-it": "^12.0.6",
-    "markdown-it-texmath": "^0.8.0",
+    "markdown-it-texmath": "^0.9.6",
     "meteor-node-stubs": "^1.0.1",
     "pug": "^3.0.2",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.5.2",
+    "react-bootstrap": "^1.6.0",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
-    "react-scrollable-feed": "^1.3.0",
+    "react-script-hook": "github:edemaine/react-script-hook#bf8ea3edac7d016d79e20fe9ac8cfe28445083c5",
+    "react-scrollable-feed": "^1.3.1",
     "ua-parser-js": "^0.7.28"
   },
   "meteor": {
@@ -59,13 +60,13 @@
     }
   },
   "devDependencies": {
-    "eslint": "^7.25.0",
+    "eslint": "^7.32.0",
     "eslint-import-resolver-meteor": "^0.4.0",
-    "eslint-plugin-coffee": "github:helixbass/eslint-plugin-coffee#eslint-plugin-coffee-v0.1.15-dev.8-gitpkg",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-coffee": "github:helixbass/eslint-plugin-coffee#eslint-plugin-coffee-v0.1.16-dev.4-gitpkg",
+    "eslint-plugin-import": "2.22.1",
     "eslint-plugin-meteor": "^7.3.0",
-    "eslint-plugin-react": "^7.23.2",
-    "markdownlint-cli": "^0.27.1",
+    "eslint-plugin-react": "^7.26.1",
+    "markdownlint-cli": "^0.29.0",
     "markdownlint-rule-github-internal-links": "0.0.2"
   }
 }

@@ -68,8 +68,12 @@ nav
       padding: 0 0 0.25rem 0.5rem !important
 
 .room-title, .tab-title
+  &.new
+    color: var(--warning-fg)
+    font-weight: bold
   &.archived
-    color: var(--danger-fg)  // danger color
+    color: var(--danger-fg)
+    font-style: italic
 
 .room-info
   color: black
@@ -96,6 +100,7 @@ nav
     &, &:hover, &:focus
       .room-title
         color: var(--danger-fg)
+        font-style: italic
 
   .room-title
     // Break words in room names if too big for sidebar
