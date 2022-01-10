@@ -53,16 +53,21 @@ defaultSort = Config.defaultSort ?
   key: 'title'
   reverse: false
 
+tagClass = (key, value) ->
+  "tag-" + key + "-" + value
+
 export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   {meetingId} = useParams()
   admin = useMeetingAdmin()
   [sortKey, setSortKey] = useState null  # null means "use default"
   [reverse, setReverse] = useState null  # null means "use default"
+  [gatherTag, setGatherTag] = useState null  # null means "use default"
   meeting = useTracker ->
     Meetings.findOne meetingId
   , [meetingId]
   sortKey ?= meeting?.defaultSort?.key ? defaultSort.key
   reverse ?= meeting?.defaultSort?.reverse ? defaultSort.reverse
+  gatherTag ?= meeting?.defaultSort?.gather ? defaultSort.gather
   [search, setSearch] = useState ''
   searchDebounce = useDebounce search, 200
   [nonempty, setNonempty] = useState false
@@ -70,6 +75,12 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   rooms = useTracker ->
     Rooms.find(meeting: meetingId).fetch()
   , [meetingId]
+  if gatherTag
+    halls = (item.tags?[gatherTag] for item in rooms when item.tags?[gatherTag]).filter((value, index, array) ->
+      array.indexOf(value, index + 1) < 0
+    ) # Get list of unique values for tags key gatherTag
+  else
+    halls = []
   useEffect ->
     raisedCount = 0
     for room in rooms
@@ -265,7 +276,18 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Available Rooms:" search={searchDebounce} className="available"
        filter={(room) -> not room.archived and
+                         not room.tags?[gatherTag] and
                          (not nonempty or hasJoined(room) or selected == room._id)}/>
+      {for hall in halls
+        filt = (t) =>
+          (room) -> not room.archived and
+                        (room.tags?[gatherTag] == t) and
+                        (not nonempty or hasJoined(room) or selected == room._id)
+        <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+         heading={hall} key={hall} search={searchDebounce}
+         className={"available " + tagClass(gatherTag,hall)}
+         filter={filt(hall)}/>
+      }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Archived Rooms:" startClosed search={searchDebounce}
        className="archived"
@@ -317,6 +339,7 @@ Sublist = React.memo ({sortedRooms, presenceByRoom, selected, selectRoom, model,
         include
     matching
   , [sortedRooms, filter, search, (if search then presenceByRoom)]
+  return null unless subrooms.length
 
   <Accordion defaultActiveKey={unless startClosed then '0'}
    className={className}>
@@ -416,10 +439,11 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
       updateStarred (star for star in starred when star != room._id)
     else
       updateStarred starred.concat [room._id]
+  tagClasses = (tagClass(k,v) for k,v of room.tags when v).join(' ')
 
   <Link ref={link} to="/m/#{meetingId}##{room._id}"
    onClick={onClick()} onDragStart={onDragStart}
-   className="list-group-item list-group-item-action room-info#{roomInfoClass}"
+   className={"list-group-item list-group-item-action room-info#{roomInfoClass} " + tagClasses}
    data-room={room._id}>
     <div className="presence-count">
       <PresenceCount type="starred" presenceClusters={presenceClusters.starred}

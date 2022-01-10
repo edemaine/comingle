@@ -34,5 +34,6 @@ export Config =
 
   ## Default sort key for all meetings
   defaultSort:
+    gather: ''
     key: 'title'  # see client/RoomList.coffee for other options
     reverse: false
