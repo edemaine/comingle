@@ -5,7 +5,7 @@ import {Alert, Button, Card} from 'react-bootstrap'
 
 import {Loading} from './Loading'
 import {useName} from './Name'
-import {getDark} from './Settings'
+import {getUI} from './Settings'
 import {Tabs} from '/lib/tabs'
 
 ## Remember the state of the last Jitsi call, except when there are no calls
@@ -63,7 +63,7 @@ export TabJitsi = React.memo ({tabId, room}) ->
       interfaceConfigOverwrite:
         # See https://github.com/jitsi/jitsi-meet/blob/master/interface_config.js
         DEFAULT_BACKGROUND:
-          if getDark() then '#111' else '#474747'
+          if getUI('dark') then '#111' else '#474747'
         DISABLE_VIDEO_BACKGROUND: true
         TOOLBAR_BUTTONS: [
           'microphone', 'camera', 'closedcaptions', 'desktop',

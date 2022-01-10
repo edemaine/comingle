@@ -19,6 +19,7 @@ import {MeetingContext} from './Meeting'
 import {useMeetingAdmin} from './MeetingSecret'
 import {Name} from './Name'
 import {useAdminVisit} from './Settings'
+import {getUI} from './Settings'
 import {Warnings} from './Warnings'
 import {getPresenceId, getUpdator} from './lib/presenceId'
 import {formatTimeDelta, formatDateTime} from './lib/dates'
@@ -151,7 +152,9 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
 
   <div className="d-flex flex-column h-100 RoomList" onKeyDown={onKeyDown}>
     <div className="sidebar flex-grow-1 overflow-auto pb-2" ref={roomList}>
-      <Header/>
+      {unless getUI('hideTitle')
+        <Header/>
+      }
       <Warnings/>
       <Name/>
       {if starredHasOld
@@ -185,7 +188,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           </div>
         </Alert>
       }
-      {if rooms.length > 0
+      {if rooms.length > 0 and not getUI('hideSearch')
         <Accordion>
           <Card>
             <CardToggle eventKey="0">
@@ -246,22 +249,24 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           No rooms in this meeting.
         </Alert>
       }
-      <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
-       heading="Your Starred Rooms:" startClosed search={searchDebounce}
-       filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}
-       className="starred">
-        <OverlayTrigger placement="top" overlay={(props) ->
-          <Tooltip {...props}>
-            Unstar all rooms
-          </Tooltip>
-        }>
-          <div className="text-center">
-            <Button size="sm" variant="outline-warning" onClick={clearStars}>
-              Clear Stars
-            </Button>
-          </div>
-        </OverlayTrigger>
-      </Sublist>
+      {unless getUI('hideStarred')
+        <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
+         heading="Your Starred Rooms:" startClosed search={searchDebounce}
+         filter={(room) -> findMyPresence(presenceByRoom[room._id]).starred}
+         className="starred">
+          <OverlayTrigger placement="top" overlay={(props) ->
+            <Tooltip {...props}>
+              Unstar all rooms
+            </Tooltip>
+          }>
+            <div className="text-center">
+              <Button size="sm" variant="outline-warning" onClick={clearStars}>
+                Clear Stars
+              </Button>
+            </div>
+          </OverlayTrigger>
+        </Sublist>
+      }
       <Sublist {...{sortedRooms, presenceByRoom, selected, selectRoom, model}}
        heading="Available Rooms:" search={searchDebounce} className="available"
        filter={(room) -> not room.archived and
@@ -272,7 +277,9 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
        filter={(room) -> room.archived and
                          (not nonempty or hasJoined(room) or selected == room._id)}/>
     </div>
-    <RoomNew selectRoom={selectRoom}/>
+    {unless getUI('hideCreate')
+      <RoomNew selectRoom={selectRoom}/>
+    }
   </div>
 RoomList.displayName = 'RoomList'
 
@@ -368,6 +375,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   roomInfoClass += " presence-#{type}" for type of myPresence
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
+  roomInfoClass += " compact" if getUI("compact")
   adminVisit = useAdminVisit()
 
   onClick = (force) -> (e) ->

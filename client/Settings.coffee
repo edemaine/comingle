@@ -5,6 +5,7 @@ import {Card, Form} from 'react-bootstrap'
 import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
 import {MeetingTitle} from './MeetingTitle'
 import {MeetingSecret, useMeetingAdmin} from './MeetingSecret'
+import {Config} from '/Config'
 
 export Settings = React.memo ->
   admin = useMeetingAdmin()
@@ -13,7 +14,7 @@ export Settings = React.memo ->
       <Card.Body>
         <Card.Title as="h3">Settings</Card.Title>
         <Form>
-          <Dark/>
+          <UIToggles/>
         </Form>
       </Card.Body>
     </Card>
@@ -34,17 +35,37 @@ export Settings = React.memo ->
   </>
 Settings.displayName = 'Settings'
 
-darkVar = new LocalStorageVar 'dark', ->
-  window.matchMedia('(prefers-color-scheme: dark)').matches
-, sync: true
-export useDark = -> darkVar.use()
-export getDark = -> darkVar.get()
+uiVars = {}
+uiLabels = {}
+export useUI = (name) -> uiVars[name].use()
+export getUI = (name) -> uiVars[name].get()
 
-export Dark = React.memo ->
-  dark = useDark()
-  <Form.Switch id="dark" label="Dark Mode" checked={dark}
-   onChange={(e) -> darkVar.set e.target.checked}/>
-Dark.displayName = 'Dark'
+addUIVar = (name, label, init) ->
+  unless init?
+    init = ->
+      Config["default_" + name]
+  uiVars[name] = new LocalStorageVar name, init, sync: true
+  uiLabels[name] = label
+
+addUIVar('dark', 'Dark Mode', -> window.matchMedia('(prefers-color-scheme: dark)').matches)
+addUIVar('compact', 'Compact Room List')
+addUIVar('hideCreate', 'Hide Room Creation Widget')
+addUIVar('hideSearch', 'Hide Room Search Widget')
+addUIVar('hideStarred', 'Hide Starred Rooms Accordion')
+addUIVar('hideTitle', 'Hide Meeting Title')
+addUIVar('hideRoombar', 'Hide Room Menubar')
+
+UIToggles = React.memo ->
+  for name, label of uiLabels
+    <UIToggle name={name} key={name}/>
+UIToggles.displayName = 'UIToggles'
+
+export UIToggle = React.memo ({name}) ->
+  value = useUI(name)
+  label = uiLabels[name]
+  <Form.Switch id={name} label={label} checked={value}
+   onChange={(e) -> uiVars[name].set e.target.checked}/>
+UIToggle.displayName = 'UIToggle'
 
 adminVisitVars = new StorageDict LocalStorageVar,
   'adminVisit', false, sync: true

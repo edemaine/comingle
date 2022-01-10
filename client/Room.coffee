@@ -24,6 +24,7 @@ import {TabNew} from './TabNew'
 import {TabIFrame} from './TabIFrame'
 import {TabJitsi} from './TabJitsi'
 import {TabZoom} from './TabZoom'
+import {getUI} from './Settings'
 
 tabTitle = (tab) ->
   tab.title or 'Untitled'
@@ -475,57 +476,59 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     </OverlayTrigger>
 
   <div className="Room" onKeyDown={onKeyDown}>
-    <div className="header">
-      {leaveRoom 'leading icon-button'}
-      <RoomTitle room={room} roomId={roomId}/>
-      <OverlayTrigger placement="bottom" overlay={(props) ->
-        <Tooltip {...props}>Copy room link to clipboard</Tooltip>
-      }>
-        <div aria-label="Copy room link to clipboard" onClick={roomLink}
-         className="flexlayout__tab_button_trailing">
-          <FontAwesomeIcon icon={clipboardLink}/>
-        </div>
-      </OverlayTrigger>
-      {if room?
-        label = "#{if showArchived then "Hide" else "Show"} Archived Tabs"
+    {unless getUI('hideroombar')
+      <div className="header">
+        {leaveRoom 'leading icon-button'}
+        <RoomTitle room={room} roomId={roomId}/>
         <OverlayTrigger placement="bottom" overlay={(props) ->
-          <Tooltip {...props}>
-            {label}
-            <div className="small">
-              Currently {unless showArchived then <b>not</b>} showing archived tabs.
-            </div>
-          </Tooltip>
+          <Tooltip {...props}>Copy room link to clipboard</Tooltip>
         }>
-          <div aria-label={label} onClick={-> setShowArchived not showArchived}
+          <div aria-label="Copy room link to clipboard" onClick={roomLink}
            className="flexlayout__tab_button_trailing">
-            <FontAwesomeIcon icon={if showArchived then faEye else faEyeSlash}/>
+            <FontAwesomeIcon icon={clipboardLink}/>
           </div>
         </OverlayTrigger>
-      }
-      {if room? and authorized
-        <ArchiveButton noun="room" className="flexlayout__tab_button_trailing"
-         archived={room?.archived} onClick={archiveRoom}
-         help="Archived rooms can still be viewed and restored from the list at the bottom of the room list."/>
-      }
-      {if room? and admin
-        <DeleteButton noun="room" onClick={deleteRoom}
-         className="flexlayout__tab_button_trailing admin"/>
-      }
-      {if room? and admin
-        <ProtectButton className="flexlayout__tab_button_trailing admin"
-         protected={room?.protected} onClick={protectRoom}/>
-      }
-      {leaveRoom 'trailing'}
-      {if enableMaximize
-        <div onClick={onMaximize} className="flexlayout__tab_button_trailing">
-          {if maximized
-            FlexLayout.icons('room').restore
-          else
-            FlexLayout.icons('room').maximize
-          }
-        </div>
-      }
-    </div>
+        {if room?
+          label = "#{if showArchived then "Hide" else "Show"} Archived Tabs"
+          <OverlayTrigger placement="bottom" overlay={(props) ->
+            <Tooltip {...props}>
+              {label}
+              <div className="small">
+                Currently {unless showArchived then <b>not</b>} showing archived tabs.
+              </div>
+            </Tooltip>
+          }>
+            <div aria-label={label} onClick={-> setShowArchived not showArchived}
+             className="flexlayout__tab_button_trailing">
+              <FontAwesomeIcon icon={if showArchived then faEye else faEyeSlash}/>
+            </div>
+          </OverlayTrigger>
+        }
+        {if room? and authorized
+          <ArchiveButton noun="room" className="flexlayout__tab_button_trailing"
+           archived={room?.archived} onClick={archiveRoom}
+           help="Archived rooms can still be viewed and restored from the list at the bottom of the room list."/>
+        }
+        {if room? and admin
+          <DeleteButton noun="room" onClick={deleteRoom}
+           className="flexlayout__tab_button_trailing admin"/>
+        }
+        {if room? and admin
+          <ProtectButton className="flexlayout__tab_button_trailing admin"
+           protected={room?.protected} onClick={protectRoom}/>
+        }
+        {leaveRoom 'trailing'}
+        {if enableMaximize
+          <div onClick={onMaximize} className="flexlayout__tab_button_trailing">
+            {if maximized
+              FlexLayout.icons('room').restore
+            else
+              FlexLayout.icons('room').maximize
+            }
+          </div>
+        }
+      </div>
+    }
     <div className="container">
       {if loading or not model?  ### Post-loading, useEffect needs a tick to set model ###
         <Loading/>
