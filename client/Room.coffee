@@ -477,26 +477,11 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
 
   <div className="Room" onKeyDown={onKeyDown}>
     {unless getUI('hideroombar')
-    <div className="header">
-      {leaveRoom 'leading icon-button'}
-      <RoomTitle room={room} roomId={roomId}/>
-      <OverlayTrigger placement="bottom" overlay={(props) ->
-        <Tooltip {...props}>Copy room link to clipboard</Tooltip>
-      }>
-        <div aria-label="Copy room link to clipboard" onClick={roomLink}
-         className="flexlayout__tab_button_trailing">
-          <FontAwesomeIcon icon={clipboardLink}/>
-        </div>
-      </OverlayTrigger>
-      {if room?
-        label = "#{if showArchived then "Hide" else "Show"} Archived Tabs"
+      <div className="header">
+        {leaveRoom 'leading icon-button'}
+        <RoomTitle room={room} roomId={roomId}/>
         <OverlayTrigger placement="bottom" overlay={(props) ->
-          <Tooltip {...props}>
-            {label}
-            <div className="small">
-              Currently {unless showArchived then <b>not</b>} showing archived tabs.
-            </div>
-          </Tooltip>
+          <Tooltip {...props}>Copy room link to clipboard</Tooltip>
         }>
           <div aria-label="Copy room link to clipboard" onClick={roomLink}
            className="flexlayout__tab_button_trailing">
@@ -507,8 +492,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           label = "#{if showArchived then "Hide" else "Show"} Archived Tabs"
           <OverlayTrigger placement="bottom" overlay={(props) ->
             <Tooltip {...props}>
-              {label}<br/>
-              <small>Currently {unless showArchived then <b>not</b>} showing archived tabs.</small>
+              {label}
+              <div className="small">
+                Currently {unless showArchived then <b>not</b>} showing archived tabs.
+              </div>
             </Tooltip>
           }>
             <div aria-label={label} onClick={-> setShowArchived not showArchived}
@@ -541,7 +528,6 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
           </div>
         }
       </div>
-      }
     }
     <div className="container">
       {if loading or not model?  ### Post-loading, useEffect needs a tick to set model ###
