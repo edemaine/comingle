@@ -27,6 +27,7 @@ export Settings = React.memo ->
           <Card.Title as="h3">Admin</Card.Title>
           <Form>
             <AdminVisit/>
+            <RaisedSound/>
           </Form>
         </Card.Body>
       </Card>
@@ -58,3 +59,16 @@ export AdminVisit = React.memo ->
   <Form.Switch id="adminVisit" label="Show timer since last admin visit" checked={adminVisit}
    onChange={(e) -> adminVisitVars.get(meetingId).set e.target.checked}/>
 AdminVisit.displayName = 'AdminVisit'
+
+raisedSoundVars = new StorageDict LocalStorageVar,
+  'raisedSound', true, sync: true
+export useRaisedSound = ->
+  {meetingId} = useParams()
+  raisedSoundVars.get(meetingId)?.use()
+
+export RaisedSound = React.memo ->
+  {meetingId} = useParams()
+  raisedSound = useRaisedSound()
+  <Form.Switch id="raisedSound" label="Play sound when hand gets raised"
+   checked={raisedSound}
+   onChange={(e) -> raisedSoundVars.get(meetingId).set e.target.checked}/>

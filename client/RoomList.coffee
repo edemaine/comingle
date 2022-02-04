@@ -18,7 +18,7 @@ import {Loading} from './Loading'
 import {MeetingContext} from './Meeting'
 import {useMeetingAdmin} from './MeetingSecret'
 import {Name} from './Name'
-import {useAdminVisit} from './Settings'
+import {useAdminVisit, useRaisedSound} from './Settings'
 import {Warnings} from './Warnings'
 import {getPresenceId, getUpdator} from './lib/presenceId'
 import {formatTimeDelta, formatDateTime} from './lib/dates'
@@ -56,6 +56,8 @@ defaultSort = Config.defaultSort ?
 export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   {meetingId} = useParams()
   admin = useMeetingAdmin()
+  raisedSound = useRaisedSound()
+  raisedAudio = useRef()
   [sortKey, setSortKey] = useState null  # null means "use default"
   [reverse, setReverse] = useState null  # null means "use default"
   meeting = useTracker ->
@@ -70,14 +72,28 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
   rooms = useTracker ->
     Rooms.find(meeting: meetingId).fetch()
   , [meetingId]
+
+  ## Raised hand maintenance: maintain count for display in Rooms tab heading,
+  ## and check for new raised hands that should trigger playing a sound.
+  raisedMap = useRef {}
   useEffect ->
     raisedCount = 0
+    newRaise = false
+    newMap = {}
     for room in rooms
-      raisedCount++ if room.raised
+      if room.raised
+        raisedCount++
+        newMap[room._id] = true
+        if raisedMap.current? and not raisedMap.current[room._id]
+          newRaise = true
+    raisedMap.current = newMap
     if raisedCount != extraData.raisedCount
       extraData.raisedCount = raisedCount
       updateTab()
+    if newRaise #and admin and raisedSound  -- checked by raisedAudio.current?
+      raisedAudio.current?.play()
   , [rooms]
+
   presences = useTracker ->
     Presence.find meeting: meetingId
     .fetch()
@@ -151,6 +167,9 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
 
   <div className="d-flex flex-column h-100 RoomList" onKeyDown={onKeyDown}>
     <div className="sidebar flex-grow-1 overflow-auto pb-2" ref={roomList}>
+      {if admin and raisedSound
+        <audio ref={raisedAudio} src="/sounds/raised.flac"/>
+      }
       <Header/>
       <Warnings/>
       <Name/>

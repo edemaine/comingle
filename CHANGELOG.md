@@ -7,6 +7,12 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-02-04
+
+* Newly raised hands will make a whistling sound by default for admins.
+  You can turn it off on a per-meeting basis in Settings.
+  [[#98](https://github.com/edemaine/comingle/issues/98)]
+
 ## 2021-12-12
 
 * Fix bug with multiple Jitsi calls in a single room
