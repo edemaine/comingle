@@ -9,7 +9,12 @@ instead of version numbers.
 
 ## 2022-02-04
 
-* Newly raised hands will make a whistling sound by default for admins.
+* Chat messages now make a bird-chirp sound by default, except when chat is
+  visible or if that chat triggered a sound within the past 30 seconds
+  (a timeout configurable in `Config.coffee`).
+  You can turn chat sounds off on a per-browser basis in Settings.
+  [[#21](https://github.com/edemaine/comingle/issues/21)]
+* Newly raised hands now make a whistling sound by default for admins.
   You can turn it off on a per-meeting basis in Settings.
   [[#98](https://github.com/edemaine/comingle/issues/98)]
 

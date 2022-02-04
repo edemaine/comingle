@@ -7,11 +7,13 @@ import {Session} from 'meteor/session'
 import ScrollableFeed from 'react-scrollable-feed'
 
 import {Loading} from './Loading'
+import {useChatSound} from './Settings'
 import {Markdown} from './lib/Markdown'
 import {Chat, useChat} from './lib/chat'
 import {getUpdator} from './lib/presenceId'
 import {formatDate, formatTime} from './lib/dates'
 import {useLocalStorage} from './lib/useLocalStorage'
+import {Config} from '/Config'
 
 export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
   loading = useChat channel
@@ -25,11 +27,22 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
 
   ## Maintain last seen message and unseen count
   [seen, setSeen] = useLocalStorage "chatSeen-#{channel}", null, sync: true
-  [loadedSeen, setLoadedSeen] = useState()
+  loadedSeen = useRef false
+  chatSound = useChatSound()
+  chatAudio = useRef()
+  lastSound = useRef()
+  ## When chat becomes visible, mark everything as seen and
+  ## reset last-sound timer.
   useLayoutEffect ->
-    setSeen messages[messages.length-1]?._id if visible
+    if visible
+      setSeen messages[messages.length-1]?._id
+      lastSound.current = undefined
     undefined
   , [messages, visible]
+  ## Reset last-sound timer if we toggle sound on/off (confusing otherwise)
+  useLayoutEffect ->
+    lastSound.current = undefined
+  , [chatSound]
   useLayoutEffect ->
     if seen?
       for unseen in [0..messages.length]
@@ -39,9 +52,14 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
       unseen = messages.length
     if unseen != extraData.unseen
       extraData.unseen = unseen
-      extraData.fresh = loadedSeen
+      extraData.fresh = loadedSeen.current
       updateTab()
-    setLoadedSeen true unless loading or loadedSeen
+      if chatSound and unseen and loadedSeen.current and not visible and
+         (not lastSound.current? or
+          (new Date) - lastSound.current >= Config.chatSoundTimeout)
+        chatAudio.current?.play()
+        lastSound.current = new Date
+    loadedSeen.current = true unless loading
     undefined
   , [messages, seen]
 
@@ -66,7 +84,11 @@ export ChatRoom = ({channel, audience, visible, extraData, updateTab}) ->
     scrollableRef.current?.scrollToBottom()
   , [texLoaded]
 
-  return null unless visible
+  unless visible
+    if chatSound
+      return <audio ref={chatAudio} src="/sounds/chat.flac"/>
+    else
+      return null
   <div className="chat">
     <ScrollableFeed className="messages" ref={scrollableRef}>
       {for message in messages
