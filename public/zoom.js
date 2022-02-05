@@ -1,6 +1,8 @@
-////////////////////////////////////////////////////////////////////////
-// https://github.com/zoom/sample-app-web/blob/master/CDN/js/tool.js
-////////////////////////////////////////////////////////////////////////
+// Concatenation of two files:
+
+//////////////////////////////////////////////////////////////////////////
+// 1. https://github.com/zoom/sample-app-web/blob/master/CDN/js/tool.js
+//////////////////////////////////////////////////////////////////////////
 
 var testTool = {
   b64EncodeUnicode: function (str) {
@@ -335,13 +337,18 @@ var testTool = {
 
 window.testTool = testTool;
 
-////////////////////////////////////////////////////////////////////////
-// https://github.com/zoom/sample-app-web/blob/master/CDN/js/meeting.js
+//////////////////////////////////////////////////////////////////////////
+// 2. https://github.com/zoom/sample-app-web/blob/master/CDN/js/meeting.js
 // customized below to have:
 //  leaveUrl: "/zoomDone.html",
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
-(function () {
+window.addEventListener('DOMContentLoaded', function(event) {
+  console.log('DOM fully loaded and parsed');
+  websdkready();
+});
+
+function websdkready() {
   var testTool = window.testTool;
   // get meeting args from url
   var tmpArgs = testTool.parseQuery();
@@ -387,19 +394,22 @@ window.testTool = testTool;
   console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
 
   // it's option if you want to change the WebSDK dependency link resources. setZoomJSLib must be run at first
-  // ZoomMtg.setZoomJSLib("https://source.zoom.us/1.7.10/lib", "/av"); // CDN version defaul
+  // ZoomMtg.setZoomJSLib("https://source.zoom.us/2.2.0/lib", "/av"); // CDN version defaul
   if (meetingConfig.china)
-    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/1.7.10/lib", "/av"); // china cdn option
+    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/2.2.0/lib", "/av"); // china cdn option
   ZoomMtg.preLoadWasm();
   ZoomMtg.prepareJssdk();
   function beginJoin(signature) {
     ZoomMtg.init({
       leaveUrl: meetingConfig.leaveUrl,
       webEndpoint: meetingConfig.webEndpoint,
+      disableCORP: !window.crossOriginIsolated, // default true
+      // disablePreview: false, // default false
       success: function () {
         console.log(meetingConfig);
         console.log("signature", signature);
-        $.i18n.reload(meetingConfig.lang);
+        ZoomMtg.i18n.load(meetingConfig.lang);
+        ZoomMtg.i18n.reload(meetingConfig.lang);
         ZoomMtg.join({
           meetingNumber: meetingConfig.meetingNumber,
           userName: meetingConfig.userName,
@@ -426,7 +436,23 @@ window.testTool = testTool;
         console.log(res);
       },
     });
+
+    ZoomMtg.inMeetingServiceListener('onUserJoin', function (data) {
+      console.log('inMeetingServiceListener onUserJoin', data);
+    });
+  
+    ZoomMtg.inMeetingServiceListener('onUserLeave', function (data) {
+      console.log('inMeetingServiceListener onUserLeave', data);
+    });
+  
+    ZoomMtg.inMeetingServiceListener('onUserIsInWaitingRoom', function (data) {
+      console.log('inMeetingServiceListener onUserIsInWaitingRoom', data);
+    });
+  
+    ZoomMtg.inMeetingServiceListener('onMeetingStatus', function (data) {
+      console.log('inMeetingServiceListener onMeetingStatus', data);
+    });
   }
 
   beginJoin(meetingConfig.signature);
-})();
+};
