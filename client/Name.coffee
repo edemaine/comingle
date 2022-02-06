@@ -63,3 +63,11 @@ export Pronouns = React.memo ->
     </Card.Body>
   </Card>
 Pronouns.displayName = 'Pronouns'
+
+export concatNamePronouns = (name, pronouns) ->
+  name += " (#{pronouns})" if pronouns
+  name
+export useNameWithPronouns = ->
+  concatNamePronouns useName(), usePronouns()
+export getNameWithPronouns = ->
+  concatNamePronouns getName(), getPronouns()

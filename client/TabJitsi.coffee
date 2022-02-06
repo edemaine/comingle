@@ -4,7 +4,7 @@ import useScript from 'react-script-hook'
 import {Alert, Button, Card} from 'react-bootstrap'
 
 import {Loading} from './Loading'
-import {useName} from './Name'
+import {useNameWithPronouns} from './Name'
 import {getDark} from './Settings'
 import {Tabs} from '/lib/tabs'
 
@@ -41,7 +41,7 @@ export TabJitsi = React.memo ({tabId, room}) ->
   ref = useRef()  # div container for Jitsi iframe
   [joined, setJoined] = useState lastJitsiStatus.joined  # joined call?
   [api, setApi] = useState()  # JitsiMeetExternalAPI object
-  name = useName()
+  name = useNameWithPronouns()
 
   ## Jitsi API
   useEffect ->

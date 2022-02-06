@@ -3,7 +3,7 @@ import {useTracker} from 'meteor/react-meteor-data'
 import {Alert, Button, Card, Row, Col} from 'react-bootstrap'
 
 import {allow} from './TabIFrame'
-import {getName} from './Name'
+import {getNameWithPronouns} from './Name'
 import {Tabs, zoomRegExp} from '/lib/tabs'
 import {meteorCallPromise} from '/lib/meteorPromise'
 
@@ -35,7 +35,7 @@ export TabZoom = React.memo ({tabId}) ->
     prefix = if ua.getDevice().type == 'mobile' then 'zoomus' else 'zoommtg'
     url = "#{prefix}://zoom.us/join?confno=#{zoomID}"
     url += "&pwd=#{zoomPwd}" if zoomPwd
-    name = getName()
+    name = getNameWithPronouns()
     url += "&uname=#{encodeURIComponent name}" if name
     window.location.replace url
 
@@ -47,7 +47,7 @@ export TabZoom = React.memo ({tabId}) ->
   [embedUrl, setEmbedUrl] = useState()
   zoomWeb = ->
     {signature, apiKey} = await meteorCallPromise 'zoomSign', zoomID
-    setEmbedUrl "/zoom.html?name=#{base64 getName() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&apiKey=#{apiKey}"
+    setEmbedUrl "/zoom.html?name=#{base64 getNameWithPronouns() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&apiKey=#{apiKey}"
   return <iframe src={embedUrl} allow={allow}/> if embedUrl
 
   <Card>
