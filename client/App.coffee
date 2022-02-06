@@ -1,5 +1,7 @@
 import React from 'react'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
+import {HTML5Backend} from 'react-dnd-html5-backend'
+import {DndProvider} from 'react-dnd'
 
 import {FrontPage} from './FrontPage'
 import {Meeting} from './Meeting'
@@ -7,10 +9,10 @@ import {useDark} from './Settings'
 import {Redirect} from './lib/Redirect'
 
 export App = React.memo ->
-  <>
+  <DndProvider backend={HTML5Backend}>
     <DarkClass/>
     <AppRouter/>
-  </>
+  </DndProvider>
 App.displayName = 'App'
 
 export AppRouter = React.memo ->

@@ -1,6 +1,7 @@
 import React, {useState, useMemo, useContext, useRef, useCallback, useEffect} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
+import {useDrop} from 'react-dnd'
 import {Accordion, Alert, Badge, Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, ListGroup, SplitButton, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
@@ -16,7 +17,7 @@ import {Header} from './Header'
 import {Highlight} from './Highlight'
 import {Loading} from './Loading'
 import {MeetingContext} from './Meeting'
-import {useMeetingAdmin} from './MeetingSecret'
+import {useMeetingAdmin, getMeetingSecret} from './MeetingSecret'
 import {Name} from './Name'
 import {useAdminVisit, useRaisedSound} from './Settings'
 import {Warnings} from './Warnings'
@@ -372,7 +373,6 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   {meetingId} = useParams()
   admin = useMeetingAdmin()
   {openRoom, openRoomWithDragAndDrop, starred, updateStarred} = useContext MeetingContext
-  link = useRef()
   {myPresence, presenceClusters} = useMemo ->
     clusters = {}
     emptyCount = 0
@@ -389,6 +389,13 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   roomInfoClass += " archived" if room.archived
   adminVisit = useAdminVisit()
   locked = room.locked and not admin
+  [collected, drop] = useDrop ->
+    accept: 'move-user'
+    drop: (user) ->
+      Meteor.call 'presenceMove', user.id, room._id, getMeetingSecret meetingId
+    collect: (monitor) ->
+      isHover: Boolean monitor.isOver() and monitor.canDrop()
+  hoverClass = if collected.isHover then ' list-group-item-warning' else ''
 
   onClick = (force) -> (e) ->
     e.preventDefault()
@@ -439,9 +446,9 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     else
       updateStarred starred.concat [room._id]
 
-  <Link ref={link} to={"/m/#{meetingId}##{room._id}" unless locked}
+  <Link ref={drop} to={"/m/#{meetingId}##{room._id}" unless locked}
    onClick={onClick()} onDragStart={onDragStart}
-   className="list-group-item list-group-item-action room-info#{roomInfoClass}"
+   className="list-group-item list-group-item-action room-info#{roomInfoClass}#{hoverClass}"
    data-room={room._id}>
     <div className="presence-count">
       <PresenceCount type="starred" presenceClusters={presenceClusters.starred}

@@ -1,8 +1,9 @@
 import React, {useRef, useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
-import {Dropdown, Overlay, Tooltip} from 'react-bootstrap'
+import {useDrag} from 'react-dnd'
+import {Dropdown, Overlay, OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUser, faUserFriends, faUserTie, faUsers} from '@fortawesome/free-solid-svg-icons'
+import {faSignInAlt, faUser, faUserFriends, faUserTie, faUsers} from '@fortawesome/free-solid-svg-icons'
 
 import {Presence} from '/lib/presence'
 import {sortNames} from '/lib/sort'
@@ -55,6 +56,8 @@ export RoomUsers = React.memo ({className, room}) ->
         <Dropdown.ItemText key={user.id}>
           {if admin
             <div className="float-right">
+              <MoveButton className="admin flexlayout__tab_button_trailing"
+               user={user}/>
               <KickButton className="admin flexlayout__tab_button_trailing"
                forceClose={forceClose} onClick={onKick user}/>
             </div>
@@ -79,3 +82,23 @@ export RoomUsers = React.memo ({className, room}) ->
   </Dropdown>
 
 RoomUsers.displayName = 'RoomUsers'
+
+export MoveButton = React.memo ({className, user}) ->
+  [collected, drag, preview] = useDrag ->
+    type: 'move-user'
+    item: user
+    collect: (monitor) -> isDragging: Boolean monitor.isDragging()
+  <OverlayTrigger placement="bottom" overlay={(props) ->
+    <Tooltip {...props}>
+      Move User to Room
+      <div className="small">
+        Drag this icon to the desired room in the room list on the left.
+      </div>
+    </Tooltip>
+  }>
+    <span ref={drag}
+    className={className + if collected.isDragging then ' dragging' else ''}>
+      <FontAwesomeIcon icon={faSignInAlt}/>
+    </span>
+  </OverlayTrigger>
+MoveButton.displayName = 'MoveButton'

@@ -203,6 +203,8 @@ export Meeting = React.memo ->
       switch msg.op
         when 'kick'
           model.doAction FlexLayout.Actions.deleteTab msg.room
+        when 'move'
+          openRoom msg.room
     -> PresenceStream.unsubscribe presenceId
   , [presenceId]
 

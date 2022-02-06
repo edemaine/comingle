@@ -13,6 +13,8 @@ instead of version numbers.
 * This list shows the users' pronouns, which can now be set in Settings.
   Pronouns are also part of a user's display name in Jitsi and Zoom calls.
   [[#189](https://github.com/edemaine/comingle/issues/189)]
+* Admins can move a user from the current room to another room.
+  [[#122](https://github.com/edemaine/comingle/issues/122)]
 * Admins can kick a user from the current room (e.g. to remove idle users).
   Users can still rejoin the room if they want, unless the room is locked.
   [[#122](https://github.com/edemaine/comingle/issues/122)]

@@ -68,11 +68,16 @@ Meteor.methods
     for roomId in old?.rooms.joined ? []
       roomLeave roomId, (old ? id: presenceId)
     Presence.remove id: presenceId
-  presenceKick: (presenceId, roomId, secret) ->
-    checkId presenceId
-    return if @isSimulation
-    room = checkRoom roomId
-    checkMeetingSecret room.meeting, secret
-    PresenceStream.emit presenceId,
-      op: 'kick'
-      room: roomId
+
+presenceOp = (op) -> (presenceId, roomId, secret) ->
+  checkId presenceId
+  return if @isSimulation
+  room = checkRoom roomId
+  checkMeetingSecret room.meeting, secret
+  PresenceStream.emit presenceId,
+    op: op
+    room: roomId
+
+Meteor.methods
+  presenceKick: presenceOp 'kick'
+  presenceMove: presenceOp 'move'
