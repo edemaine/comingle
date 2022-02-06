@@ -22,6 +22,7 @@ Meteor.methods
       meeting: Match.Where validId
       secret: Match.Maybe String
       name: String
+      pronouns: Match.Optional String
       rooms:
         joined: [Match.Where validId]
         starred: [Match.Where validId]
@@ -53,6 +54,7 @@ Meteor.methods
       $set: Object.assign (setAdmin ? {}),
         meeting: presence.meeting
         name: presence.name
+        pronouns: presence.pronouns
         rooms: presence.rooms
       $setOnInsert:
         id: presence.id

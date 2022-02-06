@@ -10,6 +10,8 @@ instead of version numbers.
 ## 2022-02-06
 
 * Rooms now have a dropdown list of users (first button after room title).
+* This list shows the users' pronouns, as set in Settings.
+  [[#189](https://github.com/edemaine/comingle/issues/189)]
 * Admins can kick a user from the current room (e.g. to remove idle users).
   Users can still rejoin the room if they want, unless the room is locked.
   [[#122](https://github.com/edemaine/comingle/issues/122)]

@@ -729,6 +729,11 @@ export RoomUsers = React.memo ({className, room}) ->
             }
             &nbsp;
             {user.name}
+            {if user.pronouns
+              <span className="pronouns">
+                ({user.pronouns})
+              </span>
+            }
           </span>
         </Dropdown.ItemText>
       }

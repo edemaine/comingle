@@ -35,3 +35,31 @@ export Name = React.memo ->
     </Card.Body>
   </Card>
 Name.displayName = 'Name'
+
+pronounsVar = new LocalStorageVar 'pronouns', '', sync: true
+export usePronouns = -> pronounsVar.use()
+export getPronouns = -> pronounsVar.get()
+
+export Pronouns = React.memo ->
+  [pronouns, setPronouns] = useState -> pronounsVar.get()
+  pronounsDebounce = useDebounce pronouns, 500
+
+  ## Synchronize global with form state
+  useTracker ->
+    setPronouns pronounsVar.get()
+  , []
+  useLayoutEffect ->
+    pronounsVar.set pronounsDebounce
+    undefined
+  , [pronounsDebounce]
+
+  <Card>
+    <Card.Header className="tight">
+      Your Pronouns:
+    </Card.Header>
+    <Card.Body>
+      <Form.Control type="text" placeholder="they" className="pronouns"
+       value={pronouns} onChange={(e) -> setPronouns e.target.value}/>
+    </Card.Body>
+  </Card>
+Pronouns.displayName = 'Pronouns'

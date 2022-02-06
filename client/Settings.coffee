@@ -5,6 +5,7 @@ import {Card, Form} from 'react-bootstrap'
 import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
 import {MeetingTitle} from './MeetingTitle'
 import {MeetingSecret, useMeetingAdmin} from './MeetingSecret'
+import {Pronouns} from './Name'
 
 export Settings = React.memo ->
   admin = useMeetingAdmin()
@@ -19,6 +20,7 @@ export Settings = React.memo ->
       </Card.Body>
     </Card>
     <div className="sidebar">
+      <Pronouns/>
       <MeetingTitle/>
       <MeetingSecret/>
     </div>

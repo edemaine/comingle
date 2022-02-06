@@ -27,8 +27,9 @@ export logPresence = (presence) ->
   diff.id = presence.id
   diff.meeting = presence.meeting
   diff.updated = presence.updated
-  ## Diff name and rooms
+  ## Diff name, pronouns, admin, and rooms
   diff.name = presence.name unless old? and old.name == presence.name
+  diff.pronouns = presence.pronouns unless old? and old.pronouns == presence.pronouns
   diff.admin = presence.admin unless old? and old.admin == presence.admin
   diff.rooms = {}
   for key of presence.rooms
@@ -36,7 +37,7 @@ export logPresence = (presence) ->
       diff.rooms[key] = presence.rooms[key]
   delete diff.rooms unless (key for key of diff.rooms).length
   ## Check for no-op update
-  return {old} unless diff.name? or diff.admin? or diff.rooms?
+  return {old} unless diff.name? or diff.pronouns? or diff.admin? or diff.rooms?
   ## Write log.  Use rawCollection() to let server assign _id,
   ## which guarantees no conflict.
   Log.rawCollection().insert diff

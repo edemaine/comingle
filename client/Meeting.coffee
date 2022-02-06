@@ -15,7 +15,7 @@ import {Room, setRoomTitle} from './Room'
 import {Settings} from './Settings'
 import {Welcome} from './Welcome'
 import {VisitMeeting} from './VisitedMeetings'
-import {useName} from './Name'
+import {useName, usePronouns} from './Name'
 import {Meetings} from '/lib/meetings'
 import {Rooms} from '/lib/rooms'
 import {PresenceStream} from '/lib/presence'
@@ -145,6 +145,7 @@ export Meeting = React.memo ->
   , [location.hash]
   presenceId = getPresenceId()
   name = useName()
+  pronouns = usePronouns()
 
   ## `starredOld` is remembered across the browser (all tabs), and may contain
   ## a list of previously starred rooms.  In this case, `starredHasOld`
@@ -168,6 +169,7 @@ export Meeting = React.memo ->
       meeting: meetingId
       secret: meetingSecret
       name: name
+      pronouns: pronouns
       rooms:
         joined: []
         starred: starred
@@ -176,20 +178,24 @@ export Meeting = React.memo ->
         presence.rooms.joined.push node.getId()
     last = lastPresence.current
     unless last? and last.meeting == presence.meeting and
-           last.name == presence.name and last.secret == presence.secret and
+           last.name == presence.name and
+           last.pronouns == presence.pronouns and
+           last.secret == presence.secret and
            sameSorted(last.rooms.joined, presence.rooms.joined) and
            sameSorted(last.rooms.starred, presence.rooms.starred)
       Meteor.call 'presenceUpdate', presence
       lastPresence.current = presence
     undefined
-  ## Send presence when name changes, when list of starred rooms changes, or
-  ## when we reconnect to server (so server may have deleted our presence).
+  ## Send presence when
+  ##  * name or pronouns change
+  ##  * list of starred rooms changes
+  ##  * we reconnect to server (so server may have deleted our presence).
   useTracker ->
     if Meteor.status().connected
       lastPresence.current = null  # force update on reconnect
       updatePresence true
   , []
-  useEffect updatePresence, [meetingId, name, meetingSecret, starred.join '\t']
+  useEffect updatePresence, [meetingId, name, pronouns, meetingSecret, starred.join '\t']
 
   ## Process PresenceStream events: Leave rooms we're kicked from.
   useEffect ->
