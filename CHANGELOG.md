@@ -18,6 +18,9 @@ instead of version numbers.
 * Admins can kick a user from the current room (e.g. to remove idle users).
   Users can still rejoin the room if they want, unless the room is locked.
   [[#122](https://github.com/edemaine/comingle/issues/122)]
+* Admins can bulk move/kick all users from the current room
+  (including themselves), e.g., to move the discussion to the correct room.
+  [[#122](https://github.com/edemaine/comingle/issues/122)]
 
 ## 2022-02-05
 

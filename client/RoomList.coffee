@@ -391,8 +391,10 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   locked = room.locked and not admin
   [collected, drop] = useDrop ->
     accept: 'move-user'
-    drop: (user) ->
-      Meteor.call 'presenceMove', user.id, room._id, getMeetingSecret meetingId
+    drop: (item) ->
+      console.log item
+      Meteor.call 'presenceMove', item.user, room._id,
+        getMeetingSecret meetingId
     collect: (monitor) ->
       isHover: Boolean monitor.isOver() and monitor.canDrop()
   hoverClass = if collected.isHover then ' list-group-item-warning' else ''

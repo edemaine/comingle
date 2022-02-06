@@ -80,11 +80,12 @@ export LockButton = React.memo ({locked, ...props}) ->
    {...props}/>
 LockButton.displayName = 'LockButton'
 
-export KickButton = React.memo (props) ->
+export KickButton = React.memo ({plural, ...props}) ->
+  plural ?= ''
   <ConfirmButton
-   action="Kick User"
+   action="Kick User#{plural}"
    suffix=" from Room"
    icon={<FontAwesomeIcon icon={faUserSlash}/>}
-   help="User can still rejoin room, unless the room is locked. Useful for idle users."
+   help="User#{plural} can still rejoin room, unless the room is locked. Useful for idle users."
    {...props}/>
 KickButton.displayName = 'KickButton'

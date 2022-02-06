@@ -45,7 +45,7 @@ export RoomUsers = React.memo ({className, room}) ->
   admin = useMeetingAdmin()
   [forceClose, setForceClose] = useState false
   onKick = (user) -> ->
-    Meteor.call 'presenceKick', user.id, room._id, getMeetingSecret room.meeting
+    Meteor.call 'presenceKick', user, room._id, getMeetingSecret room.meeting
 
   <Dropdown className="room-users" onToggle={(open) -> setForceClose not open}>
     <Dropdown.Toggle as={RoomUsersButton} className={className} count={presence.length}>
@@ -57,9 +57,9 @@ export RoomUsers = React.memo ({className, room}) ->
           {if admin
             <div className="float-right">
               <MoveButton className="admin flexlayout__tab_button_trailing"
-               user={user}/>
+               user={user.id}/>
               <KickButton className="admin flexlayout__tab_button_trailing"
-               forceClose={forceClose} onClick={onKick user}/>
+               forceClose={forceClose} onClick={onKick user.id}/>
             </div>
           }
           <span className={if user.admin then 'admin' else ''}>
@@ -78,19 +78,36 @@ export RoomUsers = React.memo ({className, room}) ->
           </span>
         </Dropdown.ItemText>
       }
+      {if admin
+        users = (user.id for user in presence)
+        <Dropdown.ItemText>
+          <div className="float-right">
+            <MoveButton className="admin flexlayout__tab_button_trailing"
+             user={users} plural="s"/>
+            <KickButton className="admin flexlayout__tab_button_trailing"
+             forceClose={forceClose} plural="s" onClick={onKick users}/>
+          </div>
+          <span className="admin font-italic">
+            <FontAwesomeIcon icon={faUsers}/>
+            &nbsp;
+            all {users.length} user{if users.length == 1 then '' else 's'}
+          </span>
+        </Dropdown.ItemText>
+      }
     </Dropdown.Menu>
   </Dropdown>
 
 RoomUsers.displayName = 'RoomUsers'
 
-export MoveButton = React.memo ({className, user}) ->
+export MoveButton = React.memo ({className, user, plural}) ->
+  plural ?= ''
   [collected, drag, preview] = useDrag ->
     type: 'move-user'
-    item: user
+    item: {user}
     collect: (monitor) -> isDragging: Boolean monitor.isDragging()
   <OverlayTrigger placement="bottom" overlay={(props) ->
     <Tooltip {...props}>
-      Move User to Room
+      Move User{plural} to Room
       <div className="small">
         Drag this icon to the desired room in the room list on the left.
       </div>

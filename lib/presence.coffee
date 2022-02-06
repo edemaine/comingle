@@ -70,13 +70,15 @@ Meteor.methods
     Presence.remove id: presenceId
 
 presenceOp = (op) -> (presenceId, roomId, secret) ->
-  checkId presenceId
+  check presenceId, Match.OneOf [Match.Where validId], Match.Where validId
   return if @isSimulation
   room = checkRoom roomId
   checkMeetingSecret room.meeting, secret
-  PresenceStream.emit presenceId,
-    op: op
-    room: roomId
+  presenceId = [presenceId] unless Array.isArray presenceId
+  for id in presenceId
+    PresenceStream.emit id,
+      op: op
+      room: roomId
 
 Meteor.methods
   presenceKick: presenceOp 'kick'
