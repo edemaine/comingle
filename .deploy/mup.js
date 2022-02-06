@@ -18,7 +18,7 @@ module.exports = {
       one: {}
     },
     docker: {
-      image: 'abernix/meteord:node-12-base',
+      image: 'zodern/meteor:latest',
       stopAppDuringPrepareBundle: false
     },
     buildOptions: {
@@ -61,7 +61,7 @@ module.exports = {
   // Run 'npm install' before deploying, to ensure packages are up-to-date
   hooks: {
     'pre.deploy': {
-      localCommand: 'npm install'
+      localCommand: 'cd ..; npm install'
     }
   },
 };
