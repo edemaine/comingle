@@ -160,9 +160,16 @@ nav
     margin-left: 0.5rem
     margin-right: -0.75rem
 
+.room-users
+  > .dropdown-menu
+    min-width: 12rem
+    font-size: 75%
+  .dropdown-item-text
+    padding: 0.125rem 0.75rem
+
 .presence
   font-size: 75%
-  > span
+  .presence-joined, .presence-starred
     margin-right: 0.5em
     white-space: nowrap  // prevent line break between icon and name
     &.presence-starred
@@ -171,6 +178,8 @@ nav
       font-size: 0.77em
     > span
       white-space: normal  // allow line break within name
+  > .dropdown-item-text > span > svg
+    font-size: 0.77em
 
 .admin
   color: #8224df  // purple from logo

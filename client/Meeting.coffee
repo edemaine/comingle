@@ -18,6 +18,7 @@ import {VisitMeeting} from './VisitedMeetings'
 import {useName} from './Name'
 import {Meetings} from '/lib/meetings'
 import {Rooms} from '/lib/rooms'
+import {PresenceStream} from '/lib/presence'
 import {validId} from '/lib/id'
 import {sameSorted} from '/lib/sort'
 import {getPresenceId} from './lib/presenceId'
@@ -189,6 +190,16 @@ export Meeting = React.memo ->
       updatePresence true
   , []
   useEffect updatePresence, [meetingId, name, meetingSecret, starred.join '\t']
+
+  ## Process PresenceStream events: Leave rooms we're kicked from.
+  useEffect ->
+    PresenceStream.on presenceId, (msg) ->
+      switch msg.op
+        when 'kick'
+          model.doAction FlexLayout.Actions.deleteTab msg.room
+    -> PresenceStream.unsubscribe presenceId
+  , [presenceId]
+
   onAction = (action) ->
     switch action.type
       when FlexLayout.Actions.RENAME_TAB

@@ -1,6 +1,9 @@
-import {Presence} from '/lib/presence'
+import {Presence, PresenceStream} from '/lib/presence'
 import {Rooms} from '/lib/rooms'
 import {pulseFrequency, logPresencePulse} from './log'
+
+PresenceStream.allowRead 'all'    # anyone can read if they know channel ID
+PresenceStream.allowWrite 'none'  # all messages from server
 
 ## On server (re)start, remove old presence values; if they're not expired,
 ## they will reload and reconnect.

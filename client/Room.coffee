@@ -1,22 +1,24 @@
 import React, {useCallback, useContext, useEffect, useReducer, useRef, useState} from 'react'
 import {useParams} from 'react-router-dom'
 import FlexLayout from './FlexLayout'
-import {Alert, OverlayTrigger, Tooltip} from 'react-bootstrap'
+import {Alert, Dropdown, Overlay, OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {useTracker} from 'meteor/react-meteor-data'
 import useEventListener from '@use-it/event-listener'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment, faDoorOpen, faEye, faEyeSlash, faPlus, faRedoAlt, faVideo, faSignInAlt} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faDoorOpen, faEye, faEyeSlash, faPlus, faRedoAlt, faSignInAlt, faUser, faUserFriends, faUserTie, faUsers, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {faYoutube} from '@fortawesome/free-brands-svg-icons'
 import {clipboardLink} from './icons/clipboardLink'
 
 import {Rooms, roomTabs} from '/lib/rooms'
+import {Presence} from '/lib/presence'
+import {sortNames} from '/lib/sort'
 import {tabTypes} from '/lib/tabs'
 import {getUpdator} from './lib/presenceId'
 import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
 import {formatDateTime} from './lib/dates'
 import {ChatRoom} from './ChatRoom'
-import {ArchiveButton, DeleteButton, LockButton, ProtectButton} from './ConfirmButton'
+import {ArchiveButton, DeleteButton, KickButton, LockButton, ProtectButton} from './ConfirmButton'
 import {Loading} from './Loading'
 import Meeting from './Meeting'
 import {useMeetingAdmin, addMeetingSecret} from './MeetingSecret'
@@ -484,6 +486,9 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
     <div className="header">
       {leaveRoom 'leading icon-button'}
       <RoomTitle room={room} roomId={roomId}/>
+      {if room?
+        <RoomUsers className="flexlayout__tab_button_trailing" room={room}/>
+      }
       <OverlayTrigger placement="bottom" overlay={(props) ->
         <Tooltip {...props}>Copy room link to clipboard</Tooltip>
       }>
@@ -665,3 +670,69 @@ export RoomTitle = React.memo ({room, roomId}) ->
      onKeyDown={onKeyDown}/>
 
 RoomTitle.displayName = 'RoomTitle'
+
+export RoomUsersButton = React.forwardRef ({className, onClick, count}, ref) ->
+  className = className.replace /\bdropdown-toggle\b/, ''  # omit caret
+  [hover, setHover] = useState false
+  iconRef = useRef()
+
+  <div className={className} ref={ref}
+   onClick={(e) -> setHover false; onClick e}
+   onMouseEnter={-> setHover true}
+   onMouseLeave={-> setHover false}
+   onMouseDown={(e) -> e.stopPropagation()}
+   onTouchStart={(e) -> e.stopPropagation()}>
+    <span ref={iconRef}>
+      <FontAwesomeIcon aria-label="List Users in Room" icon={
+        switch count
+          when 0, 1 then faUser
+          when 2 then faUserFriends
+          else faUsers
+      }/>
+    </span>
+    <Overlay target={iconRef} placement="bottom" show={hover}>
+      <Tooltip>List Users in Room</Tooltip>
+    </Overlay>
+  </div>
+RoomUsersButton.displayName = 'RoomUsersButton'
+
+export RoomUsers = React.memo ({className, room}) ->
+  presence = useTracker ->
+    presenceList = Presence.find
+      meeting: room.meeting
+      'rooms.joined': room._id
+    .fetch()
+    sortNames presenceList, (p) -> p.name
+  admin = useMeetingAdmin()
+  [forceClose, setForceClose] = useState false
+  onKick = (user) -> ->
+    Meteor.call 'presenceKick', user.id, room._id
+
+  <Dropdown className="room-users" onToggle={(open) -> setForceClose not open}>
+    <Dropdown.Toggle as={RoomUsersButton} className={className} count={presence.length}>
+      <span>{room?.users?.length}</span>
+    </Dropdown.Toggle>
+    <Dropdown.Menu className="presence">
+      {for user in presence
+        <Dropdown.ItemText key={user.id}>
+          {if admin
+            <div className="float-right">
+              <KickButton className="admin flexlayout__tab_button_trailing"
+               forceClose={forceClose} onClick={onKick user}/>
+            </div>
+          }
+          <span className={if user.admin then 'admin' else ''}>
+            {if user.admin
+              <FontAwesomeIcon icon={faUserTie}/>
+            else
+              <FontAwesomeIcon icon={faUser}/>
+            }
+            &nbsp;
+            {user.name}
+          </span>
+        </Dropdown.ItemText>
+      }
+    </Dropdown.Menu>
+  </Dropdown>
+
+RoomUsers.displayName = 'RoomUsers'

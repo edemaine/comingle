@@ -13,6 +13,7 @@ if Meteor.isServer
     {setConnection} = require '/server/presence.coffee'
 
 export Presence = new Mongo.Collection 'presence'
+export PresenceStream = new Meteor.Streamer 'presence'
 
 Meteor.methods
   presenceUpdate: (presence) ->
@@ -64,3 +65,10 @@ Meteor.methods
     for roomId in old?.rooms.joined ? []
       roomLeave roomId, (old ? id: presenceId)
     Presence.remove id: presenceId
+  presenceKick: (presenceId, roomId) ->
+    checkId presenceId
+    checkId roomId
+    return if @isSimulation
+    PresenceStream.emit presenceId,
+      op: 'kick'
+      room: roomId

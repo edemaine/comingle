@@ -1,15 +1,22 @@
-import React, {useState, useRef} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {Button, ButtonGroup, Tooltip, Overlay} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faLock, faLockOpen, faShieldAlt, faSkullCrossbones, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
+import {faLock, faLockOpen, faShieldAlt, faSkullCrossbones, faTrash, faTrashRestore, faUserSlash} from '@fortawesome/free-solid-svg-icons'
 import {shieldAltSlash} from './icons/shieldAltSlash'
 
 import {capitalize} from './lib/capitalize'
 
-export ConfirmButton = React.memo ({className, action, prefix, suffix, icon, help, onClick}) ->
+export ConfirmButton = React.memo ({className, action, prefix, suffix, icon, help, onClick, forceClose}) ->
   buttonRef = useRef()
   [click, setClick] = useState false
   [hover, setHover] = useState false
+  useEffect ->
+    if forceClose
+      setClick false
+      setHover false
+    undefined
+  , [forceClose]
+
   <div className={className}
    aria-label="#{action}#{suffix ? ''}"
    onClick={-> setClick not click}
@@ -72,3 +79,12 @@ export LockButton = React.memo ({locked, ...props}) ->
    help="Locked rooms cannot be joined (easily) by users except admins. For private discussion."
    {...props}/>
 LockButton.displayName = 'LockButton'
+
+export KickButton = React.memo (props) ->
+  <ConfirmButton
+   action="Kick User"
+   suffix=" from Room"
+   icon={<FontAwesomeIcon icon={faUserSlash}/>}
+   help="User can still rejoin room, unless the room is locked. Useful for idle users."
+   {...props}/>
+KickButton.displayName = 'KickButton'

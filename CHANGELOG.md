@@ -7,6 +7,13 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-02-06
+
+* Rooms now have a dropdown list of users (first button after room title).
+* Admins can kick a user from the current room (e.g. to remove idle users).
+  Users can still rejoin the room if they want, unless the room is locked.
+  [[#122](https://github.com/edemaine/comingle/issues/122)]
+
 ## 2022-02-05
 
 * "Protect Room" icon changed from lock to shield.
