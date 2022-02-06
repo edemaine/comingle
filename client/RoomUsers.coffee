@@ -101,7 +101,7 @@ RoomUsers.displayName = 'RoomUsers'
 
 export MoveButton = React.memo ({className, user, plural}) ->
   plural ?= ''
-  [collected, drag, preview] = useDrag ->
+  [collected, drag] = useDrag ->
     type: 'move-user'
     item: {user}
     collect: (monitor) -> isDragging: Boolean monitor.isDragging()

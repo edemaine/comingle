@@ -392,7 +392,6 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   [collected, drop] = useDrop ->
     accept: 'move-user'
     drop: (item) ->
-      console.log item
       Meteor.call 'presenceMove', item.user, room._id,
         getMeetingSecret meetingId
     collect: (monitor) ->

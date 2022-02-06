@@ -3,8 +3,7 @@ import {check, Match} from 'meteor/check'
 
 import {validId, checkId} from './id'
 import {checkMeeting, checkMeetingSecret} from './meetings'
-import {checkRoom} from './rooms'
-import {roomJoin, roomChange, roomLeave} from './rooms'
+import {checkRoom, roomJoin, roomChange, roomLeave} from './rooms'
 
 ## Load code on server only
 logPresence = logPresenceRemove = setConnection = null
