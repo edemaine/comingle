@@ -2,7 +2,8 @@ import {Mongo} from 'meteor/mongo'
 import {check, Match} from 'meteor/check'
 
 import {validId, checkId} from './id'
-import {checkMeeting} from './meetings'
+import {checkMeeting, checkMeetingSecret} from './meetings'
+import {checkRoom} from './rooms'
 import {roomJoin, roomChange, roomLeave} from './rooms'
 
 ## Load code on server only
@@ -67,10 +68,11 @@ Meteor.methods
     for roomId in old?.rooms.joined ? []
       roomLeave roomId, (old ? id: presenceId)
     Presence.remove id: presenceId
-  presenceKick: (presenceId, roomId) ->
+  presenceKick: (presenceId, roomId, secret) ->
     checkId presenceId
-    checkId roomId
     return if @isSimulation
+    room = checkRoom roomId
+    checkMeetingSecret room.meeting, secret
     PresenceStream.emit presenceId,
       op: 'kick'
       room: roomId

@@ -7,7 +7,7 @@ import {faUser, faUserFriends, faUserTie, faUsers} from '@fortawesome/free-solid
 import {Presence} from '/lib/presence'
 import {sortNames} from '/lib/sort'
 import {KickButton} from './ConfirmButton'
-import {useMeetingAdmin} from './MeetingSecret'
+import {useMeetingAdmin, getMeetingSecret} from './MeetingSecret'
 
 export RoomUsersButton = React.forwardRef ({className, onClick, count}, ref) ->
   className = className.replace /\bdropdown-toggle\b/, ''  # omit caret
@@ -44,7 +44,7 @@ export RoomUsers = React.memo ({className, room}) ->
   admin = useMeetingAdmin()
   [forceClose, setForceClose] = useState false
   onKick = (user) -> ->
-    Meteor.call 'presenceKick', user.id, room._id
+    Meteor.call 'presenceKick', user.id, room._id, getMeetingSecret room.meeting
 
   <Dropdown className="room-users" onToggle={(open) -> setForceClose not open}>
     <Dropdown.Toggle as={RoomUsersButton} className={className} count={presence.length}>
