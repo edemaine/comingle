@@ -9,7 +9,8 @@ instead of version numbers.
 
 ## 2022-02-05
 
-* Fix Zoom web client by upgrading to v2.2.0
+* "Protect Room" icon changed from lock to shield.
+* Fix Zoom web client by upgrading to v2.2.0.
   [[#184](https://github.com/edemaine/comingle/issues/184)]
 
 ## 2022-02-04

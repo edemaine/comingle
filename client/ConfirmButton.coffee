@@ -1,7 +1,8 @@
 import React, {useState, useRef} from 'react'
 import {Button, ButtonGroup, Tooltip, Overlay} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faLock, faLockOpen, faSkullCrossbones, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
+import {faShieldAlt, faSkullCrossbones, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
+import {shieldAltSlash} from './icons/shieldAltSlash'
 
 import {capitalize} from './lib/capitalize'
 
@@ -59,7 +60,7 @@ DeleteButton.displayName = 'DeleteButton'
 export ProtectButton = React.memo ({protected: prot, ...props}) ->
   <ConfirmButton 
    action="#{if prot then 'Unprotect' else 'Protect'} Room"
-   icon={<FontAwesomeIcon icon={if prot then faLock else faLockOpen}/>}
+   icon={<FontAwesomeIcon icon={if prot then faShieldAlt else shieldAltSlash}/>}
    help="Protected rooms cannot be renamed, (un)archived, or have tabs added/edited except by admins."
    {...props}/>
 ProtectButton.displayName = 'ProtectButton'
