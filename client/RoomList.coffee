@@ -5,7 +5,7 @@ import {Accordion, Alert, Badge, Button, ButtonGroup, Card, Dropdown, DropdownBu
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen, faHourglass, faUser, faUserTie, faHandPaper, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
+import {faDoorOpen, faHandPaper, faHourglass, faLock, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle, faTrash, faTrashRestore, faUser, faUserTie} from '@fortawesome/free-solid-svg-icons'
 import {faClone, faHandPaper as faHandPaperOutline, faStar as faStarOutline} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
@@ -388,6 +388,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
   roomInfoClass += " selected" if selected
   roomInfoClass += " archived" if room.archived
   adminVisit = useAdminVisit()
+  locked = room.locked and not admin
 
   onClick = (force) -> (e) ->
     e.preventDefault()
@@ -397,7 +398,9 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     ##   * We're not in any rooms
     ##   * Shift/Ctrl/Meta-click => force open
     ##   * We clicked on the Switch button (force == true)
-    if not currentRoom? or e.shiftKey or e.ctrlKey or e.metaKey or force == true
+    ## ...except if the room is locked
+    if (not currentRoom? or e.shiftKey or e.ctrlKey or e.metaKey or
+        force == true) and not locked
       openRoom room._id
       selectRoom null
     ## Otherwise, toggle whether this room is selected.
@@ -436,7 +439,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     else
       updateStarred starred.concat [room._id]
 
-  <Link ref={link} to="/m/#{meetingId}##{room._id}"
+  <Link ref={link} to={"/m/#{meetingId}##{room._id}" unless locked}
    onClick={onClick()} onDragStart={onDragStart}
    className="list-group-item list-group-item-action room-info#{roomInfoClass}"
    data-room={room._id}>
@@ -511,6 +514,9 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
       </OverlayTrigger>
     }
     <Highlight className="room-title" text={room.title} search={search}/>
+    {if room.locked
+      <FontAwesomeIcon icon={faLock} size="sm" className="ml-1"/>
+    }
     <PresenceList presenceClusters={
       if search  # show matching starred people too
         (presenceClusters.joined ? []).concat (person \
@@ -538,7 +544,8 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
             </Button>
           </>
         else
-          <Button variant="warning" onClick={onClick true}>
+          <Button variant="warning" onClick={onClick true}
+           disabled={locked}>
             <small className="mr-1"><FontAwesomeIcon icon={faDoorOpen}/></small>
             Switch to Room
             <div className="small">

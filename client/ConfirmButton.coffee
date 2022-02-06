@@ -1,7 +1,7 @@
 import React, {useState, useRef} from 'react'
 import {Button, ButtonGroup, Tooltip, Overlay} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faShieldAlt, faSkullCrossbones, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
+import {faLock, faLockOpen, faShieldAlt, faSkullCrossbones, faTrash, faTrashRestore} from '@fortawesome/free-solid-svg-icons'
 import {shieldAltSlash} from './icons/shieldAltSlash'
 
 import {capitalize} from './lib/capitalize'
@@ -58,9 +58,17 @@ export DeleteButton = React.memo ({noun, ...props}) ->
 DeleteButton.displayName = 'DeleteButton'
 
 export ProtectButton = React.memo ({protected: prot, ...props}) ->
-  <ConfirmButton 
+  <ConfirmButton
    action="#{if prot then 'Unprotect' else 'Protect'} Room"
    icon={<FontAwesomeIcon icon={if prot then faShieldAlt else shieldAltSlash}/>}
    help="Protected rooms cannot be renamed, (un)archived, or have tabs added/edited except by admins."
    {...props}/>
 ProtectButton.displayName = 'ProtectButton'
+
+export LockButton = React.memo ({locked, ...props}) ->
+  <ConfirmButton
+   action="#{if locked then 'Unlock' else 'Lock'} Room"
+   icon={<FontAwesomeIcon icon={if locked then faLock else faLockOpen}/>}
+   help="Locked rooms cannot be joined (easily) by users except admins. For private discussion."
+   {...props}/>
+LockButton.displayName = 'LockButton'

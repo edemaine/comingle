@@ -10,6 +10,9 @@ instead of version numbers.
 ## 2022-02-05
 
 * "Protect Room" icon changed from lock to shield.
+* "Lock Room" feature (which takes over the lock icon) prevents non-admin users
+  from easily joining the room (though they still could by URL manipulation).
+  [[#67](https://github.com/edemaine/comingle/issues/67)]
 * Fix Zoom web client by upgrading to v2.2.0.
   [[#184](https://github.com/edemaine/comingle/issues/184)]
 

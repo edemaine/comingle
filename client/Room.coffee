@@ -16,7 +16,7 @@ import {useLocalStorage} from './lib/useLocalStorage'
 import {useIdMap} from './lib/useIdMap'
 import {formatDateTime} from './lib/dates'
 import {ChatRoom} from './ChatRoom'
-import {ArchiveButton, DeleteButton, ProtectButton} from './ConfirmButton'
+import {ArchiveButton, DeleteButton, LockButton, ProtectButton} from './ConfirmButton'
 import {Loading} from './Loading'
 import Meeting from './Meeting'
 import {useMeetingAdmin, addMeetingSecret} from './MeetingSecret'
@@ -458,6 +458,12 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       id: room._id
       protected: not room.protected
       updator: getUpdator()
+  lockRoom = ->
+    return unless room?
+    Meteor.call 'roomEdit', addMeetingSecret meetingId,
+      id: room._id
+      locked: not room.locked
+      updator: getUpdator()
 
   leaveRoom = (position) ->
     <OverlayTrigger placement="bottom" overlay={(props) ->
@@ -514,6 +520,10 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
       {if room? and admin
         <ProtectButton className="flexlayout__tab_button_trailing admin"
          protected={room?.protected} onClick={protectRoom}/>
+      }
+      {if room? and admin
+        <LockButton className="flexlayout__tab_button_trailing admin"
+         locked={room?.locked} onClick={lockRoom}/>
       }
       {leaveRoom 'trailing'}
       {if enableMaximize
@@ -618,6 +628,12 @@ export RoomTitle = React.memo ({room, roomId}) ->
         Room &ldquo;{room.title}&rdquo;<br/>
         <b>created</b> by {room.creator?.name ? 'unknown'}<br/>
         on {formatDateTime room.created}
+        {if room.locked
+          <>
+            <br/><b>locked</b> by {room.locker?.name ? 'unknown'}
+            <br/>on {formatDateTime room.locked}
+          </>
+        }
         {if room.protected
           <>
             <br/><b>protected</b> by {room.protecter?.name ? 'unknown'}

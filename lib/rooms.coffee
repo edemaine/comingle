@@ -20,7 +20,7 @@ roomCheckSecret = (op, room, meeting) ->
     checkMeetingSecret (meeting ? room?.meeting), op.secret
     delete op.secret
   else
-    for key in ['protected', 'deleted']  # admin-only
+    for key in ['deleted', 'locked', 'protected']  # admin-only
       if op[key]?
         throw new Meteor.Error 'roomCheckSecret.unauthorized', "Need meeting secret to use #{key} flag"
     if room.protected
@@ -28,7 +28,7 @@ roomCheckSecret = (op, room, meeting) ->
         if op[key]?
           throw new Meteor.Error 'roomCheckSecret.protected', "Need meeting secret to modify #{key} in protected room #{room._id}"
 
-export dateFlags = ['archived', 'protected', 'deleted', 'raised']
+export dateFlags = ['archived', 'deleted', 'locked', 'protected', 'raised']
 export setUpdated = (op) ->
   op.updated = new Date
   for key in dateFlags
@@ -48,6 +48,7 @@ Meteor.methods
       meeting: Match.Where validId
       title: String
       archived: Match.Optional Boolean
+      locked: Match.Optional Boolean
       protected: Match.Optional Boolean
       updator: updatorPattern
       secret: Match.Optional String
@@ -88,6 +89,7 @@ Meteor.methods
       raised: Match.Optional Boolean
       archived: Match.Optional Boolean
       deleted: Match.Optional Boolean
+      locked: Match.Optional Boolean
       protected: Match.Optional Boolean
       updator: updatorPattern
       secret: Match.Optional String
@@ -110,6 +112,7 @@ Meteor.methods
       raised: Match.Optional Boolean
       archived: Match.Optional Boolean
       deleted: Match.Optional Boolean
+      locked: Match.Optional Boolean
       protected: Match.Optional Boolean
       secret: Match.Optional String
     delete query[key] for key of query when not query[key]?
