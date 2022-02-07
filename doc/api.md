@@ -108,6 +108,7 @@ Request fields: (either `room` or `rooms` or `meeting` is required)
 * `title` (optional string or regexp): Restrict to rooms with matching title
 * `raised` (optional boolean): Restrict to rooms with(out) raised hand
 * `archived` (optional boolean): Restrict to rooms that are (not) archived
+* `locked` (optional boolean): Restrict to rooms that are (not) locked
 * `protected` (optional boolean): Restrict to rooms that are (not) protected
 * `deleted` (optional boolean): Restrict to rooms that are (not) deleted
   (works only with meeting `secret`)
@@ -132,6 +133,9 @@ Response fields (when `ok` is `true`):
   * `archived` (date or null): When the room was archived,
     or `null`/absent if not
   * `archiver` (presence): Who last archived the room
+  * `locked` (date or null): When the room was locked,
+    or `null`/absent if not
+  * `locker` (presence): Who last locked the room
   * `protected` (date or null): When the room was protected,
     or `null`/absent if not
   * `protecter` (presence): Who last protected the room
@@ -260,6 +264,7 @@ Request fields (in addition to `secret` and `updator` described above):
 * `raised` (optional boolean): New raised-hand state for room(s)
 * `archived` (optional boolean): New archived state for room(s)
 * `deleted` (optional boolean): New deleted state for room(s)
+* `locked` (optional boolean): New locked state for room(s)
 * `protected` (optional boolean): New protected state for room(s)
 
 For example, the following query object matches all unprotected unarchived
@@ -319,6 +324,7 @@ Request fields (in addition to `secret` and `updator` described above):
 * `meeting` (required string): ID of meeting to add room to
 * `title` (optional string): Title for new room
 * `archived` (optional boolean): Whether new room should be archived
+* `locked` (optional boolean): Whether new room should be locked
 * `protected` (optional boolean): Whether new room should be protected
 * `tabs` (optional array of objects): Initial tabs to create within room.
   Each object should have the same fields as in
