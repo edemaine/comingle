@@ -6,7 +6,7 @@ import {Accordion, Alert, Badge, Button, ButtonGroup, Card, Dropdown, DropdownBu
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faDoorOpen, faHandPaper, faHourglass, faLock, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle, faTrash, faTrashRestore, faUser, faUserTie} from '@fortawesome/free-solid-svg-icons'
+import {faDoorOpen, faHandPaper, faHourglass, faLock, faLockOpen, faSortAlphaDown, faSortAlphaDownAlt, faStar, faTimes, faTimesCircle, faTrash, faTrashRestore, faUser, faUserTie} from '@fortawesome/free-solid-svg-icons'
 import {faClone, faHandPaper as faHandPaperOutline, faStar as faStarOutline} from '@fortawesome/free-regular-svg-icons'
 
 import FlexLayout from './FlexLayout'
@@ -17,7 +17,7 @@ import {Header} from './Header'
 import {Highlight} from './Highlight'
 import {Loading} from './Loading'
 import {MeetingContext} from './Meeting'
-import {useMeetingAdmin, getMeetingSecret} from './MeetingSecret'
+import {useMeetingAdmin, getMeetingSecret, addMeetingSecret} from './MeetingSecret'
 import {Name} from './Name'
 import {useAdminVisit, useRaisedSound} from './Settings'
 import {Warnings} from './Warnings'
@@ -427,12 +427,12 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
     newRoom = await roomDuplicate room, getUpdator()
     #openRoom newRoom
     selectRoom newRoom._id, false
-  onArchive = (e) ->
+  onToggle = (attr) -> (e) ->
     e.preventDefault()
     e.stopPropagation()
-    await meteorCallPromise 'roomEdit',
+    await meteorCallPromise 'roomEdit', addMeetingSecret meetingId,
       id: room._id
-      archived: not room.archived
+      [attr]: not room[attr]
       updator: getUpdator()
     selectRoom room._id, true
   onDragStart = (e) ->
@@ -561,14 +561,21 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
             </div>
           </Button>
         }
+        {if room.locked and admin
+          <Button variant="success" onClick={onToggle 'locked'}>
+            <small className="mr-1"><FontAwesomeIcon icon={faLockOpen}/></small>
+            Unlock Room
+            {### <div className="small"><b>Hides</b> from available room list</div> ###}
+          </Button>
+        }
         {if room.archived
-          <Button variant="success" onClick={onArchive}>
+          <Button variant="success" onClick={onToggle 'archived'}>
             <small className="mr-1"><FontAwesomeIcon icon={faTrashRestore}/></small>
             Unarchive Room
             {### <div className="small"><b>Restores</b> to available room list</div> ###}
           </Button>
         else if admin
-          <Button variant="danger" onClick={onArchive}>
+          <Button variant="danger" onClick={onToggle 'archived'}>
             <small className="mr-1"><FontAwesomeIcon icon={faTrash}/></small>
             Archive Room
             {### <div className="small"><b>Hides</b> from available room list</div> ###}

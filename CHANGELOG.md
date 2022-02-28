@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-02-28
+
+* Admins can now unlock a room without entering that room, by selecting the
+  room in the room list and clicking the resulting Unlock button.
+
 ## 2022-02-06
 
 * Rooms now have a dropdown list of users (first button after room title).
