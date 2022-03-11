@@ -8,7 +8,7 @@ dest = path.join __dirname, '../public'
 vconsoleCdn = ->
   vconsoleZoom = await fetch "#{rootUrl}/js/vconsole.min.js"
   vconsoleZoom = await vconsoleZoom.text()
-  unless match = vconsoleZoom.match /\* vConsole v(\d+\.\d+\.\d+)\s/
+  unless (match = vconsoleZoom.match /\* vConsole v(\d+\.\d+\.\d+)\s/)?
     throw new Error "unable to parse vConsole version"
   cdnUrl = "https://cdnjs.cloudflare.com/ajax/libs/vConsole/#{match[1]}/vconsole.min.js"
   vconsoleCdn = await fetch cdnUrl

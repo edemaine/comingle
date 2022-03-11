@@ -21,7 +21,8 @@
     "doc:lint": "markdownlint **/*.md --ignore node_modules --rules markdownlint-rule-github-internal-links",
     "eslint": "eslint --ext .coffee .",
     "lint": "npm run eslint && npm run doc:lint",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "upgrade-web-zoom": "coffee tools/upgrade-web-zoom.coffee"
   },
   "dependencies": {
     "@babel/runtime": "7.17.0",
