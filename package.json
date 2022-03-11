@@ -70,6 +70,7 @@
     "eslint-plugin-import": "2.19.1",
     "eslint-plugin-meteor": "7.3.0",
     "eslint-plugin-react": "7.28.0",
+    "isomorphic-fetch": "^3.0.0",
     "markdownlint-cli": "0.30.0",
     "markdownlint-rule-github-internal-links": "0.1.0"
   }

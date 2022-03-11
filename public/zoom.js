@@ -1,7 +1,7 @@
 // Concatenation of two files:
 
 //////////////////////////////////////////////////////////////////////////
-// 1. https://github.com/zoom/sample-app-web/blob/master/CDN/js/tool.js
+// 1. https://github.com/zoom/sample-app-web/raw/master/CDN/js/tool.js
 //////////////////////////////////////////////////////////////////////////
 
 var testTool = {
@@ -338,8 +338,8 @@ var testTool = {
 window.testTool = testTool;
 
 //////////////////////////////////////////////////////////////////////////
-// 2. https://github.com/zoom/sample-app-web/blob/master/CDN/js/meeting.js
-// customized below to have:
+// 2. https://github.com/zoom/sample-app-web/raw/master/CDN/js/meeting.js
+// customized below to use apiKey over sdkKey, and custom leaveUrl:
 //  leaveUrl: "/zoomDone.html",
 //////////////////////////////////////////////////////////////////////////
 
@@ -394,9 +394,9 @@ function websdkready() {
   console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
 
   // it's option if you want to change the WebSDK dependency link resources. setZoomJSLib must be run at first
-  // ZoomMtg.setZoomJSLib("https://source.zoom.us/2.2.0/lib", "/av"); // CDN version defaul
+  // ZoomMtg.setZoomJSLib("https://source.zoom.us/2.3.0/lib", "/av"); // CDN version defaul
   if (meetingConfig.china)
-    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/2.2.0/lib", "/av"); // china cdn option
+    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/2.3.0/lib", "/av"); // china cdn option
   ZoomMtg.preLoadWasm();
   ZoomMtg.prepareJssdk();
   function beginJoin(signature) {

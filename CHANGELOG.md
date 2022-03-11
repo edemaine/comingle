@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-03-11
+
+* Upgrade Zoom web client to
+  [v2.3.0](https://github.com/zoom/sample-app-web/blob/master/CHANGELOG.md#version-230).
+
 ## 2022-02-28
 
 * Admins can now unlock a room without entering that room, by selecting the

@@ -47,6 +47,7 @@ export TabZoom = React.memo ({tabId}) ->
   [embedUrl, setEmbedUrl] = useState()
   zoomWeb = ->
     {signature, apiKey} = await meteorCallPromise 'zoomSign', zoomID
+    console.log apiKey
     setEmbedUrl "/zoom.html?name=#{base64 getNameWithPronouns() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&apiKey=#{apiKey}"
   return <iframe src={embedUrl} allow={allow}/> if embedUrl
 
