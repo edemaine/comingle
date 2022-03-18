@@ -7,6 +7,10 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-03-18
+
+* Fix Zoom web client missing Join button in small tabs (missing scrollbars).
+
 ## 2022-03-11
 
 * Upgrade Zoom web client to

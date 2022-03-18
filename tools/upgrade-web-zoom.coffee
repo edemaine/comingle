@@ -36,11 +36,15 @@ makeHtml = ->
         m.replace /"js\/vconsole.min.js"/, '"'+vconsole+'"'
       else
         ""
+  # Fix Zoom join interface not fitting in Comingle tab
+  .replace /<head>\n/, (m) ->
+    changes++
+    m + "    <style>#content_container { overflow: auto }</style>\n"
   .replace /\n\s+<script>\s*<\/script>/, ''  # remove empty <script>
   .replace /[^\n]$/s, '$&\n'  # add trailing newline
-  unless changes == 4
+  unless changes == 5
     console.log html
-    throw new Error "Made #{changes} changes; expected 4"
+    throw new Error "Made #{changes} changes; expected 5"
   filename = path.join dest, 'zoom.html'
   await fs.writeFile filename, html
   console.log "Wrote #{filename}"
