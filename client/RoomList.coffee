@@ -110,6 +110,7 @@ export RoomList = React.memo ({loading, model, extraData, updateTab}) ->
           byRoom[room][type].push
             type: type
             name: presence.name
+            pronouns: presence.pronouns
             admin: presence.admin
             id: presence.id
             match: match
@@ -531,7 +532,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
           for person in (presenceClusters.starred ? []) when person.item.match)
       else
         presenceClusters.joined
-    } search={search}/>
+    } search={search} pronouns={myPresence.joined}/>
     {if selected
       <ButtonGroup vertical className="mx-n2 mt-2 d-block">
         {if myPresence.joined
@@ -604,7 +605,7 @@ export PresenceCount = React.memo ({type, presenceClusters, heading, children, o
       {heading}
       {<br/> if heading}
       {presenceClusters.length} {if presenceClusters.length == 1 then phrasing.singular else phrasing.plural}{':' if presenceClusters.length}
-      <PresenceList presenceClusters={presenceClusters}/>
+      <PresenceList presenceClusters={presenceClusters} pronouns/>
     </Tooltip>
   }>
     <span className="presence-#{type}" onClick={onClick}
@@ -615,7 +616,7 @@ export PresenceCount = React.memo ({type, presenceClusters, heading, children, o
   </OverlayTrigger>
 PresenceCount.displayName = 'PresenceCount'
 
-export PresenceList = React.memo ({presenceClusters, search}) ->
+export PresenceList = React.memo ({presenceClusters, search, pronouns}) ->
   return null unless presenceClusters?.length
   <div className="presence">
     {for person in presenceClusters
@@ -632,6 +633,11 @@ export PresenceList = React.memo ({presenceClusters, search}) ->
           }
           &nbsp;
           <Highlight search={search} text={person.name}/>
+          {if pronouns and person.item.pronouns
+            <span className="pronouns">
+              ({person.item.pronouns})
+            </span>
+          }
           {if person.count > 1
             <span className="ml-1 badge badge-secondary">{person.count}</span>
           }

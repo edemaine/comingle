@@ -9,6 +9,9 @@ instead of version numbers.
 
 ## 2022-03-18
 
+* Show users' pronouns in the room list for rooms you're currently in,
+  as well as the "number of users" popup.
+  [[#189](https://github.com/edemaine/comingle/issues/189)]
 * Fix Zoom web client missing Join button in small tabs (missing scrollbars).
 
 ## 2022-03-11
