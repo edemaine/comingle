@@ -45,6 +45,13 @@ tabIcon = (tab) ->
     else
       null
 
+noMaximize = (obj) ->
+  if obj.type == 'tabset'
+    delete obj.maximized
+  else if obj.children?
+    for child in obj.children
+      noMaximize child
+
 export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, onMaximize}) ->
   {meetingId} = useParams()
   admin = useMeetingAdmin()
@@ -72,6 +79,7 @@ export Room = React.memo ({loading, roomId, onClose, enableMaximize, maximized, 
   [model, setModel] = useState()
   useEffect ->
     return if loading or model?
+    noMaximize layout  # remove any saved maximization when resuming
     setModel FlexLayout.Model.fromJson
       global: FlexLayout.defaultGlobal
       borders: [

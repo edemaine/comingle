@@ -7,6 +7,13 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-03-20
+
+* Maximized tabsets are now unmaximized when entering a room, or when
+  reloading Comingle.  This lets confused users more easily reset their view
+  to where they can see all tabs.  It also avoids confusion when e.g.
+  coming back to a room a week later and not seeing all your tabs.
+
 ## 2022-03-18
 
 * Show users' pronouns in the room list for rooms you're currently in,
