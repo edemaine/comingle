@@ -40,6 +40,7 @@ export TabJitsi = React.memo ({tabId, room}) ->
 
   ref = useRef()  # div container for Jitsi iframe
   [joined, setJoined] = useState lastJitsiStatus.joined  # joined call?
+  [ready, setReady] = useState false  # connected to API?
   [api, setApi] = useState()  # JitsiMeetExternalAPI object
   name = useNameWithPronouns()
 
@@ -82,13 +83,17 @@ export TabJitsi = React.memo ({tabId, room}) ->
         RECENT_LIST_ENABLED: false
         SHOW_PROMOTIONAL_CLOSE_PAGE: false  # if supported by server
       userInfo:
-        displayName: name
+        displayName: name  # this gets escaped funny, but will get cleaned up
+    # Want to listen for 'dataChannelOpened' but doesn't seem to fire.
+    jitsi.addListener 'browserSupport', ->
+      setReady true
     jitsi.addListener 'audioMuteStatusChanged', ({muted}) ->
       lastJitsiStatus.audioMuted = muted
     jitsi.addListener 'videoMuteStatusChanged', ({muted}) ->
       lastJitsiStatus.videoMuted = muted
     jitsi.addListener 'readyToClose', ->  # hangup call
       setJoined false
+      setReady false
       ## Before hanging up, Jitsi mutes the video and emits an event, so we no
       ## longer know the correct Jitsi status.  So reset to default upon hangup.
       lastJitsiStatus = defaultJitsiStatus()
@@ -98,13 +103,15 @@ export TabJitsi = React.memo ({tabId, room}) ->
 
   ## Keep settings up-to-date
   useEffect ->
-    api?.executeCommand 'displayName', name
+    return unless ready
+    api.executeCommand 'displayName', name
     undefined
-  , [name]
+  , [ready, name]
   useEffect ->
-    api?.executeCommand 'subject', room.title
+    return unless ready
+    api.executeCommand 'subject', room.title
     undefined
-  , [room.title]
+  , [ready, room.title]
 
   ## Maintain number of joined Jitsi calls, and reset state if zero and timeout.
   useEffect ->
