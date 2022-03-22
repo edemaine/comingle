@@ -55,7 +55,7 @@ export Pronouns = React.memo ->
 
   <Card>
     <Card.Header className="tight">
-      Your Pronouns:
+      Your Pronoun(s):
     </Card.Header>
     <Card.Body>
       <Form.Control type="text" placeholder="they" className="pronouns"
