@@ -9,6 +9,7 @@ instead of version numbers.
 
 ## 2022-04-05
 
+* Admins can now lower the raised hands of rooms without entering them.
 * Upgrade Zoom web client to
   [v2.3.5](https://github.com/zoom/sample-app-web/blob/master/CHANGELOG.md#version-235).
 

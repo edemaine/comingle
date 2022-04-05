@@ -471,11 +471,13 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
       </div>
     }
     {if room.raised or myPresence.joined
+      ## Allow toggling hand only if actively in room or an admin
+      canToggle = myPresence.joined or admin
       if room.raised
         label = 'Lower Hand'
         help =
           <>
-            {if myPresence.joined
+            {if canToggle
               <><b>Lower Hand</b><br/></>
             }
             raised by {room.raiser?.name ? 'unknown'}<br/>
@@ -487,8 +489,7 @@ export RoomInfo = React.memo ({room, search, presence, selected, selectRoom, lea
       toggleHand = (e) ->
         e.preventDefault()
         e.stopPropagation()
-        ## Allow toggling hand only if actively in room
-        return unless myPresence.joined
+        return unless canToggle
         Meteor.call 'roomEdit',
           id: room._id
           raised: not room.raised
