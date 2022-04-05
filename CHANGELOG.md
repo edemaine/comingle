@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-04-05
+
+* Upgrade Zoom web client to
+  [v2.3.5](https://github.com/zoom/sample-app-web/blob/master/CHANGELOG.md#version-235).
+
 ## 2022-03-20
 
 * Maximized tabsets are now unmaximized when entering a room, or when
