@@ -11,6 +11,8 @@ instead of version numbers.
 
 * Upgrade Zoom web client to
   [v2.4.0](https://github.com/zoom/sample-app-web/blob/master/CHANGELOG.md#version-240).
+* Leaving a Zoom web call now automatically returns to the Native Client vs.
+  Web Client selector.
 
 ## 2022-04-05
 

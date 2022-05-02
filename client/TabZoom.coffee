@@ -1,4 +1,5 @@
-import React, {useState, useMemo} from 'react'
+import React, {useMemo, useRef, useState} from 'react'
+import useEventListener from '@use-it/event-listener'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Alert, Button, Card, Row, Col} from 'react-bootstrap'
 
@@ -48,7 +49,18 @@ export TabZoom = React.memo ({tabId}) ->
   zoomWeb = ->
     {signature, apiKey} = await meteorCallPromise 'zoomSign', zoomID
     setEmbedUrl "/zoom.html?name=#{base64 getNameWithPronouns() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&apiKey=#{apiKey}"
-  return <iframe src={embedUrl} allow={allow}/> if embedUrl
+
+  ## /public/zoomDone.html sends us a {zoom: 'done'} message
+  ## to reset from iframe to Card.
+  ref = useRef()
+  useEventListener 'message', (e) ->
+    return unless ref.current
+    return unless e.source == ref.current.contentWindow
+    return unless e.data?.coop
+    if e.data.zoom == 'done'
+      setEmbedUrl null
+
+  return <iframe src={embedUrl} allow={allow} ref={ref}/> if embedUrl
 
   <Card>
     <Card.Body>

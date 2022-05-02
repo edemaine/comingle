@@ -2,6 +2,21 @@
 <html>
   <head>
     <title>Zoom Done</title>
+    <style>
+      body {
+        background: black;
+        color: white;
+      }
+    </style>
+    <script>
+      const parent = window.opener ? window.opener : window.parent;
+      if (parent && parent !== window) {
+        parent.postMessage({
+          coop: 1,
+          zoom: 'done',
+        }, '*');
+      }
+    </script>
   </head>
   <body>
     <h1>Zoom Call Ended</h1>
