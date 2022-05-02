@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-05-02
+
+* Upgrade Zoom web client to
+  [v2.4.0](https://github.com/zoom/sample-app-web/blob/master/CHANGELOG.md#version-240).
+
 ## 2022-04-05
 
 * Admins can now lower the raised hands of rooms without entering them.
