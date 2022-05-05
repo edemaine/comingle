@@ -1,6 +1,7 @@
 import React, {useState, useLayoutEffect} from 'react'
 import {useParams} from 'react-router-dom'
-import {Card, Form} from 'react-bootstrap'
+import Card from 'react-bootstrap/Card'
+import Form from 'react-bootstrap/Form'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {Meetings} from '/lib/meetings'

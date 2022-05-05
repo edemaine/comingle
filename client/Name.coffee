@@ -1,5 +1,6 @@
 import React, {useLayoutEffect, useState} from 'react'
-import {Card, Form} from 'react-bootstrap'
+import Card from 'react-bootstrap/Card'
+import Form from 'react-bootstrap/Form'
 import {useTracker} from 'meteor/react-meteor-data'
 
 import {useMeetingAdmin} from './MeetingSecret'

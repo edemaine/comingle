@@ -1,5 +1,5 @@
 import React, {useEffect, useReducer} from 'react'
-import {Alert} from 'react-bootstrap'
+import Alert from 'react-bootstrap/Alert'
 
 import {useAsync} from './lib/useAsync'
 

@@ -1,6 +1,8 @@
 import React from 'react'
 import {useParams} from 'react-router-dom'
-import {Card, OverlayTrigger, Tooltip} from 'react-bootstrap'
+import Card from 'react-bootstrap/Card'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Tooltip from 'react-bootstrap/Tooltip'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {clipboardLink} from './icons/clipboardLink'
 

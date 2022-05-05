@@ -1,7 +1,11 @@
 import React, {useMemo, useRef, useState} from 'react'
 import useEventListener from '@use-it/event-listener'
 import {useTracker} from 'meteor/react-meteor-data'
-import {Alert, Button, Card, Row, Col} from 'react-bootstrap'
+import Alert from 'react-bootstrap/Alert'
+import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt'
 

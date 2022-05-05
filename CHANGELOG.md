@@ -9,6 +9,9 @@ instead of version numbers.
 
 ## 2022-05-05
 
+* JavaScript bundle reduced by a factor of more than 2,
+  which should improve load times especially on mobile.
+  [[#167](https://github.com/edemaine/coauthor/issues/167)]
 * Better refer to buttons (e.g., in Zoom and Jitsi tabs)
   using their icons.
 

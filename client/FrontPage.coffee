@@ -1,6 +1,9 @@
 import React, {useRef} from 'react'
 import {useHistory} from 'react-router-dom'
-import {Button, ButtonGroup, Form, Jumbotron} from 'react-bootstrap'
+import Button from 'react-bootstrap/Button'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import Form from 'react-bootstrap/Form'
+import Jumbotron from 'react-bootstrap/Jumbotron'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGithub} from '@fortawesome/free-brands-svg-icons/faGithub'
 

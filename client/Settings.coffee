@@ -1,6 +1,7 @@
 import React from 'react'
 import {useParams} from 'react-router-dom'
-import {Card, Form} from 'react-bootstrap'
+import Card from 'react-bootstrap/Card'
+import Form from 'react-bootstrap/Form'
 
 import {LocalStorageVar, StorageDict} from './lib/useLocalStorage'
 import {MeetingTitle} from './MeetingTitle'

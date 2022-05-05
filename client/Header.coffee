@@ -1,5 +1,6 @@
 import React from 'react'
-import {Tooltip, OverlayTrigger} from 'react-bootstrap'
+import Tooltip from 'react-bootstrap/Tooltip'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 
 import {useMeetingTitle} from './MeetingTitle'
 

@@ -1,5 +1,9 @@
 import React, {useState, useEffect, useLayoutEffect, useRef} from 'react'
-import {Alert, Button, Card, Form, Nav} from 'react-bootstrap'
+import Alert from 'react-bootstrap/Alert'
+import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
+import Form from 'react-bootstrap/Form'
+import Nav from 'react-bootstrap/Nav'
 
 import {addMeetingSecret} from './MeetingSecret'
 import {validURL, tabTypes, categories, mangleTab, zoomRegExp} from '/lib/tabs'
