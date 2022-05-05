@@ -3,7 +3,7 @@ import useEventListener from '@use-it/event-listener'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Alert, Button, Card, Row, Col} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faRedoAlt} from '@fortawesome/free-solid-svg-icons'
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt'
 
 import {allow} from './TabIFrame'
 import {getNameWithPronouns} from './Name'

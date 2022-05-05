@@ -2,7 +2,7 @@ import React, {useState, useLayoutEffect} from 'react'
 import {useParams} from 'react-router-dom'
 import {Accordion, Button, Card, Form, OverlayTrigger, Tooltip} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faKey} from '@fortawesome/free-solid-svg-icons'
+import {faKey} from '@fortawesome/free-solid-svg-icons/faKey'
 import {clipboardLink} from './icons/clipboardLink'
 
 import {CardToggle} from './CardToggle'

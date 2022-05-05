@@ -1,7 +1,7 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {Alert, Badge, Button, Form, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faComment} from '@fortawesome/free-solid-svg-icons'
+import {faComment} from '@fortawesome/free-solid-svg-icons/faComment'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Session} from 'meteor/session'
 import ScrollableFeed from 'react-scrollable-feed'

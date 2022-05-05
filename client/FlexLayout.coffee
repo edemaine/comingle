@@ -1,8 +1,10 @@
 import React, {forwardRef} from 'react'
 import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTimes, faExpandArrowsAlt, faCompressArrowsAlt, faWindowRestore} \
-  from '@fortawesome/free-solid-svg-icons'
+import {faCompressArrowsAlt} from '@fortawesome/free-solid-svg-icons/faCompressArrowsAlt'
+import {faExpandArrowsAlt} from '@fortawesome/free-solid-svg-icons/faExpandArrowsAlt'
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
+import {faWindowRestore} from '@fortawesome/free-solid-svg-icons/faWindowRestore'
 
 export * from './lib/FlexLayout'
 import {Actions, Layout as FlexLayout} from './lib/FlexLayout'

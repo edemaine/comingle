@@ -2,7 +2,7 @@ import React, {useRef} from 'react'
 import {useHistory} from 'react-router-dom'
 import {Button, ButtonGroup, Form, Jumbotron} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faGithub} from '@fortawesome/free-brands-svg-icons'
+import {faGithub} from '@fortawesome/free-brands-svg-icons/faGithub'
 
 import {Dark} from './Settings'
 import {setMeetingSecret} from './MeetingSecret'
