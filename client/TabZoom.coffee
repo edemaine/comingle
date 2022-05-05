@@ -2,6 +2,8 @@ import React, {useMemo, useRef, useState} from 'react'
 import useEventListener from '@use-it/event-listener'
 import {useTracker} from 'meteor/react-meteor-data'
 import {Alert, Button, Card, Row, Col} from 'react-bootstrap'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons'
 
 import {allow} from './TabIFrame'
 import {getNameWithPronouns} from './Name'
@@ -92,7 +94,7 @@ export TabZoom = React.memo ({tabId}) ->
           }
         </Col>
       </Row>
-      <p>If you want to make this decision again, select the &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
+      <p>If you want to make this decision again, select the <FontAwesomeIcon icon={faRedoAlt}/> &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
     </Card.Body>
   </Card>
 TabZoom.displayName = 'TabZoom'

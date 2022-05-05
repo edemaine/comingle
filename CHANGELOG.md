@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-05-05
+
+* Better refer to buttons (e.g., in Zoom and Jitsi tabs)
+  using their icons.
+
 ## 2022-05-02
 
 * Upgrade Zoom web client to

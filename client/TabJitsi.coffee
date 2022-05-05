@@ -2,6 +2,8 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
 import useScript from 'react-script-hook'
 import {Alert, Button, Card} from 'react-bootstrap'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faRedoAlt, faTimes} from '@fortawesome/free-solid-svg-icons'
 
 import {Loading} from './Loading'
 import {useNameWithPronouns} from './Name'
@@ -146,8 +148,8 @@ export TabJitsi = React.memo ({tabId, room}) ->
             <b>Room ID:</b> <code>{roomName}</code>
           </p>
           <Button block onClick={-> setJoined true}>Join Call</Button>
-          <p>When joining, you may need to grant access to your microphone and/or camera. If you want to try again, select the &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
-          <p>If you hang up on the call and receive an ad, click the X button (at the top right of the ad) to fully leave the call, and prevent Comingle from automatically joining future Jitsi calls.</p>
+          <p>When joining, you may need to grant access to your microphone and/or camera. If you want to try again, select the <FontAwesomeIcon icon={faRedoAlt}/> &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
+          <p>If you hang up on the call and receive an ad, click the <FontAwesomeIcon icon={faTimes}/> button (at the top right of the ad) to fully leave the call, and prevent Comingle from automatically joining future Jitsi calls.</p>
         </Card.Body>
       </Card>
     else if loading
