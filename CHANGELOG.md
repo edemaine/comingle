@@ -9,8 +9,8 @@ instead of version numbers.
 
 ## 2022-05-08
 
-* Improve welcome message, including mention of Raise Hand and Chat features
-  and more use of matching icons.
+* Improve welcome message, including mention of Raise Hand and Chat features,
+  pronouns setting, and more use of matching icons.
 
 ## 2022-05-05
 
