@@ -44,11 +44,13 @@ with the following key features:
   to supported apps (Cocreate and Coauthor).
 * Instantly create a new meeting and share the URL to meet with others.
   **No accounts required**.
-* Automatic **logs** of user actions (accessible only to admins) that enables
-  [attendance tracking](https://github.com/edemaine/comingle-attendance).
-* [**API**](https://github.com/edemaine/comingle/blob/main/doc/api.md)
-  for querying and manipulating Comingle meetings, rooms, tabs, and logs
-  from your own software.
+* Secret **admin password** gives access to advanced/dangerous features:
+  * **Moving users** to other rooms, or removing them from the current room.
+  * Access automatic **logs** of user actions that enables
+    [attendance tracking](https://github.com/edemaine/comingle-attendance).
+  * [**API**](https://github.com/edemaine/comingle/blob/main/doc/api.md)
+    for querying and manipulating Comingle meetings, rooms, tabs, and logs
+    from your own software.
 * **Free/open source** ([MIT license](LICENSE))
 
 To see what's changed in Comingle recently, check out the
