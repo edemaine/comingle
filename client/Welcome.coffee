@@ -25,7 +25,7 @@ export Welcome = ->
     <Card.Body>
       <Card.Title as="h3">Welcome to Comingle!</Card.Title>
       <p>
-        <b>Comingle</b> is an <a href={repository.url} target="_blank">open-source</a> online
+        <b>Comingle</b> is an <a href={repository.url} target="_blank" rel="noopener">open-source</a> online
         meeting tool whose goal is to approximate the advantages of
         in-person meetings.
         It integrates web tools in an open multiroom environment.
@@ -40,7 +40,7 @@ export Welcome = ->
         <li><FontAwesomeIcon className="raise-hand" icon={faHandPaper}/> <b>Raise Hand</b> within a room to signal that you'd like someone to come visit/help.</li>
         <li><FontAwesomeIcon className="presence-starred" icon={faStar}/> <b>Star</b> rooms to (publicly) indicate your interest in that topic. To focus on just starred rooms, unfold the &ldquo;<b>Your Starred Rooms</b>&rdquo; section.</li>
         <li><FontAwesomeIcon icon={faComment}/> <b>Chat</b> is available both global to the meeting (via the tab on the left) and local to each room (via the tab on the right, within the room).</li>
-        <li><a href={homepage} target="_blank">Read the documentation</a> for more information.</li>
+        <li><a href={homepage} target="_blank" rel="noopener">Read the documentation</a> for more information.</li>
       </ul>
       <h5>
         <span className="mr-2">Meeting&nbsp;Link:</span>
