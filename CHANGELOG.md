@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2022-05-08
+
+* Improve welcome message, including mention of Raise Hand and Chat features
+  and more use of matching icons.
+
 ## 2022-05-05
 
 * JavaScript bundle reduced by a factor of more than 2,

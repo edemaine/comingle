@@ -113,7 +113,6 @@ nav
     margin-right: -0.75rem
     z-index: 1
     opacity: 0.5
-    color: var(--danger-fg)
     &:hover
       opacity: 0.65
     &:active
@@ -143,7 +142,6 @@ nav
     > span
       margin-left: 0.25rem
       &.presence-starred
-        color: var(--warning-fg)
         &:hover
           opacity: 0.8
         &:active
@@ -160,6 +158,9 @@ nav
     margin-left: 0.5rem
     margin-right: -0.75rem
 
+.raise-hand
+  color: var(--danger-fg)
+
 .room-users
   > .dropdown-menu
     min-width: 12rem
@@ -172,14 +173,14 @@ nav
   .presence-joined, .presence-starred
     margin-right: 0.5em
     white-space: nowrap  // prevent line break between icon and name
-    &.presence-starred
-      color: var(--warning-fg)
     > svg
       font-size: 0.77em
     > span
       white-space: normal  // allow line break within name
   > .dropdown-item-text > span > svg
     font-size: 0.77em
+.presence-starred
+  color: var(--warning-fg)
 
 .admin
   color: #8224df  // purple from logo
