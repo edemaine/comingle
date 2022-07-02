@@ -81,13 +81,16 @@ makeJs = ->
       .replace /\bleaveUrl: "[^"]*"/g, (m) ->
         changes++
         m.replace /"[^"]*"/, '"/zoomDone.html"'
+      .replace /\bexternalLinkPage: '[^']*'/g, (m) ->
+        changes++
+        m.replace /'[^']*'/, '"/zoomLink.html"'
       # Override sdkKey mechanism (introduced in 2.3.0) back to regular apiKey
       .replace /\bsdkKey: \w+\.sdkKey,/g, (m) ->
         changes++
         m.replace /sdkKey/g, 'apiKey'
-      unless changes == 3
+      unless changes == 4
         console.log code
-        throw new Error "Made #{changes} changes; expected 3"
+        throw new Error "Made #{changes} changes; expected 4"
     js += code
   filename = path.join dest, 'zoom.js'
   await fs.writeFile filename, js

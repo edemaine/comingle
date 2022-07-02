@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>External Link</title>
+    <style>
+      body {
+        background: black;
+        color: white;
+      }
+      a {
+        color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>External Link</h1>
+    <h2>Proceeding to <a id="link"></a>&hellip;</h2>
+    <script>
+      var link = document.getElementById('link');
+      var match = /(^\??|&)ref=([^&]*)(&|$)/i.exec(window.location.search);
+      if (!match) {
+        link.innerText = 'missing link';
+      } else {
+        var url = unescape(match[2]);
+        link.href = url;
+        link.innerText = url;
+        window.location = url;
+      }
+    </script>
+  </body>
+</html>
