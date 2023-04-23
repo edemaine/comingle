@@ -10,14 +10,15 @@ import {validURL, tabTypes, categories, mangleTab, zoomRegExp} from '/lib/tabs'
 import {useDebounce} from './lib/useDebounce'
 import {getUpdator} from './lib/presenceId'
 import {capitalize} from './lib/capitalize'
+import {Config} from '/Config'
 
 export tabTypePage =
   iframe:
     topDescription: <p>Paste the URL for any embeddable website, e.g., Wikipedia:</p>
   cocreate:
-    topDescription: <p>This server uses <a className="font-weight-bold" href="https://github.com/edemaine/cocreate">Cocreate</a> for a shared whiteboard.</p>
+    topDescription: <p>Comingle recommends <a className="font-weight-bold" href="https://github.com/edemaine/cocreate">Cocreate</a> for a shared whiteboard.</p>
   jitsi:
-    topDescription: <p>This server recommends <a className="font-weight-bold" href="https://meet.jit.si/">Jitsi Meet</a> for video conferencing, because it allows free creation of unlimited rooms.</p>
+    topDescription: <p>Comingle recommends <a className="font-weight-bold" href="https://jitsi.org/jitsi-meet/">Jitsi Meet</a> for video conferencing, because it allows automatic creation of unlimited rooms.</p>
   youtube:
     topDescription: <p>Paste a <a className="font-weight-bold" href="https://www.youtube.com/">YouTube</a> link and we'll turn it into its embeddable form:</p>
   zoom:
@@ -170,14 +171,18 @@ export TabNew = React.memo ({initialUrl, node, meetingId, roomId, replaceTabNew,
                 url = await url if url.then?
                 setUrl url
                 setSubmit true
+              defaultServer = Config.defaultServers[type]
               <>
                 <Form.Group>
                   <Button variant="primary" size="lg" block
                    type="button" onClick={onClick}>
                     New {tabTypes[type].longTitle ? tabTypes[type].title} {capitalize tabTypes[type].instance}
+                    {if defaultServer
+                      <small> on {(new URL defaultServer).host}</small>
+                    }
                   </Button>
                 </Form.Group>
-                <p>Or paste the URL for an existing {tabTypes[type].instance}:</p>
+                <p>Or paste the URL for an existing {tabTypes[type].instance}{if defaultServer then " (on any server)"}:</p>
               </>
             }
             {if type == 'zoom'
