@@ -1,9 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {useTracker} from 'meteor/react-meteor-data'
+import {ReactiveVar} from 'meteor/reactive-var'
 import useScript from 'react-script-hook'
 import Alert from 'react-bootstrap/Alert'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt'
 import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
@@ -18,11 +21,36 @@ import {Tabs} from '/lib/tabs'
 resetJitsiStatusAfter = 30  # seconds
 defaultJitsiStatus = ->
   joined: false
+  external: false
   audioMuted: false
   videoMuted: false
 lastJitsiStatus = defaultJitsiStatus()
-timeoutJitsiStatus = null
+jitsiStartsJoined = (url, possible) ->
+  if lastJitsiStatus.external and externalWindow? and not externalWindow.closed
+    # prefer to re-use external tab if already open
+    externalOpen url
+    jitsiStatusReset()
+    false
+  else if lastJitsiStatus.joined
+    if possible  # don't reset joined state if impossible to actually join
+      jitsiStatusReset()
+      true
+jitsiStatusReset = ->
+  jitsiStatusCheckStop()
+  clean = defaultJitsiStatus()
+  for key in ['joined', 'external']
+    lastJitsiStatus[key] = clean[key]
+  return
 numJitsi = 0  # number of joined Jitsi calls
+
+timeoutJitsiStatus = null
+jitsiStatusCheckStart = ->
+  return unless resetJitsiStatusAfter?
+  jitsiStatusCheckStop()
+  timeoutJitsiStatus = setTimeout jitsiStatusReset, resetJitsiStatusAfter * 1000
+jitsiStatusCheckStop = ->
+  clearTimeout timeoutJitsiStatus if timeoutJitsiStatus?
+  timeoutJitsiStatus = null
 
 parseJitsiUrl = (url) ->
   return {} unless url?
@@ -34,17 +62,42 @@ parseJitsiUrl = (url) ->
   script = parsed.toString()
   {host, roomName, script}
 
+## When Jitsi is opened in an external tab, these are both set.
+externalURL = new ReactiveVar()  # url for active Jitsi call
+externalWindow = null            # Window object (for checking .closed)
+externalInterval = null          # setInterval checking for closed
+
+## Open Jitsi call in external tab
+externalOpen = (url) ->
+  externalURL.set url
+  externalWindow = window.open url + '#config.prejoinPageEnabled=false', 'jitsi'
+  externalInterval ?= setInterval ->
+    externalClosed() if externalWindow.closed
+  , 1000
+  return
+externalClose = ->
+  externalWindow?.close()
+  externalClosed()
+externalClosed = ->
+  clearInterval externalInterval
+  externalInterval = null
+  externalWindow = null
+  externalURL.set null
+  jitsiStatusCheckStart()
+
 export TabJitsi = React.memo ({tabId, room}) ->
   tab = useTracker ->
     Tabs.findOne tabId
   , [tabId]
   {host, roomName, script} = parseJitsiUrl tab?.url
+  embeddable = (host != 'meet.jit.si')
   [loading, error] = useScript
     src: script
     checkForExisting: true
 
   ref = useRef()  # div container for Jitsi iframe
-  [joined, setJoined] = useState lastJitsiStatus.joined  # joined call?
+  [joined, setJoined] = useState ->  # joined call?
+    jitsiStartsJoined tab?.url, embeddable
   [ready, setReady] = useState false  # connected to API?
   [api, setApi] = useState()  # JitsiMeetExternalAPI object
   name = useNameWithPronouns()
@@ -122,18 +175,19 @@ export TabJitsi = React.memo ({tabId, room}) ->
   useEffect ->
     numJitsi++ if joined
     lastJitsiStatus.joined = (numJitsi > 0)
-    if timeoutJitsiStatus?
-      clearTimeout timeoutJitsiStatus
-      timeoutJitsiStatus = null
+    jitsiStatusCheckStop()
     ->
       numJitsi-- if joined
-      if numJitsi == 0 and resetJitsiStatusAfter?
-        timeoutJitsiStatus = setTimeout ->
-          timeoutJitsiStatus = null
-          #lastJitsiStatus = defaultJitsiStatus()
-          lastJitsiStatus.joined = defaultJitsiStatus().joined
-        , resetJitsiStatusAfter * 1000
+      jitsiStatusCheckStart() if numJitsi == 0
   , [joined]
+
+  external = useTracker => (externalURL.get() == tab.url)
+  useEffect ->
+    -> # when tab closed
+      if externalURL.get() == tab.url
+        # encourage external join in next Jitsi tab
+        lastJitsiStatus.external = true
+  , []
 
   return null unless tab
   <div ref={ref}>
@@ -143,6 +197,7 @@ export TabJitsi = React.memo ({tabId, room}) ->
         Is <a href={'https://' + host} target="_blank" rel="noopener">{host}</a> a valid Jitsi server?
       </Alert>
     else if not joined
+      join = if external then 'Rejoin' else 'Join'
       <Card>
         <Card.Body>
           <Card.Title>Jitsi Meeting</Card.Title>
@@ -150,7 +205,37 @@ export TabJitsi = React.memo ({tabId, room}) ->
             <b>Server:</b> <a href={'https://' + host} target="_blank" rel="noopener"><code>{host}</code></a><br/>
             <b>Room ID:</b> <code>{roomName}</code>
           </p>
-          <Button block onClick={-> setJoined true}>Join Call</Button>
+          <Row>
+            <Col xs={4}>
+              <Button block disabled={not embeddable}
+               onClick={-> externalClose(); setJoined true}>
+                {join} Call Here
+              </Button>
+            </Col>
+            <Col xs={8}>
+              {if embeddable
+                <p>{join} the call within this window.</p>
+              else
+                <p>The <code>meet.jit.si</code> server <a href="https://community.jitsi.org/t/important-embedding-meet-jit-si-in-your-web-app-will-no-longer-be-supported-please-use-jaas/123003">no longer supports embedding</a> into Comingle. Instead use:</p>
+              }
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={4}>
+              {if external
+                <Button block variant="danger" onClick={externalClose}>Leave Call</Button>
+              else
+                <Button block onClick={-> externalOpen tab.url}>Join Call in External Tab</Button>
+              }
+            </Col>
+            <Col xs={8}>
+              {if external
+                <p>Close the separate browser tab.</p>
+              else
+                <p>Join the call within a separate browser tab.</p>
+              }
+            </Col>
+          </Row>
           <p>When joining, you may need to grant access to your microphone and/or camera. If you want to try again, select the <FontAwesomeIcon icon={faRedoAlt}/> &ldquo;Reload Tab&rdquo; button at the top of this tab.</p>
           <p>If you hang up on the call and receive an ad, click the <FontAwesomeIcon icon={faTimes}/> button (at the top right of the ad) to fully leave the call, and prevent Comingle from automatically joining future Jitsi calls.</p>
         </Card.Body>

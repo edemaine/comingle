@@ -14,6 +14,7 @@ $code-color: #17a2b8; // $cyan
 @import "{}/node_modules/bootstrap/scss/type";
 //@import "{}/node_modules/bootstrap/scss/images";
 @import "{}/node_modules/bootstrap/scss/code";
+// We actually use Row and Col but looks better without them
 //@import "{}/node_modules/bootstrap/scss/grid";
 @import "{}/node_modules/bootstrap/scss/tables";
 @import "{}/node_modules/bootstrap/scss/forms";
