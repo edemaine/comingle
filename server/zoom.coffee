@@ -3,41 +3,55 @@ import crypto from 'crypto'
 
 ###
 To use the Zoom Web Client SDK [https://github.com/zoom/sample-app-web],
-you need to sign up for an API Key & Secret.  Go to the Zoom Marketplace
-[https://marketplace.zoom.us/] and select "Create a JWT App".
-See https://marketplace.zoom.us/docs/sdk/native-sdks/web/getting-started/integrate
+you need to sign up for an SDK Key & Secret.  Go to the Zoom Marketplace
+[https://marketplace.zoom.us/] and select "Develop / Build App / Meeting SDK".
+See https://developers.zoom.us/docs/meeting-sdk/create/
 
-Then add the API Key & Secret into `settings.json` at the root of this
-repository.  It should look something like this:
+Then add the SDK Key & Secret (under App credentials / Client ID and Secret)
+into `.deploy/settings.json`.  It should look something like this:
 
 {
   "zoom": {
-    "apiKey": "YOUR_API_KEY",
-    "apiSecret": "YOUR_API_SECRET"
+    "sdkKey": "YOUR_SDK_KEY_AKA_CLIENT_ID",
+    "sdkSecret": "YOUR_SDK_SECRET_AKA_CLIENT_SECRET"
   }
 }
 
-DO NOT commit your changes to this file into Git; the secret needs to
-STAY SECRET.  To ensure Git doesn't accidentally commit your changes, use
+DO NOT commit this file into Git; the secret needs to STAY SECRET.
+Thus we recommend copying root `settings.json` file into `.deploy`
+and editing the copy only.
 
-    git update-index --assume-unchanged settings.json
-
-If you're deploying via mup, it should pick up these keys.
-If you're developing locally, use
+If you're deploying a public server via `mup`, it should pick up these keys.
+If you're developing on a local test server, use the following instead of
+`meteor`:
 
     meteor --settings settings.json
 ###
 
 Meteor.methods
   zoomWebSupport: ->
-    Meteor.settings.zoom?.apiKey and
-    Meteor.settings.zoom?.apiSecret
+    Meteor.settings.zoom?.sdkKey and
+    Meteor.settings.zoom?.sdkSecret
   zoomSign: (meetingID, role = 0) ->
     check meetingID, String
     check role, Match.OneOf 0, 1
-    ## https://marketplace.zoom.us/docs/sdk/native-sdks/web/essential/signature
-    timestamp = (new Date).getTime() - 30000
-    msg = Buffer.from(Meteor.settings.zoom.apiKey + meetingID + timestamp + role).toString 'base64'
-    hash = crypto.createHmac('sha256', Meteor.settings.zoom.apiSecret).update(msg).digest 'base64'
-    signature: Buffer.from("#{Meteor.settings.zoom.apiKey}.#{meetingID}.#{timestamp}.#{role}.#{hash}").toString 'base64'
-    apiKey: Meteor.settings.zoom.apiKey
+    {sdkKey, sdkSecret} = Meteor.settings.zoom
+    ## https://developers.zoom.us/docs/meeting-sdk/auth/
+    timestamp = Math.round((new Date).getTime() / 1000) - 30
+    expiration = timestamp + 24 * 60 * 60  # max expiration seems to be 24 hrs
+    header =
+      alg: 'HS256'
+      typ: 'JWT'
+    payload =
+      sdkKey: sdkKey
+      mn: meetingID
+      role: 0
+      iat: timestamp
+      exp: expiration
+      tokenExp: expiration
+    console.log payload
+    sdkKey: sdkKey
+    signature: require('jsrsasign').jws.JWS.sign 'HS256',
+      JSON.stringify header
+      JSON.stringify payload
+      sdkSecret

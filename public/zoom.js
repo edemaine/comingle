@@ -339,8 +339,10 @@ window.testTool = testTool;
 
 //////////////////////////////////////////////////////////////////////////
 // 2. https://github.com/zoom/sample-app-web/raw/master/CDN/js/meeting.js
-// customized below to use apiKey over sdkKey, and custom leaveUrl:
+// customized below to use customize the following:
 //  leaveUrl: "/zoomDone.html",
+//  externalLinkPage: "/zoomLink.html",
+//  disablePreview: true, // default false
 //////////////////////////////////////////////////////////////////////////
 
 window.addEventListener('DOMContentLoaded', function(event) {
@@ -353,7 +355,7 @@ function websdkready() {
   // get meeting args from url
   var tmpArgs = testTool.parseQuery();
   var meetingConfig = {
-    apiKey: tmpArgs.apiKey,
+    sdkKey: tmpArgs.sdkKey,
     meetingNumber: tmpArgs.mn,
     userName: (function () {
       if (tmpArgs.name) {
@@ -394,9 +396,9 @@ function websdkready() {
   console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
 
   // it's option if you want to change the WebSDK dependency link resources. setZoomJSLib must be run at first
-  // ZoomMtg.setZoomJSLib("https://source.zoom.us/2.5.0/lib", "/av"); // CDN version defaul
+  // ZoomMtg.setZoomJSLib("https://source.zoom.us/2.11.5/lib", "/av"); // CDN version defaul
   if (meetingConfig.china)
-    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/2.5.0/lib", "/av"); // china cdn option
+    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/2.11.5/lib", "/av"); // china cdn option
   ZoomMtg.preLoadWasm();
   ZoomMtg.prepareJssdk();
   function beginJoin(signature) {
@@ -404,7 +406,7 @@ function websdkready() {
       leaveUrl: meetingConfig.leaveUrl,
       webEndpoint: meetingConfig.webEndpoint,
       disableCORP: !window.crossOriginIsolated, // default true
-      // disablePreview: false, // default false
+      // disablePreview: true, // default false
       externalLinkPage: "/zoomLink.html",
       success: function () {
         console.log(meetingConfig);
@@ -415,11 +417,18 @@ function websdkready() {
           meetingNumber: meetingConfig.meetingNumber,
           userName: meetingConfig.userName,
           signature: signature,
-          apiKey: meetingConfig.apiKey,
+          sdkKey: meetingConfig.sdkKey,
           userEmail: meetingConfig.userEmail,
           passWord: meetingConfig.passWord,
           success: function (res) {
             console.log("join meeting success");
+// Automatically join audio
+const join = document.querySelector(".join-audio-container__btn");
+if (join?.querySelector("footer-button-base__button-label")?.innerText.includes("Join")) {
+  join.click()
+}
+// Automatically close initial audio join popup
+document.querySelector(".join-dialog__close")?.click();
             console.log("get attendeelist");
             ZoomMtg.getAttendeeslist({});
             ZoomMtg.getCurrentUser({

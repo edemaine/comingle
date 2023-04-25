@@ -53,8 +53,8 @@ export TabZoom = React.memo ({tabId}) ->
       setZoomWebSupport response
   [embedUrl, setEmbedUrl] = useState()
   zoomWeb = ->
-    {signature, apiKey} = await meteorCallPromise 'zoomSign', zoomID
-    setEmbedUrl "/zoom.html?name=#{base64 getNameWithPronouns() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&apiKey=#{apiKey}"
+    {signature, sdkKey} = await meteorCallPromise 'zoomSign', zoomID
+    setEmbedUrl "/zoom.html?name=#{base64 getNameWithPronouns() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&sdkKey=#{sdkKey}"
 
   ## /public/zoomDone.html sends us a {zoom: 'done'} message
   ## to reset from iframe to Card.

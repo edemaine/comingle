@@ -36,6 +36,7 @@
     "body-parser": "1.19.1",
     "bootstrap": "4.6.0",
     "flexlayout-react": "0.5.12",
+    "jsrsasign": "^10.8.3",
     "katex": "0.15.2",
     "markdown-it": "12.3.2",
     "markdown-it-texmath": "0.9.7",

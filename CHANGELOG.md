@@ -7,6 +7,15 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2023-04-25
+
+* Upgrade Zoom web client to
+  [v2.11.5](https://github.com/zoom/meetingsdk-web-sample/blob/master/CHANGELOG.md#version-2115).
+  If you're running your own Comingle server, you need to replace
+  your JWT `apiKey` and `apiSecret` with SDK `sdkKey` and `sdkSecret`;
+  see [JWT app type migration guide](https://developers.zoom.us/docs/internal-apps/jwt-app-migration/).
+  This transition must be made by May 5, 2023.
+
 ## 2023-04-24
 
 * Jitsi calls now offer two ways to join the call: 

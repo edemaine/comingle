@@ -50,23 +50,24 @@ Comingle's behavior:
 ## Zoom Support
 
 To use the [Zoom Web Client SDK](https://github.com/zoom/sample-app-web),
-you need to sign up for an API Key &amp; Secret.  Go to the
-[Zoom Marketplace](https://marketplace.zoom.us/) and select "Create a JWT App".
-See <https://marketplace.zoom.us/docs/sdk/native-sdks/web/getting-started/integrate>
+you need to sign up for an SDK Key &amp; Secret.  Go to the
+[Zoom Marketplace](https://marketplace.zoom.us/) and select
+"Develop / Build App / Meeting SDK".
+See <https://developers.zoom.us/docs/meeting-sdk/create/>
 
-Then add the API Key &amp; Secret into `.deploy/settings.json`.
-It should look something like this:
+Then add the SDK Key &amp; Secret (under App credentials / Client ID and Secret)
+into a new file `.deploy/settings.json`.  It should look something like this:
 
 ```json
 {
   "zoom": {
-    "apiKey": "YOUR_API_KEY",
-    "apiSecret": "YOUR_API_SECRET"
+    "sdkKey": "YOUR_SDK_KEY_AKA_CLIENT_ID",
+    "sdkSecret": "YOUR_SDK_SECRET_AKA_CLIENT_SECRET"
   }
 }
 ```
 
-DO NOT commit your changes into Git; the secret needs to STAY SECRET.
+DO NOT commit this file into Git; the secret needs to STAY SECRET.
 Thus we recommend copying [root `settings.json`](settings.json) file
 into `.deploy` and editing the copy only.
 
@@ -109,8 +110,8 @@ If you want Zoom support and APM, `.deploy/settings.json` should look like this
 ```json
 {
   "zoom": {
-    "apiKey": "YOUR_API_KEY",
-    "apiSecret": "YOUR_API_SECRET"
+    "sdkKey": "YOUR_SDK_KEY_AKA_CLIENT_ID",
+    "sdkSecret": "YOUR_SDK_SECRET_AKA_CLIENT_SECRET"
   },
   "kadira": {
     "appId": "xxxxxxxxxxxxxxxxx",

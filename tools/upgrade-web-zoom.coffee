@@ -64,8 +64,10 @@ makeJs = ->
     """
     if filename == 'meeting.js'
       js += """
-      // customized below to use apiKey over sdkKey, and custom leaveUrl:
+      // customized below to use customize the following:
       //  leaveUrl: "/zoomDone.html",
+      //  externalLinkPage: "/zoomLink.html",
+      //  disablePreview: true, // default false
 
       """
     js += """
@@ -84,10 +86,21 @@ makeJs = ->
       .replace /\bexternalLinkPage: '[^']*'/g, (m) ->
         changes++
         m.replace /'[^']*'/, '"/zoomLink.html"'
-      # Override sdkKey mechanism (introduced in 2.3.0) back to regular apiKey
-      .replace /\bsdkKey: \w+\.sdkKey,/g, (m) ->
+      .replace /\bdisablePreview: false/g, (m) ->
         changes++
-        m.replace /sdkKey/g, 'apiKey'
+        m.replace /false/, 'true'
+      .replace /console\.log\("join meeting success"\);\r?\n/, (m) ->
+        changes++
+        m + """
+          // Automatically join audio
+          const join = document.querySelector(".join-audio-container__btn");
+          if (join?.querySelector("footer-button-base__button-label")?.innerText.includes("Join")) {
+            join.click()
+          }
+          // Automatically close initial audio join popup
+          document.querySelector(".join-dialog__close")?.click();
+
+        """
       unless changes == 4
         console.log code
         throw new Error "Made #{changes} changes; expected 4"
