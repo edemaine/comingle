@@ -18,7 +18,7 @@ instead of version numbers.
 
 ## 2023-04-24
 
-* Jitsi calls now offer two ways to join the call: 
+* Jitsi calls now offer two ways to join the call:
   in this window (as usual) and in external browser tab (new).
   This is important because the public server `meet.jit.si`
   [no longer supports embedding](https://community.jitsi.org/t/important-embedding-meet-jit-si-in-your-web-app-will-no-longer-be-supported-please-use-jaas/123003)

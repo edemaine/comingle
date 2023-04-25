@@ -1,5 +1,4 @@
 import {check, Match} from 'meteor/check'
-import crypto from 'crypto'
 
 ###
 To use the Zoom Web Client SDK [https://github.com/zoom/sample-app-web],
