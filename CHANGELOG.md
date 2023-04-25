@@ -7,6 +7,18 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2023-04-24
+
+* Jitsi calls now offer two ways to join the call: 
+  in this window (as usual) and in external browser tab (new).
+  This is important because the public server `meet.jit.si`
+  [no longer supports embedding](https://community.jitsi.org/t/important-embedding-meet-jit-si-in-your-web-app-will-no-longer-be-supported-please-use-jaas/123003)
+  (so Comingle disables "join in this window" for such servers).
+  Comingle supports a seamless room-switching experience
+  even when the Jitsi call is opened in a separate tab.
+  [[#197](https://github.com/edemaine/coauthor/issues/197)]
+* "New" buttons specify default server they'll use
+
 ## 2022-07-02
 
 * Upgrade Zoom web client to
