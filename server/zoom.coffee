@@ -44,7 +44,7 @@ Meteor.methods
     payload =
       sdkKey: sdkKey
       mn: meetingID
-      role: 0
+      role: role
       iat: timestamp
       exp: expiration
       tokenExp: expiration
