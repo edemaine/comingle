@@ -48,7 +48,6 @@ Meteor.methods
       iat: timestamp
       exp: expiration
       tokenExp: expiration
-    console.log payload
     sdkKey: sdkKey
     signature: require('jsrsasign').jws.JWS.sign 'HS256',
       JSON.stringify header
