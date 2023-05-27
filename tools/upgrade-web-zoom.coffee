@@ -92,13 +92,16 @@ makeJs = ->
       .replace /console\.log\("join meeting success"\);\r?\n/, (m) ->
         changes++
         m + """
-          // Automatically join audio
-          const join = document.querySelector(".join-audio-container__btn");
-          if (join?.querySelector("footer-button-base__button-label")?.innerText.includes("Join")) {
-            join.click()
-          }
-          // Automatically close initial audio join popup
-          document.querySelector(".join-dialog__close")?.click();
+          const autoJoinInterval = setInterval(() => {
+            // Automatically join audio
+            const join = document.querySelector(".join-audio-container__btn");
+            if (join?.querySelector(".footer-button-base__button-label")?.innerText.includes("Join")) {
+              join.click();
+            }
+            // Automatically close initial audio join popup
+            document.querySelector(".join-dialog__close")?.click();
+          }, 250);
+          setTimeout(() => clearInterval(autoJoinInterval), 5000);
 
         """
       unless changes == 4

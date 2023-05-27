@@ -13,6 +13,7 @@ instead of version numbers.
   you join in-browser, you'll automatically join the new Zoom call in-browser
   provided you rejoin within 30 seconds of when you leave the previous room.
   This matches the existing Jitsi behavior.
+* Fix Zoom web client to auto-join audio (for easier room switching/joining).
 * Upgrade Zoom web client to
   [v2.12.2](https://github.com/zoom/meetingsdk-web-sample/blob/master/CHANGELOG.md#version-2122).
 
