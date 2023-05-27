@@ -14,6 +14,7 @@ import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes'
 import {Loading} from './Loading'
 import {useNameWithPronouns} from './Name'
 import {getDark} from './Settings'
+import {trigger} from './lib/trigger'
 import {Tabs} from '/lib/tabs'
 
 ## Remember the state of the last Jitsi call, except when there are no calls
@@ -36,21 +37,13 @@ jitsiStartsJoined = (url, possible) ->
       jitsiStatusReset()
       true
 jitsiStatusReset = ->
-  jitsiStatusCheckStop()
+  jitsiStatusCheck.stop()
   clean = defaultJitsiStatus()
   for key in ['joined', 'external']
     lastJitsiStatus[key] = clean[key]
   return
 numJitsi = 0  # number of joined Jitsi calls
-
-timeoutJitsiStatus = null
-jitsiStatusCheckStart = ->
-  return unless resetJitsiStatusAfter?
-  jitsiStatusCheckStop()
-  timeoutJitsiStatus = setTimeout jitsiStatusReset, resetJitsiStatusAfter * 1000
-jitsiStatusCheckStop = ->
-  clearTimeout timeoutJitsiStatus if timeoutJitsiStatus?
-  timeoutJitsiStatus = null
+jitsiStatusCheck = trigger resetJitsiStatusAfter, jitsiStatusReset
 
 parseJitsiUrl = (url) ->
   return {} unless url?
@@ -83,7 +76,7 @@ externalClosed = ->
   externalInterval = null
   externalWindow = null
   externalURL.set null
-  jitsiStatusCheckStart()
+  jitsiStatusCheck.start()
 
 export TabJitsi = React.memo ({tabId, room}) ->
   tab = useTracker ->
@@ -173,12 +166,14 @@ export TabJitsi = React.memo ({tabId, room}) ->
 
   ## Maintain number of joined Jitsi calls, and reset state if zero and timeout.
   useEffect ->
-    numJitsi++ if joined
-    lastJitsiStatus.joined = (numJitsi > 0)
-    jitsiStatusCheckStop()
+    if joined
+      numJitsi++
+      lastJitsiStatus.joined = (numJitsi > 0)
+      jitsiStatusCheck.stop()
     ->
-      numJitsi-- if joined
-      jitsiStatusCheckStart() if numJitsi == 0
+      if joined
+        numJitsi--
+        jitsiStatusCheck.start() if numJitsi == 0
   , [joined]
 
   external = useTracker => (externalURL.get() == tab.url)

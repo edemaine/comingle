@@ -7,6 +7,13 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2023-05-27
+
+* It's now easy to jump between rooms with different Zoom calls: provided
+  you join in-browser, you'll automatically join the new Zoom call in-browser
+  provided you rejoin within 30 seconds of when you leave the previous room.
+  This matches the existing Jitsi behavior.
+
 ## 2023-04-25
 
 * Upgrade Zoom web client to

@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import useEventListener from '@use-it/event-listener'
 import {useTracker} from 'meteor/react-meteor-data'
 import Alert from 'react-bootstrap/Alert'
@@ -11,8 +11,29 @@ import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt'
 
 import {allow} from './TabIFrame'
 import {getNameWithPronouns} from './Name'
+import {trigger} from './lib/trigger'
 import {Tabs, zoomRegExp} from '/lib/tabs'
 import {meteorCallPromise} from '/lib/meteorPromise'
+
+## Remember the state of the last in-browser Zoom call, except when there are
+## no calls and resetZoomStatusAfter seconds elapse; then reset to default
+## state.  Modeled after analogous code in TabJitsi.coffee.
+resetZoomStatusAfter = 30  # seconds
+defaultZoomStatus = ->
+  joined: false
+  ## Might eventually track audio/video status via this feature request:
+  ## https://devforum.zoom.us/t/microphone-state-events-in-web-sdk/41941
+  #audioMuted: false
+  #videoMuted: false
+lastZoomStatus = defaultZoomStatus()
+zoomStatusReset = ->
+  zoomStatusCheck.stop()
+  clean = defaultZoomStatus()
+  for key in ['joined']
+    lastZoomStatus[key] = clean[key]
+  return
+numZoom = 0  # number of joined in-browser Zoom calls
+zoomStatusCheck = trigger resetZoomStatusAfter, zoomStatusReset
 
 ## https://github.com/zoom/sample-app-web/blob/master/CDN/js/tool.js
 base64 = (str) ->
@@ -56,6 +77,13 @@ export TabZoom = React.memo ({tabId}) ->
     {signature, sdkKey} = await meteorCallPromise 'zoomSign', zoomID
     setEmbedUrl "/zoom.html?name=#{base64 getNameWithPronouns() ? ''}&mn=#{zoomID}&email=&pwd=#{zoomPwd ? ''}&role=0&lang=en-US&signature=#{signature}&china=0&sdkKey=#{sdkKey}"
 
+  ## Join in-browser if recently switched from a room where we joined in-browser
+  useEffect ->
+    if zoomWebSupport and lastZoomStatus.joined
+      zoomWeb()
+    null
+  , [zoomWebSupport]
+
   ## /public/zoomDone.html sends us a {zoom: 'done'} message
   ## to reset from iframe to Card.
   ref = useRef()
@@ -65,6 +93,19 @@ export TabZoom = React.memo ({tabId}) ->
     return unless e.data?.coop
     if e.data.zoom == 'done'
       setEmbedUrl null
+
+  ## Maintain number of joined in-browser Zoom calls,
+  ## and reset state if zero and timeout.
+  useEffect ->
+    if embedUrl
+      numZoom++
+      lastZoomStatus.joined = (numZoom > 0)
+      zoomStatusCheck.stop()
+    ->
+      if embedUrl
+        numZoom--
+        zoomStatusCheck.start() if numZoom == 0
+  , [embedUrl]
 
   return <iframe src={embedUrl} allow={allow} ref={ref}/> if embedUrl
 
