@@ -122,7 +122,7 @@ export TabZoom = React.memo ({tabId}) ->
           <Button block onClick={zoomNative}>Native Client</Button>
         </Col>
         <Col xs={8}>
-          <p>Zoom's desktop or mobile Zoom client has the <b>best quality</b> but will open in a separate window, not within Comingle.</p>
+          <p>Zoom's desktop or mobile Zoom client has the <b>best quality</b> but will open in a separate window, not within Comingle, so you need to manually switch calls if you switch rooms.</p>
           <p>You must also <a href="https://zoom.us/download">install Zoom</a> before using this option.</p>
         </Col>
       </Row>
@@ -133,7 +133,7 @@ export TabZoom = React.memo ({tabId}) ->
           </Button>
         </Col>
         <Col xs={8}>
-          <p>Zoom's web client embeds into Comingle and requires no installation, but the <b>quality is lower</b>, and <a href="https://support.zoom.us/hc/en-us/articles/360027397692-Desktop-client-mobile-app-and-web-client-comparison">some features are missing</a>.</p>
+          <p>Zoom's web client embeds into Comingle, enables easy jumping between rooms with different Zoom calls, and requires no installation, but the <b>quality is lower</b> and <a href="https://support.zoom.us/hc/en-us/articles/360027397692-Desktop-client-mobile-app-and-web-client-comparison">some features are missing</a>.</p>
           {unless zoomWebSupport
             <p>However, the Comingle server needs to be configured to support this.</p>
           }
