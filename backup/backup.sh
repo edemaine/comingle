@@ -12,8 +12,8 @@ USERNAME=ubuntu
 #USERNAME=root
 SSH_REMOTE=$USERNAME@$HOSTNAME
 
-## Mongo collection to dump
-MONGO_COLLECTION=comingle
+## Mongo database to dump
+MONGO_DB=comingle
 
 ## Local backup directory name
 BACKUP_DIR=comingle-backup
@@ -41,9 +41,9 @@ CLOUD_DIR="comingle-backup$datedir"
 
 cd "`dirname "$0"`"
 echo \* mongodump
-ssh "$SSH_REMOTE" mongodump --db "$MONGO_COLLECTION" --gzip
+ssh "$SSH_REMOTE" mongodump --db "$MONGO_DB" --gzip
 echo \* rsync
-rsync -e ssh -a "$SSH_REMOTE:dump/$MONGO_COLLECTION/" "$BACKUP_DIR/"
+rsync -e ssh -a "$SSH_REMOTE:dump/$MONGO_DB/" "$BACKUP_DIR/"
 
 echo \* $METHOD
 
