@@ -83,12 +83,13 @@ makeJs = ->
       .replace /\bleaveUrl: "[^"]*"/g, (m) ->
         changes++
         m.replace /"[^"]*"/, '"/zoomDone.html"'
-      .replace /\bexternalLinkPage: '[^']*'/g, (m) ->
+      .replace /\bexternalLinkPage: "[^"]*"/g, (m) ->
         changes++
-        m.replace /'[^']*'/, '"/zoomLink.html"'
-      .replace /\bdisablePreview: false/g, (m) ->
+        m.replace /"[^"]*"/, '"/zoomLink.html"'
+      .replace /(\/\/ )?\bdisablePreview: false/g, (m) ->
         changes++
         m.replace /false/, 'true'
+        .replace /\/\/ /, ''
       .replace /console\.log\("join meeting success"\);\r?\n/, (m) ->
         changes++
         m + """

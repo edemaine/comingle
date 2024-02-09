@@ -11,6 +11,8 @@ instead of version numbers.
 
 * Creating a room without entering a room title creates visual feedback
   instead of silently failing.
+* Upgrade Zoom web client to
+  [v3.1.6](https://developers.zoom.us/changelog/meeting-sdk/web/3.1.6).
 
 ## 2023-05-27
 

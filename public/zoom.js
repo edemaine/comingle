@@ -345,8 +345,8 @@ window.testTool = testTool;
 //  disablePreview: true, // default false
 //////////////////////////////////////////////////////////////////////////
 
-window.addEventListener('DOMContentLoaded', function(event) {
-  console.log('DOM fully loaded and parsed');
+window.addEventListener("DOMContentLoaded", function (event) {
+  console.log("DOM fully loaded and parsed");
   websdkready();
 });
 
@@ -395,24 +395,26 @@ function websdkready() {
   }
   console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
 
-  // it's option if you want to change the WebSDK dependency link resources. setZoomJSLib must be run at first
-  // ZoomMtg.setZoomJSLib("https://source.zoom.us/2.12.2/lib", "/av"); // CDN version defaul
+  // it's option if you want to change the MeetingSDK-Web dependency link resources. setZoomJSLib must be run at first
+  // ZoomMtg.setZoomJSLib("https://source.zoom.us/{VERSION}/lib", "/av"); // default, don't need call it
   if (meetingConfig.china)
-    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/2.12.2/lib", "/av"); // china cdn option
+    ZoomMtg.setZoomJSLib("https://jssdk.zoomus.cn/3.1.6/lib", "/av"); // china cdn option
+
   ZoomMtg.preLoadWasm();
-  ZoomMtg.prepareJssdk();
+  ZoomMtg.prepareWebSDK();
+
   function beginJoin(signature) {
+    ZoomMtg.i18n.load(meetingConfig.lang);
     ZoomMtg.init({
       leaveUrl: meetingConfig.leaveUrl,
       webEndpoint: meetingConfig.webEndpoint,
       disableCORP: !window.crossOriginIsolated, // default true
-      // disablePreview: true, // default false
+      disablePreview: true, // default false
       externalLinkPage: "/zoomLink.html",
       success: function () {
         console.log(meetingConfig);
         console.log("signature", signature);
-        ZoomMtg.i18n.load(meetingConfig.lang);
-        ZoomMtg.i18n.reload(meetingConfig.lang);
+
         ZoomMtg.join({
           meetingNumber: meetingConfig.meetingNumber,
           userName: meetingConfig.userName,
@@ -450,22 +452,22 @@ setTimeout(() => clearInterval(autoJoinInterval), 5000);
       },
     });
 
-    ZoomMtg.inMeetingServiceListener('onUserJoin', function (data) {
-      console.log('inMeetingServiceListener onUserJoin', data);
+    ZoomMtg.inMeetingServiceListener("onUserJoin", function (data) {
+      console.log("inMeetingServiceListener onUserJoin", data);
     });
-  
-    ZoomMtg.inMeetingServiceListener('onUserLeave', function (data) {
-      console.log('inMeetingServiceListener onUserLeave', data);
+
+    ZoomMtg.inMeetingServiceListener("onUserLeave", function (data) {
+      console.log("inMeetingServiceListener onUserLeave", data);
     });
-  
-    ZoomMtg.inMeetingServiceListener('onUserIsInWaitingRoom', function (data) {
-      console.log('inMeetingServiceListener onUserIsInWaitingRoom', data);
+
+    ZoomMtg.inMeetingServiceListener("onUserIsInWaitingRoom", function (data) {
+      console.log("inMeetingServiceListener onUserIsInWaitingRoom", data);
     });
-  
-    ZoomMtg.inMeetingServiceListener('onMeetingStatus', function (data) {
-      console.log('inMeetingServiceListener onMeetingStatus', data);
+
+    ZoomMtg.inMeetingServiceListener("onMeetingStatus", function (data) {
+      console.log("inMeetingServiceListener onMeetingStatus", data);
     });
   }
 
   beginJoin(meetingConfig.signature);
-};
+}
