@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useContext, useRef, useCallback, useEffect} from 'react'
+import React, {useState, useMemo, useContext, useRef, useCallback, useEffect, useLayoutEffect} from 'react'
 import useInterval from '@use-it/interval'
 import {Link, useParams} from 'react-router-dom'
 import {useDrop} from 'react-dnd'
@@ -11,6 +11,7 @@ import Card from 'react-bootstrap/Card'
 import Dropdown from 'react-bootstrap/Dropdown'
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
 import ListGroup from 'react-bootstrap/ListGroup'
 import SplitButton from 'react-bootstrap/SplitButton'
 import Tooltip from 'react-bootstrap/Tooltip'
@@ -697,10 +698,20 @@ Timer.displayName = 'Timer'
 export RoomNew = React.memo ({selectRoom}) ->
   {meetingId} = useParams()
   [title, setTitle] = useState ''
+  [invalid, setInvalid] = useState false
   {openRoom} = useContext MeetingContext
+
+  # Reset invalid state if we start typing a title
+  useLayoutEffect =>
+    if title.trim().length
+      setInvalid false
+  , [title]
+
   submit = (e, template = 'jitsi') ->
     e.preventDefault?()
-    return unless title.trim().length
+    unless title.trim().length
+      setInvalid true
+      return
     room =
       meeting: meetingId
       title: title.trim()
@@ -721,10 +732,16 @@ export RoomNew = React.memo ({selectRoom}) ->
     if e.key == 'Enter'
       submit e
 
-  <form onSubmit={submit}>
-    <input type="text" placeholder="Title" className="form-control"
-     value={title} onChange={(e) -> setTitle e.target.value}
-     onKeyDown={onKeyDown}/>
+  <form onSubmit={submit} className="position-relative">
+    <InputGroup hasValidation>
+      <Form.Control type="text" placeholder="Title"
+       className="form-control" isInvalid={invalid}
+       value={title} onChange={(e) -> setTitle e.target.value}
+       onKeyDown={onKeyDown}/>
+      <Form.Control.Feedback type="invalid" tooltip>
+        Enter room title to create:
+      </Form.Control.Feedback>
+    </InputGroup>
     <SplitButton type="submit" className="btn-block" drop="up"
      title="Create Room" onClick={submit}>
       <Dropdown.Item onClick={(e) -> submit e, ''}>

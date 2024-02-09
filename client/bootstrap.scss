@@ -255,4 +255,15 @@ $pre-color: inherit;
   //UNUSED: @import "{}/node_modules/bootstrap/scss/carousel";
   //NO COLOR: @import "{}/node_modules/bootstrap/scss/spinners";
   //NO COLOR: @import "{}/node_modules/bootstrap/scss/utilities";
+
+  // Repeat this for additional weight
+  .is-invalid ~ .invalid-tooltip {
+    display: block;
+  }
+}
+
+// Put invalid tooltips above instead of below
+:root .invalid-tooltip {
+  top: auto;
+  bottom: 100%;
 }

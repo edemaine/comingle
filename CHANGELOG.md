@@ -7,6 +7,11 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2024-02-09
+
+* Creating a room without entering a room title creates visual feedback
+  instead of silently failing.
+
 ## 2023-05-27
 
 * It's now easy to jump between rooms with different Zoom calls: provided
