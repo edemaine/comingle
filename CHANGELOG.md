@@ -7,6 +7,10 @@ To see every change with descriptions aimed at developers, see
 As a continuously updated web app, Comingle uses dates
 instead of version numbers.
 
+## 2024-07-10
+
+* Performance security updates for KaTeX and Markdown
+
 ## 2024-02-09
 
 * Creating a room without entering a room title creates visual feedback

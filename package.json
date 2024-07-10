@@ -37,11 +37,11 @@
     "bootstrap": "4.6.0",
     "flexlayout-react": "0.5.12",
     "jsrsasign": "^10.8.3",
-    "katex": "0.15.2",
+    "katex": "0.16.11",
     "markdown-it": "12.3.2",
     "markdown-it-texmath": "0.9.7",
     "meteor-node-stubs": "1.1.0",
-    "pug": "3.0.2",
+    "pug": "3.0.3",
     "react": "17.0.2",
     "react-bootstrap": "1.6.0",
     "react-dnd": "15.1.0",
@@ -72,8 +72,8 @@
     "eslint-plugin-import": "2.19.1",
     "eslint-plugin-meteor": "7.3.0",
     "eslint-plugin-react": "7.28.0",
-    "isomorphic-fetch": "^3.0.0",
-    "markdownlint-cli": "0.30.0",
+    "isomorphic-fetch": "3.0.0",
+    "markdownlint-cli": "0.41.0",
     "markdownlint-rule-github-internal-links": "0.1.0"
   }
 }
